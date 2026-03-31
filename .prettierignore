@@ -1,0 +1,42 @@
+# Node
+node_modules
+
+# Build output
+.next
+out
+build
+dist
+
+# Generated files (IMPORTANT)
+src/graphql/
+*.generated.ts
+*.generated.tsx
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Coverage
+coverage
+
+# VSCode
+.vscode
+
+# Static assets
+public
+
+# Config files (optional)
+postcss.config.js
+tailwind.config.js
+
+# JSON you don't want auto-sorted
+package.json
+
+lib/auth

@@ -1,0 +1,21 @@
+mutation Login($email: String!) {
+    login(email: $email) {
+        accessToken
+        refreshToken
+        hasOnBoarded
+        userId
+    }
+}
+
+mutation Refresh($refreshToken: String!){
+    refresh(refreshToken: $refreshToken){
+        accessToken
+        refreshToken
+        hasOnBoarded
+        userId
+    }
+}
+
+mutation Logout{
+    logout
+}

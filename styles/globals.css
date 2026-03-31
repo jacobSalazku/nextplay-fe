@@ -1,0 +1,31 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans:
+    var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-righteous:
+    var(--font-righteous), ui-serif, Georgia, Cambria, "Times New Roman", Times,
+    serif;
+  --font-roboto:
+    var(--font-roboto), ui-serif, Georgia, Cambria, "Times New Roman", Times,
+    serif;
+}
+
+.font-righteous {
+  font-family: var(--font-righteous);
+}
+
+.font-roboto {
+  font-family: var(--font-roboto);
+}
+
+.scrollbar-none {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}

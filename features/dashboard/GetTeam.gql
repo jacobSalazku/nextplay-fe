@@ -1,0 +1,17 @@
+query GetTeamForDashboard {
+  getDashboardTeams {
+    id
+    name
+    ageGroup
+    members {
+      id
+    }
+    activities {
+      id
+      type
+      title
+      date
+      time
+    }
+  }
+}
