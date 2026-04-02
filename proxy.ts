@@ -9,20 +9,46 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  const isLoggedIn = !!token;
+  const accessToken =
+    token && typeof token.accessToken === 'string' ? token.accessToken : '';
+  const tokenError =
+    token && typeof token.error === 'string' ? token.error : undefined;
+
+  const hasValidSession = Boolean(token && accessToken && !tokenError);
   const isAuthPage = pathname.startsWith('/login');
   const isProtectedPage =
+    pathname.startsWith('/club') ||
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/teams') ||
     pathname.startsWith('/create') ||
     pathname.startsWith('/api/graphql');
 
-  if (isAuthPage && isLoggedIn) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  const clearAuthCookies = (response: NextResponse) => {
+    response.cookies.delete('next-auth.session-token');
+    response.cookies.delete('__Secure-next-auth.session-token');
+  };
+
+  if (isAuthPage && hasValidSession) {
+    return NextResponse.redirect(new URL('/club', request.url));
   }
 
-  if (isProtectedPage && !isLoggedIn) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  // Stale/invalid token cookie: allow login page and clear cookie to stop loops.
+  if (isAuthPage && token && !hasValidSession) {
+    const response = NextResponse.next();
+    clearAuthCookies(response);
+    return response;
+  }
+
+  if (isProtectedPage && !hasValidSession) {
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('error', 'SessionExpired');
+    const response = NextResponse.redirect(loginUrl);
+
+    if (token && !hasValidSession) {
+      clearAuthCookies(response);
+    }
+
+    return response;
   }
 
   return NextResponse.next();
@@ -31,6 +57,7 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     '/login',
+    '/club/:path*',
     '/dashboard/:path*',
     '/teams/:path*',
     '/create/:path*',

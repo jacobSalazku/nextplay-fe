@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import NavLink from 'next/link';
-import { cn } from '@/lib/helpers/utils';
 import type { VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/helpers/utils';
 import { buttonVariants } from './button';
 
 export type LinkProps = {
