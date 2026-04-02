@@ -1,14 +1,12 @@
-import { requireAccessToken } from '@/lib/auth/require-acces-token';
 import ProfileDropDown from '@/features/auth/components/profile-dropdown';
 import Teamlist from '@/features/dashboard/components/team-list';
-import { Session } from 'next-auth';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth/options';
+import { requireAccessToken } from '@/lib/auth/require-acces-token';
 
-type DashboardProps = {
-  session: Session;
-};
-
-export default async function Dashboard({ session }: DashboardProps) {
+export default async function ClubPage() {
   await requireAccessToken();
+  const session = await getServerSession(authOptions);
 
   return (
     <div className="flex h-screen bg-gray-950 text-white">

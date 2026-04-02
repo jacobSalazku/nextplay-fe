@@ -7,6 +7,7 @@ import { cache } from 'react';
 
 export const requireAccessToken = cache(async () => {
   const session = await getServerSession(authOptions);
+  
   const hasSessionError =
     !!session &&
     'error' in session &&

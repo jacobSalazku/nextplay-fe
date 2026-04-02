@@ -1,15 +1,8 @@
-import { redirect } from 'next/navigation';
-import { authOptions } from '@/lib/auth/options';
-import { Link } from '../../components/foundation/button/link';
-import { getServerSession } from 'next-auth';
+import { requireAccessToken } from '@/lib/auth/require-acces-token';
+import { Link } from '@/components/foundation/button/link';
 
 async function CreatePage() {
-  const session = await getServerSession(authOptions);
-
-  if (session?.user?.hasOnBoarded === true) {
-    redirect('/dashboard');
-  }
-
+  await requireAccessToken();
   return (
     <main className="max flex min-h-screen flex-col items-center justify-center bg-black text-white">
       <div className="flex h-screen w-full flex-row items-center justify-center border-2">

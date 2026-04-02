@@ -12,3 +12,14 @@ export async function executeAuthedGraphQL<
   const accessToken = await requireAccessToken();
   return performGraphQLRequest(document, variables, { accessToken });
 }
+
+export async function executeAuthedMutation<
+  TData,
+  TVariables extends Record<string, unknown>,
+>(
+  document: TypedDocumentNode<TData, TVariables>,
+  variables: TVariables,
+): Promise<TData> {
+  const accessToken = await requireAccessToken();
+  return performGraphQLRequest(document, variables, { accessToken });
+}

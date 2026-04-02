@@ -28,7 +28,7 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, account, profile }) {
+    async jwt({ token, account, profile, trigger, session }) {
       // first login
       if (account && profile?.email) {
         const data = await authMutation(LoginDocument, {
@@ -44,6 +44,22 @@ export const authOptions: AuthOptions = {
           userId: data.login.userId,
           error: undefined,
         };
+      }
+
+      if (trigger === 'update') {
+        const updatedHasOnBoarded =
+          typeof (
+            session as { hasOnBoarded?: unknown } | undefined
+          )?.hasOnBoarded === 'boolean'
+            ? (session as { hasOnBoarded: boolean }).hasOnBoarded
+            : undefined;
+
+        if (typeof updatedHasOnBoarded === 'boolean') {
+          return {
+            ...token,
+            hasOnBoarded: updatedHasOnBoarded,
+          };
+        }
       }
 
       // token still valid

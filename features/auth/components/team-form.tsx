@@ -31,7 +31,7 @@ const CreateTeamForm = () => {
         },
       });
 
-      router.push('/dashboard');
+      router.push('/club');
     } catch (error: unknown) {
       setError('root', {
         type: 'server',
