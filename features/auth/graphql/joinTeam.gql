@@ -1,0 +1,7 @@
+mutation JoinTeam($input: JoinTeamInput!) {
+  joinTeam(input: $input) {
+    teamCode
+    position
+    number
+  }
+}

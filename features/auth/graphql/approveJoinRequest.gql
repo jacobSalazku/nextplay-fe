@@ -1,0 +1,7 @@
+mutation ApproveJoinRequest($input: ApproveJoinRequestInput!) {
+  approveJoinRequest(input: $input) {
+    memberId
+    teamId
+    status
+  }
+}

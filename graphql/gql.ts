@@ -16,15 +16,19 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 type Documents = {
     "mutation createTeam($input: CreateTeamInput!) {\n  createTeam(input: $input) {\n    id\n    name\n    image\n    ageGroup\n    code\n    creatorId\n  }\n}": typeof types.CreateTeamDocument,
     "mutation Login($email: String!) {\n  login(email: $email) {\n    accessToken\n    refreshToken\n    hasOnBoarded\n    userId\n  }\n}\n\nmutation Refresh($refreshToken: String!) {\n  refresh(refreshToken: $refreshToken) {\n    accessToken\n    refreshToken\n    hasOnBoarded\n    userId\n  }\n}\n\nmutation Logout {\n  logout\n}": typeof types.LoginDocument,
-    "query Health {\n  __typename\n}": typeof types.HealthDocument,
-    "mutation updateUser($input: UpdateUserInput!) {\n  updateUser(input: $input) {\n    name\n    dateOfBirth\n    phone\n    height\n    weight\n    dominantHand\n  }\n}": typeof types.UpdateUserDocument,
+    "mutation ApproveJoinRequest($input: ApproveJoinRequestInput!) {\n  approveJoinRequest(input: $input) {\n    memberId\n    teamId\n    status\n  }\n}": typeof types.ApproveJoinRequestDocument,
+    "mutation JoinTeam($input: JoinTeamInput!) {\n  joinTeam(input: $input) {\n    teamCode\n    position\n    number\n  }\n}": typeof types.JoinTeamDocument,
+    "mutation RejectJoinRequest($input: ApproveJoinRequestInput!) {\n  rejectJoinRequest(input: $input) {\n    memberId\n    teamId\n    status\n  }\n}": typeof types.RejectJoinRequestDocument,
+    "mutation UpdateUser($input: UpdateUserInput!) {\n  updateUser(input: $input) {\n    name\n    dateOfBirth\n    phone\n    height\n    weight\n    dominantHand\n  }\n}": typeof types.UpdateUserDocument,
     "query GetTeamForDashboard {\n  getDashboardTeams {\n    id\n    name\n    ageGroup\n    members {\n      id\n    }\n    activities {\n      id\n      type\n      title\n      date\n      time\n    }\n  }\n}": typeof types.GetTeamForDashboardDocument,
 };
 const documents: Documents = {
     "mutation createTeam($input: CreateTeamInput!) {\n  createTeam(input: $input) {\n    id\n    name\n    image\n    ageGroup\n    code\n    creatorId\n  }\n}": types.CreateTeamDocument,
     "mutation Login($email: String!) {\n  login(email: $email) {\n    accessToken\n    refreshToken\n    hasOnBoarded\n    userId\n  }\n}\n\nmutation Refresh($refreshToken: String!) {\n  refresh(refreshToken: $refreshToken) {\n    accessToken\n    refreshToken\n    hasOnBoarded\n    userId\n  }\n}\n\nmutation Logout {\n  logout\n}": types.LoginDocument,
-    "query Health {\n  __typename\n}": types.HealthDocument,
-    "mutation updateUser($input: UpdateUserInput!) {\n  updateUser(input: $input) {\n    name\n    dateOfBirth\n    phone\n    height\n    weight\n    dominantHand\n  }\n}": types.UpdateUserDocument,
+    "mutation ApproveJoinRequest($input: ApproveJoinRequestInput!) {\n  approveJoinRequest(input: $input) {\n    memberId\n    teamId\n    status\n  }\n}": types.ApproveJoinRequestDocument,
+    "mutation JoinTeam($input: JoinTeamInput!) {\n  joinTeam(input: $input) {\n    teamCode\n    position\n    number\n  }\n}": types.JoinTeamDocument,
+    "mutation RejectJoinRequest($input: ApproveJoinRequestInput!) {\n  rejectJoinRequest(input: $input) {\n    memberId\n    teamId\n    status\n  }\n}": types.RejectJoinRequestDocument,
+    "mutation UpdateUser($input: UpdateUserInput!) {\n  updateUser(input: $input) {\n    name\n    dateOfBirth\n    phone\n    height\n    weight\n    dominantHand\n  }\n}": types.UpdateUserDocument,
     "query GetTeamForDashboard {\n  getDashboardTeams {\n    id\n    name\n    ageGroup\n    members {\n      id\n    }\n    activities {\n      id\n      type\n      title\n      date\n      time\n    }\n  }\n}": types.GetTeamForDashboardDocument,
 };
 
@@ -53,11 +57,19 @@ export function graphql(source: "mutation Login($email: String!) {\n  login(emai
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query Health {\n  __typename\n}"): (typeof documents)["query Health {\n  __typename\n}"];
+export function graphql(source: "mutation ApproveJoinRequest($input: ApproveJoinRequestInput!) {\n  approveJoinRequest(input: $input) {\n    memberId\n    teamId\n    status\n  }\n}"): (typeof documents)["mutation ApproveJoinRequest($input: ApproveJoinRequestInput!) {\n  approveJoinRequest(input: $input) {\n    memberId\n    teamId\n    status\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "mutation updateUser($input: UpdateUserInput!) {\n  updateUser(input: $input) {\n    name\n    dateOfBirth\n    phone\n    height\n    weight\n    dominantHand\n  }\n}"): (typeof documents)["mutation updateUser($input: UpdateUserInput!) {\n  updateUser(input: $input) {\n    name\n    dateOfBirth\n    phone\n    height\n    weight\n    dominantHand\n  }\n}"];
+export function graphql(source: "mutation JoinTeam($input: JoinTeamInput!) {\n  joinTeam(input: $input) {\n    teamCode\n    position\n    number\n  }\n}"): (typeof documents)["mutation JoinTeam($input: JoinTeamInput!) {\n  joinTeam(input: $input) {\n    teamCode\n    position\n    number\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "mutation RejectJoinRequest($input: ApproveJoinRequestInput!) {\n  rejectJoinRequest(input: $input) {\n    memberId\n    teamId\n    status\n  }\n}"): (typeof documents)["mutation RejectJoinRequest($input: ApproveJoinRequestInput!) {\n  rejectJoinRequest(input: $input) {\n    memberId\n    teamId\n    status\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "mutation UpdateUser($input: UpdateUserInput!) {\n  updateUser(input: $input) {\n    name\n    dateOfBirth\n    phone\n    height\n    weight\n    dominantHand\n  }\n}"): (typeof documents)["mutation UpdateUser($input: UpdateUserInput!) {\n  updateUser(input: $input) {\n    name\n    dateOfBirth\n    phone\n    height\n    weight\n    dominantHand\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
