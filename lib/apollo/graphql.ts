@@ -27,8 +27,6 @@ export async function executeGraphQL<
     accessToken = session?.accessToken as string | undefined;
   }
 
-  console.log('executeGraphQL accessToken:', accessToken ?? 'UNDEFINED');
-
   const res = await fetch(process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!, {
     method: 'POST',
     headers: {

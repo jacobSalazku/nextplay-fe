@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { submitUpdateUser } from '../actions/update-user';
 import { UpdateUserData, updateUserSchema } from '../zod';
 import { useMutation } from '@apollo/client/react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -33,60 +34,15 @@ const UserUpdateForm = () => {
   });
 
   const onSubmit = async (data: UpdateUserData) => {
-    try {
-      if (status === 'loading') {
-        setError('root', {
-          type: 'server',
-          message: 'Session is still loading. Please try again.',
-        });
-        return;
-      }
-
-      if (!session?.accessToken || session.error) {
-        router.push('/login?error=SessionExpired');
-        return;
-      }
-
-      await runUpdateUser({
-        variables: {
-          input: {
-            ...data,
-            height: Number(data.height),
-            weight: Number(data.weight),
-          },
-        },
-        context: {
-          headers: {
-            Authorization: `Bearer ${session.accessToken}`,
-          },
-        },
-      });
-
-      await update({ hasOnBoarded: true });
-      router.replace('/club');
-      router.refresh();
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : 'Failed to update user';
-      const normalized = message.toLowerCase();
-
-      if (
-        normalized.includes('phone') &&
-        (normalized.includes('duplicate') ||
-          normalized.includes('already in use'))
-      ) {
-        setError('phone', {
-          type: 'server',
-          message: 'Phone number is already in use.',
-        });
-        return;
-      }
-
-      setError('root', {
-        type: 'server',
-        message,
-      });
-    }
+    await submitUpdateUser({
+      status,
+      session,
+      data,
+      runUpdateUser,
+      update,
+      router,
+      setError,
+    });
   };
 
   return (
