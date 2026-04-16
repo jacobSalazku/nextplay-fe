@@ -1,5 +1,5 @@
-import { performGraphQLRequest } from '../apollo/graphql';
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import { performGraphQLRequest } from '../apollo/graphql';
 import { requireAccessToken } from './require-acces-token';
 
 export async function executeAuthedGraphQL<

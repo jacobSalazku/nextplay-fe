@@ -19,8 +19,29 @@ export const requireAccessToken = cache(async () => {
   }
 
   if (session?.user?.hasOnBoarded === false) {
-    redirect('/create/onboarding');
+    redirect('/create');
   }
 
   return session.accessToken;
+});
+
+
+export const userHasOnBoarded = cache(async () => {
+  const session = await getServerSession(authOptions);
+  
+  const hasSessionError =
+    !!session &&
+    'error' in session &&
+    typeof session.error === 'string' &&
+    session.error.length > 0;
+
+  if (!session?.accessToken || hasSessionError) {
+    redirect('/login?error=SessionExpired');
+  }
+
+  if (session?.user?.hasOnBoarded === true) {
+    redirect('/club');
+  }
+
+  return session;
 });
