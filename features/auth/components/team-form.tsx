@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { CreateTeamData, createTeamSchema } from '../zod';
 import { useMutation } from '@apollo/client/react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { CreateTeamDocument } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
@@ -11,6 +12,7 @@ import { Input } from '@/components/foundation/input';
 
 const CreateTeamForm = () => {
   const [createTeam] = useMutation(CreateTeamDocument);
+  const { update } = useSession();
 
   const {
     register,
@@ -31,7 +33,9 @@ const CreateTeamForm = () => {
         },
       });
 
-      router.push('/club');
+      await update({ hasOnBoarded: true });
+      router.replace('/club');
+      router.refresh();
     } catch (error: unknown) {
       setError('root', {
         type: 'server',

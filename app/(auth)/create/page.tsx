@@ -1,8 +1,7 @@
-import { requireAccessToken } from '@/lib/auth/require-acces-token';
+import { withCreateFlowPage } from '@/lib/auth/with-page-guards';
 import { Link } from '@/components/foundation/button/link';
 
 async function CreatePage() {
-  await requireAccessToken();
   return (
     <main className="max flex min-h-screen flex-col items-center justify-center bg-black text-white">
       <div className="flex h-screen w-full flex-row items-center justify-center border-2">
@@ -30,4 +29,4 @@ async function CreatePage() {
   );
 }
 
-export default CreatePage;
+export default withCreateFlowPage(CreatePage);

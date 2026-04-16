@@ -1,11 +1,11 @@
 'use client';
 
-import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { positionOptions } from '../utils/constants';
 import { JoinTeamFormData, joinTeamSchema } from '../zod';
 import { useMutation } from '@apollo/client/react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { cn } from '@/lib/helpers/utils';
 import { JoinTeamDocument } from '@/graphql/graphql';
@@ -16,11 +16,12 @@ import { RadioGroupItem } from '@/components/foundation/radio/radio-group-item';
 
 const JoinTeamForm = () => {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const { update } = useSession();
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    setError,
+    formState: { errors, isSubmitting },
   } = useForm<JoinTeamFormData>({
     resolver: zodResolver(joinTeamSchema),
   });
@@ -28,7 +29,7 @@ const JoinTeamForm = () => {
   const [joinTeam] = useMutation(JoinTeamDocument);
 
   const onSubmit = async (data: JoinTeamFormData) => {
-    startTransition(async () => {
+    try {
       await joinTeam({
         variables: {
           input: {
@@ -36,9 +37,15 @@ const JoinTeamForm = () => {
           },
         },
       });
-    });
-
-    router.push('/');
+      await update({ hasOnBoarded: true });
+      router.replace('/club');
+      router.refresh();
+    } catch (error: unknown) {
+      setError('root', {
+        type: 'server',
+        message: error instanceof Error ? error.message : 'Failed to join team',
+      });
+    }
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -86,11 +93,14 @@ const JoinTeamForm = () => {
           aria-label="Join team"
           type="submit"
           className="w-full py-5 text-sm hover:border-gray-950 hover:bg-gray-600 hover:text-white sm:w-1/3"
-          disabled={isPending}
+          disabled={isSubmitting}
         >
-          {isPending ? 'Joining...' : 'Join Team'}
+          {isSubmitting ? 'Joining...' : 'Join Team'}
         </Button>
       </div>
+      {errors.root?.message ? (
+        <p className="text-sm text-red-500">{errors.root.message}</p>
+      ) : null}
     </form>
   );
 };

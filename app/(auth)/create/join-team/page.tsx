@@ -1,12 +1,13 @@
-import { JoinTeamForm } from "@/features/auth/components/join-form";
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
+import { JoinTeamForm } from '@/features/auth/components/join-form';
+import { withProtectedPage } from '@/lib/auth/with-page-guards';
 
 export const metadata: Metadata = {
-  title: "Join Team",
-  description: "Join an existing team to manage your players and playbook.",
+  title: 'Join Team',
+  description: 'Join an existing team to manage your players and playbook.',
   openGraph: {
-    title: "Join Team",
-    description: "Join an existing team to manage your players and playbook.",
+    title: 'Join Team',
+    description: 'Join an existing team to manage your players and playbook.',
   },
 };
 
@@ -24,5 +25,4 @@ async function JoinTeamPage() {
     </main>
   );
 }
-
-export default JoinTeamPage;
+export default withProtectedPage(JoinTeamPage);

@@ -2,10 +2,9 @@ import ProfileDropDown from '@/features/auth/components/profile-dropdown';
 import Teamlist from '@/features/dashboard/components/team-list';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/options';
-import { requireAccessToken } from '@/lib/auth/require-acces-token';
+import { withProtectedPage } from '@/lib/auth/with-page-guards';
 
-export default async function ClubPage() {
-  await requireAccessToken();
+async function ClubPage() {
   const session = await getServerSession(authOptions);
 
   return (
@@ -30,3 +29,5 @@ export default async function ClubPage() {
     </div>
   );
 }
+
+export default withProtectedPage(ClubPage);
