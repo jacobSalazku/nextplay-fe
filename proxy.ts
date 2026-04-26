@@ -18,6 +18,7 @@ export async function proxy(request: NextRequest) {
   const isAuthPage = pathname.startsWith('/login');
   const isProtectedPage =
     pathname.startsWith('/club') ||
+    pathname.startsWith('/team') ||
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/teams') ||
     pathname.startsWith('/create') ||
@@ -58,6 +59,7 @@ export const config = {
   matcher: [
     '/login',
     '/club/:path*',
+    '/team/:path*',
     '/dashboard/:path*',
     '/teams/:path*',
     '/create/:path*',
