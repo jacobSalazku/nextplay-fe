@@ -6,6 +6,7 @@ mutation UpdatePractice($input: UpdatePracticeInput!) {
     date
     duration
     type
+    teamId
     practice {
       facility
       practicetype
