@@ -12,7 +12,11 @@ if (!endpoint) {
 const config: CodegenConfig = {
   overwrite: true,
   schema: [endpoint],
-  documents: ['app/**/*.{gql,graphql}', 'features/**/*.{ts,tsx,graphql,gql}'],
+  documents: [
+    'app/**/*.{gql,graphql}',
+    'features/**/*.{ts,tsx,graphql,gql}',
+    'api/**/*.{gql,graphql}',
+  ],
   ignoreNoDocuments: true,
   generates: {
     './graphql/': {
