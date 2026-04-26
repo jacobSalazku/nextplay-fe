@@ -1,0 +1,8 @@
+mutation SubmitAttendance($input: PlayerActivityAttendanceInput!) {
+  submitAttendance(input: $input) {
+    id
+    memberId
+    attendanceStatus
+    reason
+  }
+}

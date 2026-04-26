@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import GameForm from '../form/game-form';
 import PracticeForm from '../form/practice-form';
+import AttendanceModal from '@/features/attendance/components/attendance-modal';
 import useStore from '@/store/store';
 import { useUserStore } from '@/store/user-store';
 import { format, isSameDay } from 'date-fns';
@@ -24,10 +25,12 @@ export function ActivityList({ activities, team }: ActivityListProps) {
     openGameDetails,
     openPracticeModal,
     openPracticeDetails,
+    openGameAttendance,
     setOpenGameModal,
     setOpenGameDetails,
     setOpenPracticeModal,
     setOpenPracticeDetails,
+    openPracticeAttendance,
   } = useStore();
 
   const { user } = useUserStore();
@@ -152,10 +155,12 @@ export function ActivityList({ activities, team }: ActivityListProps) {
           onClose={() => setOpenPracticeDetails(false)}
         />
       )}
-      {/* {openGameAttendance && <AttendanceModal member={member} mode="Game" />}
+      {openGameAttendance && (
+        <AttendanceModal member={user.member} mode="Game" />
+      )}
       {openPracticeAttendance && (
-        <AttendanceModal member={member} mode="Practice" />
-      )} */}
+        <AttendanceModal member={user.member} mode="Practice" />
+      )}
     </>
   );
 }

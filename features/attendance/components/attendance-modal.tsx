@@ -4,10 +4,11 @@ import { useEffect, useState, type FC } from 'react';
 import { attendanceStatus } from '../utils/const';
 import { type AttendanceData, type AttendanceStatusOption } from '../zod';
 import useStore from '@/store/store';
+import { useMutation } from '@apollo/client/react';
 import { format } from 'date-fns';
 import { X } from 'lucide-react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
-import { User } from '@/graphql/graphql';
+import { Member, SubmitAttendanceDocument } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import { RadioGroup } from '@/components/foundation/radio/radio-group';
 import { RadioGroupItem } from '@/components/foundation/radio/radio-group-item';
@@ -17,7 +18,7 @@ type Mode = 'Game' | 'Practice';
 
 type AttendanceProps = {
   mode: Mode;
-  member: User['members'][0];
+  member: Member;
 };
 
 const AttendanceModal: FC<AttendanceProps> = ({ mode, member }) => {
@@ -25,10 +26,11 @@ const AttendanceModal: FC<AttendanceProps> = ({ mode, member }) => {
     useStore();
 
   const [state, setFormState] = useState<Mode>(mode);
+  const [submitAttendance] = useMutation(SubmitAttendanceDocument);
 
   const { handleSubmit, register, control, reset } = useForm<AttendanceData>({
     defaultValues: {
-      activityId: selectedActivity?.id ?? '',
+      id: selectedActivity?.id ?? '',
       teamMemberId: member?.id ?? '',
       attendanceStatus:
         (selectedActivity?.attendees?.find((a) => a.memberId === member?.id)
@@ -44,13 +46,6 @@ const AttendanceModal: FC<AttendanceProps> = ({ mode, member }) => {
   });
 
   const isGame = state === 'Game';
-
-  const submitAttendance = useAttendance(
-    isGame
-      ? () => setOpenGameAttendance(false)
-      : () => setOpenPracticeAttendance(false),
-  );
-  //
   const attendanceSelection = useWatch({ control, name: 'attendanceStatus' });
 
   useEffect(() => {
@@ -68,13 +63,24 @@ const AttendanceModal: FC<AttendanceProps> = ({ mode, member }) => {
       throw new Error('Team member is required.');
     }
 
-    await submitAttendance.mutateAsync({
-      ...attendance,
-      activityId: selectedActivity.id,
-      teamMemberId: member.id,
+    await submitAttendance({
+      variables: {
+        input: {
+          ...attendance,
+          id: selectedActivity.id,
+          memberId: member.id, // ✅ correct name
+        },
+      },
     });
+
+    if (!isGame) {
+      setOpenGameAttendance(false);
+    } else {
+      setOpenPracticeAttendance(false);
+    }
+
     reset({
-      activityId: selectedActivity?.id ?? '',
+      id: selectedActivity?.id ?? '',
       teamMemberId: member?.id ?? '',
       attendanceStatus: attendance.attendanceStatus,
       reason: attendance.reason,
