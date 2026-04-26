@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, type FC } from 'react';
-import { useAttendance } from '../hooks/use-attendance';
 import { attendanceStatus } from '../utils/const';
 import { type AttendanceData, type AttendanceStatusOption } from '../zod';
 import useStore from '@/store/store';
