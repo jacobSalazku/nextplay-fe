@@ -20,10 +20,16 @@ export type Scalars = {
 
 export type Activity = {
   __typename?: 'Activity';
+  attendees: Array<PlayerActivityAttendance>;
   createdAt: Scalars['DateTime']['output'];
   date: Scalars['DateTime']['output'];
   duration?: Maybe<Scalars['Float']['output']>;
+  feedback?: Maybe<Feedback>;
+  film?: Maybe<Film>;
+  game?: Maybe<Game>;
   id: Scalars['ID']['output'];
+  meeting?: Maybe<Meeting>;
+  practice?: Maybe<Practice>;
   teamId: Scalars['String']['output'];
   time: Scalars['String']['output'];
   title: Scalars['String']['output'];
@@ -43,6 +49,12 @@ export type ApproveJoinRequestInput = {
   memberId: Scalars['String']['input'];
 };
 
+export enum AttendanceStatus {
+  Attending = 'ATTENDING',
+  Late = 'LATE',
+  NotAttending = 'NOT_ATTENDING'
+}
+
 export type AuthPayload = {
   __typename?: 'AuthPayload';
   accessToken: Scalars['String']['output'];
@@ -51,10 +63,91 @@ export type AuthPayload = {
   userId: Scalars['String']['output'];
 };
 
+export type CreateFeedbackInput = {
+  coach: Scalars['String']['input'];
+  date: Scalars['DateTime']['input'];
+  duration: Scalars['Float']['input'];
+  notes: Scalars['String']['input'];
+  teamId: Scalars['String']['input'];
+  time: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+  type: ActivityType;
+};
+
+export type CreateFilmInput = {
+  date: Scalars['DateTime']['input'];
+  duration: Scalars['Float']['input'];
+  notes: Scalars['String']['input'];
+  teamId: Scalars['String']['input'];
+  time: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+  type: ActivityType;
+};
+
+export type CreateGameInput = {
+  date: Scalars['DateTime']['input'];
+  duration: Scalars['Float']['input'];
+  location: Location;
+  teamId: Scalars['String']['input'];
+  time: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+  type: ActivityType;
+};
+
+export type CreateMeetingInput = {
+  date: Scalars['DateTime']['input'];
+  duration: Scalars['Float']['input'];
+  notes: Scalars['String']['input'];
+  teamId: Scalars['String']['input'];
+  time: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+  type: ActivityType;
+};
+
+export type CreatePracticeInput = {
+  date: Scalars['DateTime']['input'];
+  duration: Scalars['Float']['input'];
+  facility: Scalars['String']['input'];
+  practiceType: PracticeType;
+  teamId: Scalars['String']['input'];
+  time: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+  type: ActivityType;
+};
+
 export type CreateTeamInput = {
   ageGroup: Scalars['String']['input'];
   image?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
+};
+
+export type DeleteActivity = {
+  id: Scalars['ID']['input'];
+};
+
+export type Feedback = {
+  __typename?: 'Feedback';
+  activityId: Scalars['String']['output'];
+  coach: Scalars['String']['output'];
+  notes: Scalars['String']['output'];
+};
+
+export type Film = {
+  __typename?: 'Film';
+  activityId: Scalars['String']['output'];
+  notes: Scalars['String']['output'];
+};
+
+export type Game = {
+  __typename?: 'Game';
+  activityId: Scalars['String']['output'];
+  location: Location;
+};
+
+export type GetUserResponse = {
+  __typename?: 'GetUserResponse';
+  member: Member;
+  user: UserProfile;
 };
 
 export type JoinTeamInput = {
@@ -70,6 +163,17 @@ export type JoinTeamResponse = {
   teamCode: Scalars['String']['output'];
 };
 
+export enum Location {
+  Away = 'AWAY',
+  Home = 'HOME'
+}
+
+export type Meeting = {
+  __typename?: 'Meeting';
+  activityId: Scalars['String']['output'];
+  notes: Scalars['String']['output'];
+};
+
 export type Member = {
   __typename?: 'Member';
   id: Scalars['ID']['output'];
@@ -78,7 +182,6 @@ export type Member = {
   role: Role;
   status: Status;
   teamId: Scalars['String']['output'];
-  user: TeamMemberUser;
   userId: Scalars['String']['output'];
 };
 
@@ -92,12 +195,23 @@ export type ModerateJoinRequestResult = {
 export type Mutation = {
   __typename?: 'Mutation';
   approveJoinRequest: ModerateJoinRequestResult;
+  createFeedback: Activity;
+  createFilm: Activity;
+  createGame: Activity;
+  createMeeting: Activity;
+  createPractice: Activity;
   createTeam: Team;
+  deleteActivity: Activity;
   joinTeam: JoinTeamResponse;
   login: AuthPayload;
   logout: Scalars['Boolean']['output'];
   refresh: AuthPayload;
   rejectJoinRequest: ModerateJoinRequestResult;
+  updateFeedback: Activity;
+  updateFilm: Activity;
+  updateGame: Activity;
+  updateMeeting: Activity;
+  updatePractice: Activity;
   updateUser: User;
 };
 
@@ -107,8 +221,38 @@ export type MutationApproveJoinRequestArgs = {
 };
 
 
+export type MutationCreateFeedbackArgs = {
+  input: CreateFeedbackInput;
+};
+
+
+export type MutationCreateFilmArgs = {
+  input: CreateFilmInput;
+};
+
+
+export type MutationCreateGameArgs = {
+  input: CreateGameInput;
+};
+
+
+export type MutationCreateMeetingArgs = {
+  input: CreateMeetingInput;
+};
+
+
+export type MutationCreatePracticeArgs = {
+  input: CreatePracticeInput;
+};
+
+
 export type MutationCreateTeamArgs = {
   input: CreateTeamInput;
+};
+
+
+export type MutationDeleteActivityArgs = {
+  input: DeleteActivity;
 };
 
 
@@ -132,15 +276,82 @@ export type MutationRejectJoinRequestArgs = {
 };
 
 
+export type MutationUpdateFeedbackArgs = {
+  input: UpdateFeedbackInput;
+};
+
+
+export type MutationUpdateFilmArgs = {
+  input: UpdateFilmInput;
+};
+
+
+export type MutationUpdateGameArgs = {
+  input: UpdateGameInput;
+};
+
+
+export type MutationUpdateMeetingArgs = {
+  input: UpdateMeetingInput;
+};
+
+
+export type MutationUpdatePracticeArgs = {
+  input: UpdatePracticeInput;
+};
+
+
 export type MutationUpdateUserArgs = {
   input: UpdateUserInput;
 };
 
+export type PlayerActivityAttendance = {
+  __typename?: 'PlayerActivityAttendance';
+  attendanceStatus: AttendanceStatus;
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  memberId: Scalars['String']['output'];
+  reason?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type Practice = {
+  __typename?: 'Practice';
+  activityId: Scalars['String']['output'];
+  facility: Scalars['String']['output'];
+  practicetype: Scalars['String']['output'];
+};
+
+export enum PracticeType {
+  Physical = 'PHYSICAL',
+  Shooting = 'SHOOTING',
+  Specialisation = 'SPECIALISATION',
+  Team = 'TEAM'
+}
+
 export type Query = {
   __typename?: 'Query';
   _ping: Scalars['Boolean']['output'];
+  getActivities: Array<Activity>;
   getDashboardTeams: Array<TeamDashboard>;
+  getTeamActivities: Team;
+  getUserById: GetUserResponse;
   me: User;
+};
+
+
+export type QueryGetActivitiesArgs = {
+  teamShortId: Scalars['String']['input'];
+};
+
+
+export type QueryGetTeamActivitiesArgs = {
+  teamRef: Scalars['String']['input'];
+};
+
+
+export type QueryGetUserByIdArgs = {
+  teamShortId: Scalars['String']['input'];
 };
 
 export enum Role {
@@ -156,14 +367,19 @@ export enum Status {
 
 export type Team = {
   __typename?: 'Team';
+  activities: Array<Activity>;
   ageGroup?: Maybe<Scalars['String']['output']>;
   code: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  creatorId: Scalars['String']['output'];
-  id: Scalars['String']['output'];
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  creatorId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
   image?: Maybe<Scalars['String']['output']>;
+  members: Array<TeamMemberUser>;
   name: Scalars['String']['output'];
-  updatedAt: Scalars['DateTime']['output'];
+  routeKey: Scalars['String']['output'];
+  shortId: Scalars['String']['output'];
+  slug: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type TeamDashboard = {
@@ -173,13 +389,75 @@ export type TeamDashboard = {
   id: Scalars['ID']['output'];
   members: Array<Member>;
   name: Scalars['String']['output'];
+  routeKey: Scalars['String']['output'];
+  shortId: Scalars['String']['output'];
+  slug: Scalars['String']['output'];
 };
 
 export type TeamMemberUser = {
   __typename?: 'TeamMemberUser';
-  id: Scalars['ID']['output'];
+  id: Scalars['String']['output'];
   image?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  teamId: Scalars['String']['output'];
+  userId: Scalars['String']['output'];
+};
+
+export type UpdateFeedbackInput = {
+  coach?: InputMaybe<Scalars['String']['input']>;
+  date?: InputMaybe<Scalars['DateTime']['input']>;
+  duration?: InputMaybe<Scalars['Float']['input']>;
+  id: Scalars['ID']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  teamId: Scalars['String']['input'];
+  time?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  type: ActivityType;
+};
+
+export type UpdateFilmInput = {
+  date?: InputMaybe<Scalars['DateTime']['input']>;
+  duration?: InputMaybe<Scalars['Float']['input']>;
+  id: Scalars['ID']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  teamId: Scalars['String']['input'];
+  time?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  type: ActivityType;
+};
+
+export type UpdateGameInput = {
+  date?: InputMaybe<Scalars['DateTime']['input']>;
+  duration?: InputMaybe<Scalars['Float']['input']>;
+  id: Scalars['ID']['input'];
+  location?: InputMaybe<Location>;
+  teamId: Scalars['String']['input'];
+  time?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  type: ActivityType;
+};
+
+export type UpdateMeetingInput = {
+  date?: InputMaybe<Scalars['DateTime']['input']>;
+  duration?: InputMaybe<Scalars['Float']['input']>;
+  id: Scalars['ID']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  teamId: Scalars['String']['input'];
+  time?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  type: ActivityType;
+};
+
+export type UpdatePracticeInput = {
+  date?: InputMaybe<Scalars['DateTime']['input']>;
+  duration?: InputMaybe<Scalars['Float']['input']>;
+  facility?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  practiceType?: InputMaybe<PracticeType>;
+  teamId: Scalars['String']['input'];
+  time?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  type: ActivityType;
 };
 
 export type UpdateUserInput = {
@@ -201,18 +479,39 @@ export type User = {
   height?: Maybe<Scalars['Float']['output']>;
   id: Scalars['ID']['output'];
   isBlocked: Scalars['Boolean']['output'];
+  members: Array<Member>;
   name?: Maybe<Scalars['String']['output']>;
   phone?: Maybe<Scalars['String']['output']>;
   tokenVersion: Scalars['Float']['output'];
   weight?: Maybe<Scalars['Float']['output']>;
 };
 
+export type UserProfile = {
+  __typename?: 'UserProfile';
+  dateOfBirth?: Maybe<Scalars['DateTime']['output']>;
+  dominantHand?: Maybe<Scalars['String']['output']>;
+  email: Scalars['String']['output'];
+  hasOnBoarded: Scalars['Boolean']['output'];
+  height?: Maybe<Scalars['Float']['output']>;
+  id: Scalars['ID']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+  phone?: Maybe<Scalars['String']['output']>;
+  weight?: Maybe<Scalars['Float']['output']>;
+};
+
+export type GetUserQueryVariables = Exact<{
+  teamShortId: Scalars['String']['input'];
+}>;
+
+
+export type GetUserQuery = { __typename?: 'Query', getUserById: { __typename?: 'GetUserResponse', user: { __typename?: 'UserProfile', id: string, name?: string | null, email: string, dateOfBirth?: any | null, phone?: string | null, height?: number | null, weight?: number | null, dominantHand?: string | null, hasOnBoarded: boolean }, member: { __typename?: 'Member', id: string, userId: string, teamId: string, role: Role, status: Status, number?: string | null, position?: string | null } } };
+
 export type CreateTeamMutationVariables = Exact<{
   input: CreateTeamInput;
 }>;
 
 
-export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'Team', id: string, name: string, image?: string | null, ageGroup?: string | null, code: string, creatorId: string } };
+export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'Team', id: string, name: string, image?: string | null, ageGroup?: string | null, code: string, creatorId?: string | null } };
 
 export type LoginMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -264,9 +563,94 @@ export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __type
 export type GetTeamForDashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetTeamForDashboardQuery = { __typename?: 'Query', getDashboardTeams: Array<{ __typename?: 'TeamDashboard', id: string, name: string, ageGroup?: string | null, members: Array<{ __typename?: 'Member', id: string }>, activities: Array<{ __typename?: 'Activity', id: string, type: ActivityType, title: string, date: any, time: string }> }> };
+export type GetTeamForDashboardQuery = { __typename?: 'Query', getDashboardTeams: Array<{ __typename?: 'TeamDashboard', id: string, name: string, slug: string, shortId: string, routeKey: string, ageGroup?: string | null, members: Array<{ __typename?: 'Member', id: string }>, activities: Array<{ __typename?: 'Activity', id: string, type: ActivityType, title: string, date: any, time: string }> }> };
+
+export type GetTeamActivitiesQueryVariables = Exact<{
+  teamRef: Scalars['String']['input'];
+}>;
 
 
+export type GetTeamActivitiesQuery = { __typename?: 'Query', getTeamActivities: { __typename?: 'Team', id: string, name: string, code: string, slug: string, routeKey: string, shortId: string, image?: string | null, ageGroup?: string | null, createdAt?: any | null, updatedAt?: any | null, creatorId?: string | null, members: Array<{ __typename?: 'TeamMemberUser', id: string, name?: string | null, image?: string | null, teamId: string, userId: string }>, activities: Array<{ __typename?: 'Activity', id: string, teamId: string, type: ActivityType, title: string, time: string, duration?: number | null, date: any, createdAt: any, updatedAt: any, attendees: Array<{ __typename?: 'PlayerActivityAttendance', id: string, memberId: string, attendanceStatus: AttendanceStatus, reason?: string | null, createdAt: any, updatedAt: any }> }> } };
+
+export type CreateFeedbackMutationVariables = Exact<{
+  input: CreateFeedbackInput;
+}>;
+
+
+export type CreateFeedbackMutation = { __typename?: 'Mutation', createFeedback: { __typename?: 'Activity', id: string, title: string, time: string, date: any, type: ActivityType, feedback?: { __typename?: 'Feedback', notes: string, coach: string } | null } };
+
+export type CreateFilmMutationVariables = Exact<{
+  input: CreateFilmInput;
+}>;
+
+
+export type CreateFilmMutation = { __typename?: 'Mutation', createFilm: { __typename?: 'Activity', id: string, title: string, time: string, date: any, type: ActivityType, film?: { __typename?: 'Film', notes: string } | null } };
+
+export type CreateGameMutationVariables = Exact<{
+  input: CreateGameInput;
+}>;
+
+
+export type CreateGameMutation = { __typename?: 'Mutation', createGame: { __typename?: 'Activity', id: string, title: string, time: string, date: any, duration?: number | null, type: ActivityType, game?: { __typename?: 'Game', location: Location } | null } };
+
+export type CreateMeetingMutationVariables = Exact<{
+  input: CreateMeetingInput;
+}>;
+
+
+export type CreateMeetingMutation = { __typename?: 'Mutation', createMeeting: { __typename?: 'Activity', id: string, title: string, time: string, date: any, duration?: number | null, type: ActivityType, meeting?: { __typename?: 'Meeting', notes: string } | null } };
+
+export type CreatePracticeMutationVariables = Exact<{
+  input: CreatePracticeInput;
+}>;
+
+
+export type CreatePracticeMutation = { __typename?: 'Mutation', createPractice: { __typename?: 'Activity', title: string, time: string, date: any, duration?: number | null, type: ActivityType, practice?: { __typename?: 'Practice', facility: string, practicetype: string } | null } };
+
+export type DeleteActivityMutationVariables = Exact<{
+  input: DeleteActivity;
+}>;
+
+
+export type DeleteActivityMutation = { __typename?: 'Mutation', deleteActivity: { __typename?: 'Activity', id: string } };
+
+export type UpdateFeedbackMutationVariables = Exact<{
+  input: UpdateFeedbackInput;
+}>;
+
+
+export type UpdateFeedbackMutation = { __typename?: 'Mutation', updateFeedback: { __typename?: 'Activity', id: string, title: string, time: string, date: any, type: ActivityType, teamId: string, feedback?: { __typename?: 'Feedback', notes: string, coach: string } | null } };
+
+export type UpdateFilmMutationVariables = Exact<{
+  input: UpdateFilmInput;
+}>;
+
+
+export type UpdateFilmMutation = { __typename?: 'Mutation', updateFilm: { __typename?: 'Activity', id: string, title: string, time: string, date: any, type: ActivityType, teamId: string, film?: { __typename?: 'Film', notes: string } | null } };
+
+export type UpdateGameMutationVariables = Exact<{
+  input: UpdateGameInput;
+}>;
+
+
+export type UpdateGameMutation = { __typename?: 'Mutation', updateGame: { __typename?: 'Activity', id: string, title: string, time: string, date: any, duration?: number | null, type: ActivityType, teamId: string, game?: { __typename?: 'Game', location: Location } | null } };
+
+export type UpdateMeetingMutationVariables = Exact<{
+  input: UpdateMeetingInput;
+}>;
+
+
+export type UpdateMeetingMutation = { __typename?: 'Mutation', updateMeeting: { __typename?: 'Activity', id: string, title: string, time: string, date: any, duration?: number | null, type: ActivityType, teamId: string, meeting?: { __typename?: 'Meeting', notes: string } | null } };
+
+export type UpdatePracticeMutationVariables = Exact<{
+  input: UpdatePracticeInput;
+}>;
+
+
+export type UpdatePracticeMutation = { __typename?: 'Mutation', updatePractice: { __typename?: 'Activity', id: string, title: string, time: string, date: any, duration?: number | null, type: ActivityType, practice?: { __typename?: 'Practice', facility: string, practicetype: string } | null } };
+
+
+export const GetUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"teamShortId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getUserById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"teamShortId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"teamShortId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"dateOfBirth"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"dominantHand"}},{"kind":"Field","name":{"kind":"Name","value":"hasOnBoarded"}}]}},{"kind":"Field","name":{"kind":"Name","value":"member"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"number"}},{"kind":"Field","name":{"kind":"Name","value":"position"}}]}}]}}]}}]} as unknown as DocumentNode<GetUserQuery, GetUserQueryVariables>;
 export const CreateTeamDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createTeam"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateTeamInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createTeam"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"ageGroup"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"creatorId"}}]}}]}}]} as unknown as DocumentNode<CreateTeamMutation, CreateTeamMutationVariables>;
 export const LoginDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Login"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"login"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"accessToken"}},{"kind":"Field","name":{"kind":"Name","value":"refreshToken"}},{"kind":"Field","name":{"kind":"Name","value":"hasOnBoarded"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}}]}}]}}]} as unknown as DocumentNode<LoginMutation, LoginMutationVariables>;
 export const RefreshDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Refresh"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"refreshToken"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"refresh"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"refreshToken"},"value":{"kind":"Variable","name":{"kind":"Name","value":"refreshToken"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"accessToken"}},{"kind":"Field","name":{"kind":"Name","value":"refreshToken"}},{"kind":"Field","name":{"kind":"Name","value":"hasOnBoarded"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}}]}}]}}]} as unknown as DocumentNode<RefreshMutation, RefreshMutationVariables>;
@@ -275,4 +659,16 @@ export const ApproveJoinRequestDocument = {"kind":"Document","definitions":[{"ki
 export const JoinTeamDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"JoinTeam"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"JoinTeamInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"joinTeam"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"teamCode"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"number"}}]}}]}}]} as unknown as DocumentNode<JoinTeamMutation, JoinTeamMutationVariables>;
 export const RejectJoinRequestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RejectJoinRequest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ApproveJoinRequestInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rejectJoinRequest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"memberId"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]} as unknown as DocumentNode<RejectJoinRequestMutation, RejectJoinRequestMutationVariables>;
 export const UpdateUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"dateOfBirth"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"dominantHand"}}]}}]}}]} as unknown as DocumentNode<UpdateUserMutation, UpdateUserMutationVariables>;
-export const GetTeamForDashboardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTeamForDashboard"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getDashboardTeams"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"ageGroup"}},{"kind":"Field","name":{"kind":"Name","value":"members"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"activities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"time"}}]}}]}}]}}]} as unknown as DocumentNode<GetTeamForDashboardQuery, GetTeamForDashboardQueryVariables>;
+export const GetTeamForDashboardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTeamForDashboard"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getDashboardTeams"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"shortId"}},{"kind":"Field","name":{"kind":"Name","value":"routeKey"}},{"kind":"Field","name":{"kind":"Name","value":"ageGroup"}},{"kind":"Field","name":{"kind":"Name","value":"members"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"activities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"time"}}]}}]}}]}}]} as unknown as DocumentNode<GetTeamForDashboardQuery, GetTeamForDashboardQueryVariables>;
+export const GetTeamActivitiesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTeamActivities"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"teamRef"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getTeamActivities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"teamRef"},"value":{"kind":"Variable","name":{"kind":"Name","value":"teamRef"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"routeKey"}},{"kind":"Field","name":{"kind":"Name","value":"shortId"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"ageGroup"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"creatorId"}},{"kind":"Field","name":{"kind":"Name","value":"members"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}}]}},{"kind":"Field","name":{"kind":"Name","value":"activities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"attendees"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"memberId"}},{"kind":"Field","name":{"kind":"Name","value":"attendanceStatus"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetTeamActivitiesQuery, GetTeamActivitiesQueryVariables>;
+export const CreateFeedbackDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateFeedback"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateFeedbackInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createFeedback"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"feedback"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"coach"}}]}}]}}]}}]} as unknown as DocumentNode<CreateFeedbackMutation, CreateFeedbackMutationVariables>;
+export const CreateFilmDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateFilm"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateFilmInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createFilm"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"film"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"notes"}}]}}]}}]}}]} as unknown as DocumentNode<CreateFilmMutation, CreateFilmMutationVariables>;
+export const CreateGameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateGame"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateGameInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"game"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"location"}}]}}]}}]}}]} as unknown as DocumentNode<CreateGameMutation, CreateGameMutationVariables>;
+export const CreateMeetingDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateMeeting"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateMeetingInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createMeeting"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"meeting"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"notes"}}]}}]}}]}}]} as unknown as DocumentNode<CreateMeetingMutation, CreateMeetingMutationVariables>;
+export const CreatePracticeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreatePractice"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreatePracticeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createPractice"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"practice"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"facility"}},{"kind":"Field","name":{"kind":"Name","value":"practicetype"}}]}}]}}]}}]} as unknown as DocumentNode<CreatePracticeMutation, CreatePracticeMutationVariables>;
+export const DeleteActivityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteActivity"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteActivity"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteActivity"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteActivityMutation, DeleteActivityMutationVariables>;
+export const UpdateFeedbackDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateFeedback"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateFeedbackInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateFeedback"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"feedback"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"coach"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateFeedbackMutation, UpdateFeedbackMutationVariables>;
+export const UpdateFilmDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateFilm"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateFilmInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateFilm"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"film"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"notes"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateFilmMutation, UpdateFilmMutationVariables>;
+export const UpdateGameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateGame"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateGameInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"game"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"location"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateGameMutation, UpdateGameMutationVariables>;
+export const UpdateMeetingDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateMeeting"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateMeetingInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateMeeting"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"meeting"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"notes"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateMeetingMutation, UpdateMeetingMutationVariables>;
+export const UpdatePracticeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdatePractice"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdatePracticeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updatePractice"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"practice"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"facility"}},{"kind":"Field","name":{"kind":"Name","value":"practicetype"}}]}}]}}]}}]} as unknown as DocumentNode<UpdatePracticeMutation, UpdatePracticeMutationVariables>;

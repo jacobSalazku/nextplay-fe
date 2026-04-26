@@ -1,0 +1,14 @@
+mutation UpdateFeedback($input: UpdateFeedbackInput!) {
+  updateFeedback(input: $input) {
+    id
+    title
+    time
+    date
+    type
+    teamId
+    feedback {
+      notes
+      coach
+    }
+  }
+}

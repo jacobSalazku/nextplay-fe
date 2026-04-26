@@ -1,0 +1,13 @@
+mutation CreatePractice($input: CreatePracticeInput!) {
+  createPractice(input: $input) {
+    title
+    time
+    date
+    duration
+    type
+    practice {
+      facility
+      practicetype
+    }
+  }
+}

@@ -1,0 +1,13 @@
+mutation UpdateFilm($input: UpdateFilmInput!) {
+  updateFilm(input: $input) {
+    id
+    title
+    time
+    date
+    type
+    teamId
+    film {
+      notes
+    }
+  }
+}

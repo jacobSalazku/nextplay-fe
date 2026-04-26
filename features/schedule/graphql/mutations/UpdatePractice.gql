@@ -1,0 +1,14 @@
+mutation UpdatePractice($input: UpdatePracticeInput!) {
+  updatePractice(input: $input) {
+    id
+    title
+    time
+    date
+    duration
+    type
+    practice {
+      facility
+      practicetype
+    }
+  }
+}
