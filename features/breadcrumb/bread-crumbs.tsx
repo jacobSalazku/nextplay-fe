@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTeam } from '@/context/team-context';
-import { useGetUser } from '@/hooks/use-get-user';
 import { useNavigationStore } from '@/store/use-navigation-store';
+import { useUserStore } from '@/store/user-store';
 import { ChevronRight, User } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { cn } from '@/lib/helpers/utils';
@@ -20,8 +20,8 @@ export const Breadcrumb = () => {
 
   const { setOpenLogOutModal } = useNavigationStore();
   const { data: session } = useSession();
-  const { teamRef, teamSlug } = useTeam();
-  const { data } = useGetUser(teamRef);
+  const { teamSlug, teamRef } = useTeam();
+  const { user } = useUserStore();
 
   const pathname = usePathname();
   const segments = pathname.split('/').filter(Boolean);
@@ -42,8 +42,11 @@ export const Breadcrumb = () => {
   }, []);
 
   const teamLabel = capitalize(teamSlug);
-  const userName =
-    data?.getUserById?.user?.name ?? session?.user?.name ?? 'User';
+
+  if (!user?.user) {
+    return null;
+  }
+  const userName = user.user.name ?? session?.user?.name ?? 'User';
 
   return (
     <div className="-mx-4 mb-4 hidden items-center justify-between gap-2 border-b border-orange-200/30 py-4 pt-3.5 pl-4 text-sm text-orange-200 md:flex">

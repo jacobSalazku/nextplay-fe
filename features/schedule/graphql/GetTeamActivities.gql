@@ -1,0 +1,41 @@
+query GetTeamActivities($teamRef: String!) {
+  getTeamActivities(teamRef: $teamRef) {
+    id
+    name
+    code
+    slug
+    routeKey
+    shortId
+    image
+    ageGroup
+    createdAt
+    updatedAt
+    creatorId
+    members {
+      id
+      name
+      image
+      teamId
+      userId
+    }
+    activities {
+      id
+      teamId
+      type
+      title
+      time
+      duration
+      date
+      createdAt
+      updatedAt
+      attendees {
+        id
+        memberId
+        attendanceStatus
+        reason
+        createdAt
+        updatedAt
+      }
+    }
+  }
+}
