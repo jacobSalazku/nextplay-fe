@@ -17,6 +17,7 @@ type Documents = {
     "query GetUser($teamShortId: String!) {\n  getUserById(teamShortId: $teamShortId) {\n    user {\n      id\n      name\n      email\n      dateOfBirth\n      phone\n      height\n      weight\n      dominantHand\n      hasOnBoarded\n    }\n    member {\n      id\n      userId\n      teamId\n      role\n      status\n      number\n      position\n    }\n  }\n}": typeof types.GetUserDocument,
     "mutation createTeam($input: CreateTeamInput!) {\n  createTeam(input: $input) {\n    id\n    name\n    image\n    ageGroup\n    code\n    creatorId\n  }\n}": typeof types.CreateTeamDocument,
     "mutation Login($email: String!) {\n  login(email: $email) {\n    accessToken\n    refreshToken\n    hasOnBoarded\n    userId\n  }\n}\n\nmutation Refresh($refreshToken: String!) {\n  refresh(refreshToken: $refreshToken) {\n    accessToken\n    refreshToken\n    hasOnBoarded\n    userId\n  }\n}\n\nmutation Logout {\n  logout\n}": typeof types.LoginDocument,
+    "mutation SubmitAttendance($input: PlayerActivityAttendanceInput!) {\n  submitAttendance(input: $input) {\n    id\n    memberId\n    attendanceStatus\n    reason\n  }\n}": typeof types.SubmitAttendanceDocument,
     "mutation ApproveJoinRequest($input: ApproveJoinRequestInput!) {\n  approveJoinRequest(input: $input) {\n    memberId\n    teamId\n    status\n  }\n}": typeof types.ApproveJoinRequestDocument,
     "mutation JoinTeam($input: JoinTeamInput!) {\n  joinTeam(input: $input) {\n    teamCode\n    position\n    number\n  }\n}": typeof types.JoinTeamDocument,
     "mutation RejectJoinRequest($input: ApproveJoinRequestInput!) {\n  rejectJoinRequest(input: $input) {\n    memberId\n    teamId\n    status\n  }\n}": typeof types.RejectJoinRequestDocument,
@@ -33,12 +34,13 @@ type Documents = {
     "mutation UpdateFilm($input: UpdateFilmInput!) {\n  updateFilm(input: $input) {\n    id\n    title\n    time\n    date\n    type\n    teamId\n    film {\n      notes\n    }\n  }\n}": typeof types.UpdateFilmDocument,
     "mutation UpdateGame($input: UpdateGameInput!) {\n  updateGame(input: $input) {\n    id\n    title\n    time\n    date\n    duration\n    type\n    teamId\n    game {\n      location\n    }\n  }\n}": typeof types.UpdateGameDocument,
     "mutation UpdateMeeting($input: UpdateMeetingInput!) {\n  updateMeeting(input: $input) {\n    id\n    title\n    time\n    date\n    duration\n    type\n    teamId\n    meeting {\n      notes\n    }\n  }\n}": typeof types.UpdateMeetingDocument,
-    "mutation UpdatePractice($input: UpdatePracticeInput!) {\n  updatePractice(input: $input) {\n    id\n    title\n    time\n    date\n    duration\n    type\n    practice {\n      facility\n      practicetype\n    }\n  }\n}": typeof types.UpdatePracticeDocument,
+    "mutation UpdatePractice($input: UpdatePracticeInput!) {\n  updatePractice(input: $input) {\n    id\n    title\n    time\n    date\n    duration\n    type\n    teamId\n    practice {\n      facility\n      practicetype\n    }\n  }\n}": typeof types.UpdatePracticeDocument,
 };
 const documents: Documents = {
     "query GetUser($teamShortId: String!) {\n  getUserById(teamShortId: $teamShortId) {\n    user {\n      id\n      name\n      email\n      dateOfBirth\n      phone\n      height\n      weight\n      dominantHand\n      hasOnBoarded\n    }\n    member {\n      id\n      userId\n      teamId\n      role\n      status\n      number\n      position\n    }\n  }\n}": types.GetUserDocument,
     "mutation createTeam($input: CreateTeamInput!) {\n  createTeam(input: $input) {\n    id\n    name\n    image\n    ageGroup\n    code\n    creatorId\n  }\n}": types.CreateTeamDocument,
     "mutation Login($email: String!) {\n  login(email: $email) {\n    accessToken\n    refreshToken\n    hasOnBoarded\n    userId\n  }\n}\n\nmutation Refresh($refreshToken: String!) {\n  refresh(refreshToken: $refreshToken) {\n    accessToken\n    refreshToken\n    hasOnBoarded\n    userId\n  }\n}\n\nmutation Logout {\n  logout\n}": types.LoginDocument,
+    "mutation SubmitAttendance($input: PlayerActivityAttendanceInput!) {\n  submitAttendance(input: $input) {\n    id\n    memberId\n    attendanceStatus\n    reason\n  }\n}": types.SubmitAttendanceDocument,
     "mutation ApproveJoinRequest($input: ApproveJoinRequestInput!) {\n  approveJoinRequest(input: $input) {\n    memberId\n    teamId\n    status\n  }\n}": types.ApproveJoinRequestDocument,
     "mutation JoinTeam($input: JoinTeamInput!) {\n  joinTeam(input: $input) {\n    teamCode\n    position\n    number\n  }\n}": types.JoinTeamDocument,
     "mutation RejectJoinRequest($input: ApproveJoinRequestInput!) {\n  rejectJoinRequest(input: $input) {\n    memberId\n    teamId\n    status\n  }\n}": types.RejectJoinRequestDocument,
@@ -55,7 +57,7 @@ const documents: Documents = {
     "mutation UpdateFilm($input: UpdateFilmInput!) {\n  updateFilm(input: $input) {\n    id\n    title\n    time\n    date\n    type\n    teamId\n    film {\n      notes\n    }\n  }\n}": types.UpdateFilmDocument,
     "mutation UpdateGame($input: UpdateGameInput!) {\n  updateGame(input: $input) {\n    id\n    title\n    time\n    date\n    duration\n    type\n    teamId\n    game {\n      location\n    }\n  }\n}": types.UpdateGameDocument,
     "mutation UpdateMeeting($input: UpdateMeetingInput!) {\n  updateMeeting(input: $input) {\n    id\n    title\n    time\n    date\n    duration\n    type\n    teamId\n    meeting {\n      notes\n    }\n  }\n}": types.UpdateMeetingDocument,
-    "mutation UpdatePractice($input: UpdatePracticeInput!) {\n  updatePractice(input: $input) {\n    id\n    title\n    time\n    date\n    duration\n    type\n    practice {\n      facility\n      practicetype\n    }\n  }\n}": types.UpdatePracticeDocument,
+    "mutation UpdatePractice($input: UpdatePracticeInput!) {\n  updatePractice(input: $input) {\n    id\n    title\n    time\n    date\n    duration\n    type\n    teamId\n    practice {\n      facility\n      practicetype\n    }\n  }\n}": types.UpdatePracticeDocument,
 };
 
 /**
@@ -84,6 +86,10 @@ export function graphql(source: "mutation createTeam($input: CreateTeamInput!) {
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "mutation Login($email: String!) {\n  login(email: $email) {\n    accessToken\n    refreshToken\n    hasOnBoarded\n    userId\n  }\n}\n\nmutation Refresh($refreshToken: String!) {\n  refresh(refreshToken: $refreshToken) {\n    accessToken\n    refreshToken\n    hasOnBoarded\n    userId\n  }\n}\n\nmutation Logout {\n  logout\n}"): (typeof documents)["mutation Login($email: String!) {\n  login(email: $email) {\n    accessToken\n    refreshToken\n    hasOnBoarded\n    userId\n  }\n}\n\nmutation Refresh($refreshToken: String!) {\n  refresh(refreshToken: $refreshToken) {\n    accessToken\n    refreshToken\n    hasOnBoarded\n    userId\n  }\n}\n\nmutation Logout {\n  logout\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "mutation SubmitAttendance($input: PlayerActivityAttendanceInput!) {\n  submitAttendance(input: $input) {\n    id\n    memberId\n    attendanceStatus\n    reason\n  }\n}"): (typeof documents)["mutation SubmitAttendance($input: PlayerActivityAttendanceInput!) {\n  submitAttendance(input: $input) {\n    id\n    memberId\n    attendanceStatus\n    reason\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -151,7 +157,7 @@ export function graphql(source: "mutation UpdateMeeting($input: UpdateMeetingInp
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "mutation UpdatePractice($input: UpdatePracticeInput!) {\n  updatePractice(input: $input) {\n    id\n    title\n    time\n    date\n    duration\n    type\n    practice {\n      facility\n      practicetype\n    }\n  }\n}"): (typeof documents)["mutation UpdatePractice($input: UpdatePracticeInput!) {\n  updatePractice(input: $input) {\n    id\n    title\n    time\n    date\n    duration\n    type\n    practice {\n      facility\n      practicetype\n    }\n  }\n}"];
+export function graphql(source: "mutation UpdatePractice($input: UpdatePracticeInput!) {\n  updatePractice(input: $input) {\n    id\n    title\n    time\n    date\n    duration\n    type\n    teamId\n    practice {\n      facility\n      practicetype\n    }\n  }\n}"): (typeof documents)["mutation UpdatePractice($input: UpdatePracticeInput!) {\n  updatePractice(input: $input) {\n    id\n    title\n    time\n    date\n    duration\n    type\n    teamId\n    practice {\n      facility\n      practicetype\n    }\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};
