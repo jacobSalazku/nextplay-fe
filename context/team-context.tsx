@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useEffect } from 'react';
 import { useUserStore } from '@/store/user-store';
 import { parseTeamRef } from '@/lib/helpers/team-ref';
 import { GetUserResponse } from '@/graphql/graphql';
@@ -25,7 +25,9 @@ export function TeamProvider({
   const parsed = parseTeamRef(teamRef);
 
   const setUser = useUserStore.getState().setUser;
-  setUser(user);
+  useEffect(() => {
+    setUser(user);
+  }, [user, setUser]);
 
   return (
     <TeamContext.Provider
