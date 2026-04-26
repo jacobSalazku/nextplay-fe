@@ -2,6 +2,9 @@ query GetTeamForDashboard {
   getDashboardTeams {
     id
     name
+    slug
+    shortId
+    routeKey
     ageGroup
     members {
       id

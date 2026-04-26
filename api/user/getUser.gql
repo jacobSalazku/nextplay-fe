@@ -1,0 +1,24 @@
+query GetUser($teamShortId: String!) {
+  getUserById(teamShortId: $teamShortId) {
+    user {
+      id
+      name
+      email
+      dateOfBirth
+      phone
+      height
+      weight
+      dominantHand
+      hasOnBoarded
+    }
+    member {
+      id
+      userId
+      teamId
+      role
+      status
+      number
+      position
+    }
+  }
+}

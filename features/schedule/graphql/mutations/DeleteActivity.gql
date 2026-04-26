@@ -1,0 +1,5 @@
+mutation DeleteActivity($input: DeleteActivity!) {
+  deleteActivity(input: $input) {
+    id
+  }
+}

@@ -11,8 +11,7 @@ const buttonVariants = cva(
         default:
           'bg-gray-800 text-white shadow-md transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900',
         primary:
-          'bg-gradient-to-br from-orange-700/80 to-orange-400 text-white shadow-sm hover:bg-orange-400/90',
-
+          'bg-linear-to-br from-orange-700/80 to-orange-400 text-white shadow-sm hover:bg-orange-400/90',
         outline:
           'border border-orange-300/30 text-white transition-all duration-200 ease-in-out hover:text-white hover:bg-gray-800 hover:shadow-md px-4 py-2 rounded',
         light:

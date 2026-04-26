@@ -1,0 +1,13 @@
+mutation CreateMeeting($input: CreateMeetingInput!) {
+  createMeeting(input: $input) {
+    id
+    title
+    time
+    date
+    duration
+    type
+    meeting {
+      notes
+    }
+  }
+}
