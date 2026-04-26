@@ -11,7 +11,6 @@ type TeamCardProps = {
 };
 
 const TeamCard: FC<TeamCardProps> = ({ team }) => {
-  console.log(team);
   return (
     <div className="mx-auto w-full max-w-md cursor-pointer rounded-2xl border border-gray-500 p-5 text-blue-200 shadow-sm transition-shadow hover:shadow-md">
       <div className="border-b border-white/10 pb-3">
@@ -73,7 +72,7 @@ const TeamCard: FC<TeamCardProps> = ({ team }) => {
           </span>
         </div>
         <Link
-          href={`${team.id.toLowerCase()}/schedule`}
+          href={`/team/${team.routeKey}/schedule`}
           aria-label={`View ${team.name} details`}
           variant="outline"
         >
