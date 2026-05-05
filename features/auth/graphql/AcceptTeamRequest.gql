@@ -1,0 +1,7 @@
+mutation AcceptTeamRequest($input: AcceptTeamRequestInput!) {
+  acceptTeamRequest(input: $input) {
+    memberId
+    teamId
+    status
+  }
+}
