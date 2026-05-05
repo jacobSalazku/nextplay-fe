@@ -1,4 +1,4 @@
-import { withCreateFlowPage } from '@/lib/auth/with-page-guards';
+import { withOnboardingOnlyPage } from '@/lib/auth/with-page-guards';
 import { Link } from '@/components/foundation/button/link';
 
 async function CreatePage() {
@@ -29,4 +29,4 @@ async function CreatePage() {
   );
 }
 
-export default withCreateFlowPage(CreatePage);
+export default withOnboardingOnlyPage(CreatePage);

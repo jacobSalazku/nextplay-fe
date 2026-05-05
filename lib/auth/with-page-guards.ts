@@ -1,7 +1,10 @@
 import 'server-only';
 
 import { type ReactNode } from 'react';
-import { requireAccessToken, userHasOnBoarded } from './require-acces-token';
+import {
+  requireAccessToken,
+  requireNotOnboarded,
+} from './require-acces-token';
 
 type ServerPage<Props extends object = object> = (
   props: Props,
@@ -20,7 +23,16 @@ export function withCreateFlowPage<Props extends object = object>(
   page: ServerPage<Props>,
 ): ServerPage<Props> {
   return async function CreateFlowPage(props: Props) {
-    await userHasOnBoarded();
+    await requireAccessToken();
+    return page(props);
+  };
+}
+
+export function withOnboardingOnlyPage<Props extends object = object>(
+  page: ServerPage<Props>,
+): ServerPage<Props> {
+  return async function OnboardingOnlyPage(props: Props) {
+    await requireNotOnboarded();
     return page(props);
   };
 }

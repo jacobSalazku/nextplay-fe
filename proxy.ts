@@ -11,11 +11,26 @@ export async function proxy(request: NextRequest) {
 
   const accessToken =
     token && typeof token.accessToken === 'string' ? token.accessToken : '';
+
   const tokenError =
     token && typeof token.error === 'string' ? token.error : undefined;
 
   const hasValidSession = Boolean(token && accessToken && !tokenError);
+
+  const hasOnBoarded =
+    token && typeof token.hasOnBoarded === 'boolean'
+      ? token.hasOnBoarded
+      : false;
+
   const isAuthPage = pathname.startsWith('/login');
+  const isCreatePage = pathname === '/create';
+  const isOnboardingPage = pathname.startsWith('/create/onboarding');
+  const isJoinOrCreateTeamPage =
+    pathname.startsWith('/create/join-team') ||
+    pathname.startsWith('/create/create-team');
+  const isCreateFlowRoute =
+    isCreatePage || isOnboardingPage || isJoinOrCreateTeamPage;
+
   const isProtectedPage =
     pathname.startsWith('/club') ||
     pathname.startsWith('/team') ||
@@ -24,32 +39,24 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith('/create') ||
     pathname.startsWith('/api/graphql');
 
-  const clearAuthCookies = (response: NextResponse) => {
-    response.cookies.delete('next-auth.session-token');
-    response.cookies.delete('__Secure-next-auth.session-token');
-  };
+  // Not logged in block protected
+  if (isProtectedPage && !hasValidSession) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
 
+  // Logged in redirect away from login
   if (isAuthPage && hasValidSession) {
     return NextResponse.redirect(new URL('/club', request.url));
   }
 
-  // Stale/invalid token cookie: allow login page and clear cookie to stop loops.
-  if (isAuthPage && token && !hasValidSession) {
-    const response = NextResponse.next();
-    clearAuthCookies(response);
-    return response;
+  // NOT onboarded → only create flow routes are allowed.
+  if (hasValidSession && !hasOnBoarded && !isCreateFlowRoute) {
+    return NextResponse.redirect(new URL('/create', request.url));
   }
 
-  if (isProtectedPage && !hasValidSession) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('error', 'SessionExpired');
-    const response = NextResponse.redirect(loginUrl);
-
-    if (token && !hasValidSession) {
-      clearAuthCookies(response);
-    }
-
-    return response;
+  // keep onboarding entry pages blocked, but still allow join/create team pages later.
+  if (hasValidSession && hasOnBoarded && (isCreatePage || isOnboardingPage)) {
+    return NextResponse.redirect(new URL('/club', request.url));
   }
 
   return NextResponse.next();
@@ -58,6 +65,7 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     '/login',
+    '/create',
     '/club/:path*',
     '/team/:path*',
     '/dashboard/:path*',
