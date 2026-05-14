@@ -1,5 +1,5 @@
 query GetUser($teamShortId: String!) {
-  getUserById(teamShortId: $teamShortId) {
+  getCurrentUser(teamShortId: $teamShortId) {
     user {
       id
       name
@@ -19,6 +19,21 @@ query GetUser($teamShortId: String!) {
       status
       number
       position
+      attendances {
+        id
+        activityId
+        memberId
+        attendanceStatus
+        reason
+        createdAt
+        updatedAt
+        activity {
+          id
+          title
+          time
+          date
+        }
+      }
     }
   }
 }
