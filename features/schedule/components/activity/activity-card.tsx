@@ -15,14 +15,14 @@ import {
   Activity,
   ActivityType,
   DeleteActivityDocument,
-  User,
+  MemberWithAttendances,
 } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import { Link } from '@/components/foundation/button/link';
 
 type ActivityCardProps = {
   activity: Activity;
-  member: User['members'][0];
+  member: MemberWithAttendances;
 };
 
 export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
@@ -74,6 +74,7 @@ export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
         position: 'top-center',
       });
     } catch (error) {
+      console.error(error);
       toast.error('Failed to delete activity');
     }
   };

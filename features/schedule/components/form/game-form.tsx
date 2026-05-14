@@ -18,9 +18,9 @@ import { toast } from 'sonner';
 import {
   ActivityType,
   CreateGameDocument,
+  MemberWithAttendances,
   Team,
   UpdateGameDocument,
-  User,
 } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import { CategoryBadge } from '@/components/foundation/category-badge';
@@ -32,7 +32,7 @@ type GameFormProps = {
   mode: Mode;
   team: Team;
   onClose: () => void;
-  member: User['members'][0];
+  member: MemberWithAttendances;
 };
 
 const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {

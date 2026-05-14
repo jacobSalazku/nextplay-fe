@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type FC } from 'react';
+import { type FC } from 'react';
 import { attendanceStatus } from '../utils/const';
 import { type AttendanceData, type AttendanceStatusOption } from '../zod';
 import useStore from '@/store/store';
@@ -8,7 +8,10 @@ import { useMutation } from '@apollo/client/react';
 import { format } from 'date-fns';
 import { X } from 'lucide-react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
-import { Member, SubmitAttendanceDocument } from '@/graphql/graphql';
+import {
+  MemberWithAttendances,
+  SubmitAttendanceDocument,
+} from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import { RadioGroup } from '@/components/foundation/radio/radio-group';
 import { RadioGroupItem } from '@/components/foundation/radio/radio-group-item';
@@ -18,20 +21,17 @@ type Mode = 'Game' | 'Practice';
 
 type AttendanceProps = {
   mode: Mode;
-  member: Member;
+  member: MemberWithAttendances;
 };
 
 const AttendanceModal: FC<AttendanceProps> = ({ mode, member }) => {
   const { selectedActivity, setOpenGameAttendance, setOpenPracticeAttendance } =
     useStore();
 
-  const [state, setFormState] = useState<Mode>(mode);
   const [submitAttendance] = useMutation(SubmitAttendanceDocument);
 
   const { handleSubmit, register, control, reset } = useForm<AttendanceData>({
     defaultValues: {
-      id: selectedActivity?.id ?? '',
-      teamMemberId: member?.id ?? '',
       attendanceStatus:
         (selectedActivity?.attendees?.find((a) => a.memberId === member?.id)
           ?.attendanceStatus as
@@ -45,12 +45,8 @@ const AttendanceModal: FC<AttendanceProps> = ({ mode, member }) => {
     },
   });
 
-  const isGame = state === 'Game';
+  const isGame = mode === 'Game';
   const attendanceSelection = useWatch({ control, name: 'attendanceStatus' });
-
-  useEffect(() => {
-    setFormState(mode);
-  }, [mode]);
 
   const formattedDate =
     selectedActivity && format(selectedActivity.date, 'EEEE, d MMM');
@@ -66,22 +62,18 @@ const AttendanceModal: FC<AttendanceProps> = ({ mode, member }) => {
     await submitAttendance({
       variables: {
         input: {
-          ...attendance,
-          id: selectedActivity.id,
-          memberId: member.id, // ✅ correct name
+          activityId: selectedActivity.id,
+          memberId: member.id,
+          attendanceStatus: attendance.attendanceStatus,
+          reason: attendance.reason ?? '',
         },
       },
     });
 
-    if (!isGame) {
-      setOpenGameAttendance(false);
-    } else {
-      setOpenPracticeAttendance(false);
-    }
+    if (isGame) setOpenGameAttendance(false);
+    if (!isGame) setOpenPracticeAttendance(false);
 
     reset({
-      id: selectedActivity?.id ?? '',
-      teamMemberId: member?.id ?? '',
       attendanceStatus: attendance.attendanceStatus,
       reason: attendance.reason,
     });
