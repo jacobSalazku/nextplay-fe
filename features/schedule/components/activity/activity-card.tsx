@@ -59,6 +59,25 @@ export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
     }
   };
 
+  const handleDeleteActivity = async (id: string) => {
+    try {
+      await deleteActivity({
+        variables: {
+          input: { id },
+        },
+      });
+
+      router.refresh();
+
+      toast.success('Activity deleted', {
+        ...deleteToastStyling,
+        position: 'top-center',
+      });
+    } catch (error) {
+      toast.error('Failed to delete activity');
+    }
+  };
+
   const date = isToday(new Date(activity.date));
 
   return (
@@ -122,20 +141,7 @@ export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
         </Button>
         {role && (
           <Button
-            onClick={async () => {
-              await deleteActivity({
-                variables: {
-                  input: {
-                    id: activity.id,
-                  },
-                },
-              });
-              router.refresh();
-              toast.success('Your Activity has been deleted', {
-                ...deleteToastStyling,
-                position: 'top-center',
-              });
-            }}
+            onClick={async () => handleDeleteActivity(activity.id)}
             aria-label="Delete Activity"
             size="sm"
             variant="danger"
