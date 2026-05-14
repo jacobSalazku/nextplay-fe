@@ -18,10 +18,10 @@ import { toast } from 'sonner';
 import {
   ActivityType,
   CreatePracticeDocument,
+  MemberWithAttendances,
   PracticeType,
   Team,
   UpdatePracticeDocument,
-  User,
 } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import { Input } from '@/components/foundation/input';
@@ -31,7 +31,7 @@ type PracticeProps = {
   mode: Mode;
   team: Team;
   onClose: () => void;
-  member: User['members'][0];
+  member: MemberWithAttendances;
 };
 
 const PracticeForm: FC<PracticeProps> = ({ mode, onClose, member }) => {
@@ -210,6 +210,7 @@ const PracticeForm: FC<PracticeProps> = ({ mode, onClose, member }) => {
             )}
           </>
         )}
+
         {(isEditMode || isCreateMode) && (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
             <Input

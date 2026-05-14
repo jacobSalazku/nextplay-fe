@@ -1,0 +1,39 @@
+query GetMembers($input: MembersInput!) {
+  getMembers(input: $input) {
+    id
+    userId
+    teamId
+    role
+    status
+    number
+    position
+    name
+    attendances {
+      id
+      activityId
+      memberId
+      attendanceStatus
+      reason
+      createdAt
+      updatedAt
+      activity {
+        id
+        title
+        time
+        date
+      }
+    }
+    user {
+      id
+      name
+      email
+      image
+      dateOfBirth
+      phone
+      height
+      weight
+      dominantHand
+      hasOnBoarded
+    }
+  }
+}

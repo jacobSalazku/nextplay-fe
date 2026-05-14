@@ -30,6 +30,7 @@ query GetTeamActivities($teamRef: String!) {
       updatedAt
       attendees {
         id
+        activityId
         memberId
         attendanceStatus
         reason

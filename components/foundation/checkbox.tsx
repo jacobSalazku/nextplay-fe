@@ -1,9 +1,9 @@
 'use client';
 
 import { useId, type ComponentProps, type ReactElement } from 'react';
-import { cn } from '@/utils/tw-merge';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import { CheckIcon } from 'lucide-react';
+import { cn } from '@/lib/helpers/utils';
 
 function Checkbox({
   className,

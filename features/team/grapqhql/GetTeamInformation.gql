@@ -1,0 +1,35 @@
+query GetTeam($input: GetTeamInput!) {
+  getTeam(input: $input) {
+    id
+    name
+    code
+    slug
+    shortId
+    routeKey
+    image
+    ageGroup
+    creatorId
+    createdAt
+    updatedAt
+    members {
+      id
+      teamId
+      name
+      number
+      position
+      image
+      user {
+        id
+        name
+        email
+        image
+        dateOfBirth
+        phone
+        height
+        weight
+        dominantHand
+        hasOnBoarded
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import CreateTeamForm from '@/features/auth/components/team-form';
-import { withProtectedPage } from '@/lib/auth/with-page-guards';
+import { withCreateFlowPage } from '@/lib/auth/with-page-guards';
 
 export const metadata: Metadata = {
   title: 'Create Team',
@@ -26,4 +26,4 @@ async function CreateTeamPage() {
   );
 }
 
-export default withProtectedPage(CreateTeamPage);
+export default withCreateFlowPage(CreateTeamPage);

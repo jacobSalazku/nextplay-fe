@@ -1,0 +1,3 @@
+mutation DeleteMember($input: DeleteMemberInput!) {
+  deleteMember(input: $input)
+}

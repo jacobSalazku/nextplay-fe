@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
 export const attendanceSchema = z.object({
-  id: z.string(),
-  teamMemberId: z.string(),
   attendanceStatus: z.enum(['ATTENDING', 'NOT_ATTENDING', 'LATE']),
   reason: z.string().optional(),
 });

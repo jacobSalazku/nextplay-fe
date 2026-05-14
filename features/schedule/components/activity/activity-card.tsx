@@ -15,14 +15,14 @@ import {
   Activity,
   ActivityType,
   DeleteActivityDocument,
-  User,
+  MemberWithAttendances,
 } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import { Link } from '@/components/foundation/button/link';
 
 type ActivityCardProps = {
   activity: Activity;
-  member: User['members'][0];
+  member: MemberWithAttendances;
 };
 
 export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
@@ -56,6 +56,26 @@ export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
       setOpenGameAttendance(true);
     } else {
       setOpenPracticeAttendance(true);
+    }
+  };
+
+  const handleDeleteActivity = async (id: string) => {
+    try {
+      await deleteActivity({
+        variables: {
+          input: { id },
+        },
+      });
+
+      router.refresh();
+
+      toast.success('Activity deleted', {
+        ...deleteToastStyling,
+        position: 'top-center',
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to delete activity');
     }
   };
 
@@ -122,20 +142,7 @@ export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
         </Button>
         {role && (
           <Button
-            onClick={async () => {
-              await deleteActivity({
-                variables: {
-                  input: {
-                    id: activity.id,
-                  },
-                },
-              });
-              router.refresh();
-              toast.success('Your Activity has been deleted', {
-                ...deleteToastStyling,
-                position: 'top-center',
-              });
-            }}
+            onClick={async () => handleDeleteActivity(activity.id)}
             aria-label="Delete Activity"
             size="sm"
             variant="danger"
