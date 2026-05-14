@@ -1,0 +1,39 @@
+query GetUserProfile($input: GetMemberProfileInput!) {
+  getUserProfile: getMemberProfile(input: $input) {
+    id
+    userId
+    teamId
+    role
+    status
+    number
+    position
+    name
+    user {
+      id
+      name
+      email
+      image
+      dateOfBirth
+      phone
+      height
+      weight
+      dominantHand
+      hasOnBoarded
+    }
+    attendances {
+      id
+      activityId
+      memberId
+      attendanceStatus
+      reason
+      createdAt
+      updatedAt
+      activity {
+        id
+        title
+        time
+        date
+      }
+    }
+  }
+}
