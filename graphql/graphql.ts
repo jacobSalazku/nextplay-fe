@@ -23,11 +23,6 @@ export type AcceptTeamRequestInput = {
   teamRef: Scalars['String']['input'];
 };
 
-export type ActiveAttendedMembersInput = {
-  activityId: Scalars['String']['input'];
-  teamRef: Scalars['String']['input'];
-};
-
 export type Activity = {
   __typename?: 'Activity';
   attendees: Array<PlayerActivityAttendance>;
@@ -160,23 +155,6 @@ export type Game = {
   __typename?: 'Game';
   activityId: Scalars['String']['output'];
   location: Location;
-  opponentStatline?: Maybe<OpponentStatline>;
-};
-
-export type GameWithBoxScore = {
-  __typename?: 'GameWithBoxScore';
-  activityId: Scalars['String']['output'];
-  date: Scalars['DateTime']['output'];
-  opponentName: Scalars['String']['output'];
-  opponentStats: OpponentTotalsBoxScore;
-  playerStats: Array<PlayerBoxScore>;
-  teamTotals: TeamTotalsBoxScore;
-  title: Scalars['String']['output'];
-};
-
-export type GetActivityInput = {
-  activityId: Scalars['String']['input'];
-  teamRef: Scalars['String']['input'];
 };
 
 export type GetAttendanceByActivitiesInput = {
@@ -241,24 +219,6 @@ export type MemberId = {
   id: Scalars['String']['output'];
 };
 
-export type MemberStatline = {
-  __typename?: 'MemberStatline';
-  activityId: Scalars['String']['output'];
-  assists: Scalars['Float']['output'];
-  blocks: Scalars['Float']['output'];
-  defensiveRebounds: Scalars['Float']['output'];
-  fieldGoalsMade: Scalars['Float']['output'];
-  fieldGoalsMissed: Scalars['Float']['output'];
-  freeThrows: Scalars['Float']['output'];
-  id: Scalars['ID']['output'];
-  missedFreeThrows: Scalars['Float']['output'];
-  offensiveRebounds: Scalars['Float']['output'];
-  steals: Scalars['Float']['output'];
-  threePointersMade: Scalars['Float']['output'];
-  threePointersMissed: Scalars['Float']['output'];
-  turnovers: Scalars['Float']['output'];
-};
-
 export type MemberWithAttendances = {
   __typename?: 'MemberWithAttendances';
   attendances: Array<PlayerActivityAttendance>;
@@ -267,20 +227,6 @@ export type MemberWithAttendances = {
   number?: Maybe<Scalars['String']['output']>;
   position?: Maybe<Scalars['String']['output']>;
   role: Role;
-  status: Status;
-  teamId: Scalars['String']['output'];
-  user?: Maybe<UserDetail>;
-  userId: Scalars['String']['output'];
-};
-
-export type MemberWithStatlines = {
-  __typename?: 'MemberWithStatlines';
-  id: Scalars['ID']['output'];
-  name?: Maybe<Scalars['String']['output']>;
-  number?: Maybe<Scalars['String']['output']>;
-  position?: Maybe<Scalars['String']['output']>;
-  role: Role;
-  statlines: Array<MemberStatline>;
   status: Status;
   teamId: Scalars['String']['output'];
   user?: Maybe<UserDetail>;
@@ -316,7 +262,6 @@ export type Mutation = {
   refresh: AuthPayload;
   rejectJoinRequest: ModerateJoinRequestResult;
   submitAttendance: PlayerActivityAttendance;
-  submitStatlines: SubmitStatlinesResult;
   updateFeedback: Activity;
   updateFilm: Activity;
   updateGame: Activity;
@@ -401,11 +346,6 @@ export type MutationSubmitAttendanceArgs = {
 };
 
 
-export type MutationSubmitStatlinesArgs = {
-  input: SubmitStatlinesInput;
-};
-
-
 export type MutationUpdateFeedbackArgs = {
   input: UpdateFeedbackInput;
 };
@@ -435,31 +375,6 @@ export type MutationUpdateUserArgs = {
   input: UpdateUserInput;
 };
 
-export type OpponentStatline = {
-  __typename?: 'OpponentStatline';
-  activityId: Scalars['String']['output'];
-  fieldGoalsMade: Scalars['Float']['output'];
-  freeThrowsMade: Scalars['Float']['output'];
-  name: Scalars['String']['output'];
-  threePointersMade: Scalars['Float']['output'];
-};
-
-export type OpponentStatlineInput = {
-  activityId: Scalars['String']['input'];
-  fieldGoalsMade: Scalars['Int']['input'];
-  freeThrowsMade: Scalars['Int']['input'];
-  name: Scalars['String']['input'];
-  threePointersMade: Scalars['Int']['input'];
-};
-
-export type OpponentTotalsBoxScore = {
-  __typename?: 'OpponentTotalsBoxScore';
-  fieldGoalsMade: Scalars['Float']['output'];
-  freeThrowsMade: Scalars['Float']['output'];
-  points: Scalars['Float']['output'];
-  threePointersMade: Scalars['Float']['output'];
-};
-
 export type PendingMember = {
   __typename?: 'PendingMember';
   email?: Maybe<Scalars['String']['output']>;
@@ -486,51 +401,6 @@ export type PlayerActivityAttendanceInput = {
   reason: Scalars['String']['input'];
 };
 
-export type PlayerBoxScore = {
-  __typename?: 'PlayerBoxScore';
-  assists: Scalars['Float']['output'];
-  blocks: Scalars['Float']['output'];
-  defensiveRebounds: Scalars['Float']['output'];
-  fieldGoalsMade: Scalars['Float']['output'];
-  freeThrows: Scalars['Float']['output'];
-  memberId: Scalars['String']['output'];
-  name?: Maybe<Scalars['String']['output']>;
-  offensiveRebounds: Scalars['Float']['output'];
-  points: Scalars['Float']['output'];
-  steals: Scalars['Float']['output'];
-  threePointersMade: Scalars['Float']['output'];
-  turnovers: Scalars['Float']['output'];
-};
-
-export type PlayerStatlineAverage = {
-  __typename?: 'PlayerStatlineAverage';
-  averages: PlayerStatlineAverageValues;
-  gamesPlayed: Scalars['Int']['output'];
-  memberId: Scalars['String']['output'];
-  name?: Maybe<Scalars['String']['output']>;
-  totalPoints: Scalars['Float']['output'];
-};
-
-export type PlayerStatlineAverageValues = {
-  __typename?: 'PlayerStatlineAverageValues';
-  assists: Scalars['Float']['output'];
-  blocks: Scalars['Float']['output'];
-  defensiveRebound: Scalars['Float']['output'];
-  fieldGoalPercentage: Scalars['Float']['output'];
-  freeThrowPercentage: Scalars['Float']['output'];
-  offensiveRebound: Scalars['Float']['output'];
-  pointsPerGame: Scalars['Float']['output'];
-  steals: Scalars['Float']['output'];
-  threePointPercentage: Scalars['Float']['output'];
-  turnovers: Scalars['Float']['output'];
-};
-
-export type PlayerStatlineEntryInput = {
-  activityId: Scalars['String']['input'];
-  memberId: Scalars['String']['input'];
-  statlines: Array<StatlineValueInput>;
-};
-
 export type Practice = {
   __typename?: 'Practice';
   activityId: Scalars['String']['output'];
@@ -548,27 +418,15 @@ export enum PracticeType {
 export type Query = {
   __typename?: 'Query';
   _ping: Scalars['Boolean']['output'];
-  getActiveAttendedMembers: Array<MemberWithStatlines>;
   getActivities: Array<Activity>;
-  getActivity: Activity;
   getCurrentUser: GetUserResponse;
   getDashboardTeams: Array<TeamDashboard>;
-  getGamesWithBoxScores: Array<GameWithBoxScore>;
   getMemberProfile: MemberWithAttendances;
   getMembers: Array<MemberWithAttendances>;
   getPendingMembers: Array<PendingMember>;
-  getStatlineAverages: Array<PlayerStatlineAverage>;
-  getStatsPerGame: Array<StatsPerGame>;
   getTeam: TeamInformation;
   getTeamActivities: Team;
-  getTeamStats: TeamStats;
-  getWeeklyTeamAverages: Array<WeeklyTeamAverage>;
   me: User;
-};
-
-
-export type QueryGetActiveAttendedMembersArgs = {
-  input: ActiveAttendedMembersInput;
 };
 
 
@@ -577,18 +435,8 @@ export type QueryGetActivitiesArgs = {
 };
 
 
-export type QueryGetActivityArgs = {
-  input: GetActivityInput;
-};
-
-
 export type QueryGetCurrentUserArgs = {
   teamShortId: Scalars['String']['input'];
-};
-
-
-export type QueryGetGamesWithBoxScoresArgs = {
-  input: TeamStatlineInput;
 };
 
 
@@ -607,16 +455,6 @@ export type QueryGetPendingMembersArgs = {
 };
 
 
-export type QueryGetStatlineAveragesArgs = {
-  input: TeamStatlineInput;
-};
-
-
-export type QueryGetStatsPerGameArgs = {
-  input: StatsPerGameInput;
-};
-
-
 export type QueryGetTeamArgs = {
   input: GetTeamInput;
 };
@@ -626,80 +464,16 @@ export type QueryGetTeamActivitiesArgs = {
   teamRef: Scalars['String']['input'];
 };
 
-
-export type QueryGetTeamStatsArgs = {
-  input: TeamStatlineInput;
-};
-
-
-export type QueryGetWeeklyTeamAveragesArgs = {
-  input: TeamStatlineInput;
-};
-
 export enum Role {
   Coach = 'COACH',
   Player = 'PLAYER'
 }
-
-export type SavedOpponentStatline = {
-  __typename?: 'SavedOpponentStatline';
-  fieldGoalsMade: Scalars['Float']['output'];
-  freeThrowsMade: Scalars['Float']['output'];
-  gameId: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  threePointersMade: Scalars['Float']['output'];
-};
-
-export type StatlineValueInput = {
-  assists?: InputMaybe<Scalars['Int']['input']>;
-  blocks?: InputMaybe<Scalars['Int']['input']>;
-  defensiveRebounds?: InputMaybe<Scalars['Int']['input']>;
-  fieldGoalsMade?: InputMaybe<Scalars['Int']['input']>;
-  fieldGoalsMissed?: InputMaybe<Scalars['Int']['input']>;
-  freeThrows?: InputMaybe<Scalars['Int']['input']>;
-  freeThrowsMissed?: InputMaybe<Scalars['Int']['input']>;
-  offensiveRebounds?: InputMaybe<Scalars['Int']['input']>;
-  steals?: InputMaybe<Scalars['Int']['input']>;
-  threePointersMade?: InputMaybe<Scalars['Int']['input']>;
-  threePointersMissed?: InputMaybe<Scalars['Int']['input']>;
-  turnovers?: InputMaybe<Scalars['Int']['input']>;
-};
-
-export type StatsPerGame = {
-  __typename?: 'StatsPerGame';
-  assists: Scalars['Float']['output'];
-  date?: Maybe<Scalars['DateTime']['output']>;
-  gameTitle: Scalars['String']['output'];
-  points: Scalars['Float']['output'];
-  rebounds: Scalars['Float']['output'];
-  steals: Scalars['Float']['output'];
-};
-
-export type StatsPerGameInput = {
-  memberId: Scalars['String']['input'];
-  month: Scalars['Int']['input'];
-  teamRef: Scalars['String']['input'];
-  year: Scalars['Int']['input'];
-};
 
 export enum Status {
   Active = 'ACTIVE',
   Inactive = 'INACTIVE',
   Pending = 'PENDING'
 }
-
-export type SubmitStatlinesInput = {
-  opponentStatline?: InputMaybe<OpponentStatlineInput>;
-  players: Array<PlayerStatlineEntryInput>;
-  teamRef: Scalars['String']['input'];
-};
-
-export type SubmitStatlinesResult = {
-  __typename?: 'SubmitStatlinesResult';
-  count: Scalars['Int']['output'];
-  opponentStatline?: Maybe<SavedOpponentStatline>;
-  success: Scalars['Boolean']['output'];
-};
 
 export type Team = {
   __typename?: 'Team';
@@ -716,28 +490,6 @@ export type Team = {
   shortId: Scalars['String']['output'];
   slug: Scalars['String']['output'];
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
-};
-
-export type TeamAdvancedValues = {
-  __typename?: 'TeamAdvancedValues';
-  assistToTurnoverRatio: Scalars['Float']['output'];
-  effectiveFieldGoalPercentage: Scalars['Float']['output'];
-  netRating: Scalars['Float']['output'];
-  offensiveRating: Scalars['Float']['output'];
-  trueShootingPercentage: Scalars['Float']['output'];
-};
-
-export type TeamAverageValues = {
-  __typename?: 'TeamAverageValues';
-  assists: Scalars['Float']['output'];
-  blocks: Scalars['Float']['output'];
-  fieldGoalPercentage: Scalars['Float']['output'];
-  freeThrowPercentage: Scalars['Float']['output'];
-  pointsPerGame: Scalars['Float']['output'];
-  rebounds: Scalars['Float']['output'];
-  steals: Scalars['Float']['output'];
-  threePointPercentage: Scalars['Float']['output'];
-  turnovers: Scalars['Float']['output'];
 };
 
 export type TeamDashboard = {
@@ -790,44 +542,6 @@ export type TeamMemberUser = {
 
 export type TeamRequestInput = {
   memberId: Scalars['String']['input'];
-};
-
-export type TeamStatlineInput = {
-  teamRef: Scalars['String']['input'];
-};
-
-export type TeamStats = {
-  __typename?: 'TeamStats';
-  advanced: TeamAdvancedValues;
-  averages: TeamAverageValues;
-  totalAssists: Scalars['Float']['output'];
-  totalBlocks: Scalars['Float']['output'];
-  totalFieldGoalsMade: Scalars['Float']['output'];
-  totalFieldGoalsMissed: Scalars['Float']['output'];
-  totalFreeThrows: Scalars['Float']['output'];
-  totalFreeThrowsMissed: Scalars['Float']['output'];
-  totalGames: Scalars['Int']['output'];
-  totalOpponentPoints: Scalars['Float']['output'];
-  totalPoints: Scalars['Float']['output'];
-  totalRebounds: Scalars['Float']['output'];
-  totalSteals: Scalars['Float']['output'];
-  totalThreePointersMade: Scalars['Float']['output'];
-  totalThreePointersMissed: Scalars['Float']['output'];
-  totalTurnovers: Scalars['Float']['output'];
-};
-
-export type TeamTotalsBoxScore = {
-  __typename?: 'TeamTotalsBoxScore';
-  assists: Scalars['Float']['output'];
-  blocks: Scalars['Float']['output'];
-  defensiveRebounds: Scalars['Float']['output'];
-  fieldGoalsMade: Scalars['Float']['output'];
-  freeThrows: Scalars['Float']['output'];
-  offensiveRebounds: Scalars['Float']['output'];
-  points: Scalars['Float']['output'];
-  steals: Scalars['Float']['output'];
-  threePointersMade: Scalars['Float']['output'];
-  turnovers: Scalars['Float']['output'];
 };
 
 export type UpdateFeedbackInput = {
@@ -903,35 +617,6 @@ export type UserProfile = {
   name?: Maybe<Scalars['String']['output']>;
   phone?: Maybe<Scalars['String']['output']>;
   weight?: Maybe<Scalars['Float']['output']>;
-};
-
-export type WeeklyTeamAverage = {
-  __typename?: 'WeeklyTeamAverage';
-  assists: Scalars['Float']['output'];
-  averages: WeeklyTeamAverageValues;
-  blocks: Scalars['Float']['output'];
-  fieldGoalsMade: Scalars['Float']['output'];
-  fieldGoalsMissed: Scalars['Float']['output'];
-  freeThrows: Scalars['Float']['output'];
-  freeThrowsMissed: Scalars['Float']['output'];
-  gamesPlayed: Scalars['Int']['output'];
-  rebounds: Scalars['Float']['output'];
-  steals: Scalars['Float']['output'];
-  threePointersMade: Scalars['Float']['output'];
-  threePointersMissed: Scalars['Float']['output'];
-  totalPoints: Scalars['Float']['output'];
-  turnovers: Scalars['Float']['output'];
-  weekStart: Scalars['String']['output'];
-};
-
-export type WeeklyTeamAverageValues = {
-  __typename?: 'WeeklyTeamAverageValues';
-  assistsPerGame: Scalars['Float']['output'];
-  blocksPerGame: Scalars['Float']['output'];
-  pointsPerGame: Scalars['Float']['output'];
-  reboundsPerGame: Scalars['Float']['output'];
-  stealsPerGame: Scalars['Float']['output'];
-  turnoversPerGame: Scalars['Float']['output'];
 };
 
 export type GetUserQueryVariables = Exact<{
@@ -1091,62 +776,6 @@ export type UpdatePracticeMutationVariables = Exact<{
 
 export type UpdatePracticeMutation = { __typename?: 'Mutation', updatePractice: { __typename?: 'Activity', id: string, title: string, time: string, date: any, duration?: number | null, type: ActivityType, teamId: string, practice?: { __typename?: 'Practice', facility: string, practicetype: string } | null } };
 
-export type GetActiveAttendedMembersQueryVariables = Exact<{
-  input: ActiveAttendedMembersInput;
-}>;
-
-
-export type GetActiveAttendedMembersQuery = { __typename?: 'Query', getActiveAttendedMembers: Array<{ __typename?: 'MemberWithStatlines', id: string, userId: string, teamId: string, role: Role, status: Status, number?: string | null, position?: string | null, name?: string | null, user?: { __typename?: 'UserDetail', id: string, name?: string | null, image?: string | null, email?: string | null, dateOfBirth?: any | null, phone?: string | null, height?: number | null, weight?: number | null, dominantHand?: string | null, hasOnBoarded: boolean } | null, statlines: Array<{ __typename?: 'MemberStatline', id: string, activityId: string, fieldGoalsMade: number, fieldGoalsMissed: number, threePointersMade: number, threePointersMissed: number, freeThrows: number, missedFreeThrows: number, assists: number, steals: number, turnovers: number, offensiveRebounds: number, defensiveRebounds: number, blocks: number }> }> };
-
-export type GetActivityQueryVariables = Exact<{
-  input: GetActivityInput;
-}>;
-
-
-export type GetActivityQuery = { __typename?: 'Query', getActivity: { __typename?: 'Activity', id: string, title: string, time: string, type: ActivityType, duration?: number | null, date: any, createdAt: any, updatedAt: any, teamId: string, attendees: Array<{ __typename?: 'PlayerActivityAttendance', id: string, activityId: string, memberId: string, attendanceStatus: AttendanceStatus, reason?: string | null, createdAt: any, updatedAt: any }>, game?: { __typename?: 'Game', activityId: string, location: Location, opponentStatline?: { __typename?: 'OpponentStatline', activityId: string, name: string, fieldGoalsMade: number, threePointersMade: number, freeThrowsMade: number } | null } | null } };
-
-export type GetGamesWithBoxScoresQueryVariables = Exact<{
-  input: TeamStatlineInput;
-}>;
-
-
-export type GetGamesWithBoxScoresQuery = { __typename?: 'Query', getGamesWithBoxScores: Array<{ __typename?: 'GameWithBoxScore', activityId: string, title: string, date: any, opponentName: string, opponentStats: { __typename?: 'OpponentTotalsBoxScore', fieldGoalsMade: number, threePointersMade: number, freeThrowsMade: number, points: number }, teamTotals: { __typename?: 'TeamTotalsBoxScore', fieldGoalsMade: number, threePointersMade: number, freeThrows: number, assists: number, offensiveRebounds: number, defensiveRebounds: number, steals: number, blocks: number, turnovers: number, points: number }, playerStats: Array<{ __typename?: 'PlayerBoxScore', memberId: string, name?: string | null, fieldGoalsMade: number, threePointersMade: number, freeThrows: number, assists: number, offensiveRebounds: number, defensiveRebounds: number, steals: number, blocks: number, turnovers: number, points: number }> }> };
-
-export type GetStatlineAveragesQueryVariables = Exact<{
-  input: TeamStatlineInput;
-}>;
-
-
-export type GetStatlineAveragesQuery = { __typename?: 'Query', getStatlineAverages: Array<{ __typename?: 'PlayerStatlineAverage', memberId: string, name?: string | null, totalPoints: number, gamesPlayed: number, averages: { __typename?: 'PlayerStatlineAverageValues', pointsPerGame: number, fieldGoalPercentage: number, threePointPercentage: number, freeThrowPercentage: number, assists: number, offensiveRebound: number, defensiveRebound: number, blocks: number, steals: number, turnovers: number } }> };
-
-export type GetStatsPerGameQueryVariables = Exact<{
-  input: StatsPerGameInput;
-}>;
-
-
-export type GetStatsPerGameQuery = { __typename?: 'Query', getStatsPerGame: Array<{ __typename?: 'StatsPerGame', gameTitle: string, date?: any | null, points: number, assists: number, rebounds: number, steals: number }> };
-
-export type GetTeamStatsQueryVariables = Exact<{
-  input: TeamStatlineInput;
-}>;
-
-
-export type GetTeamStatsQuery = { __typename?: 'Query', getTeamStats: { __typename?: 'TeamStats', totalGames: number, totalFieldGoalsMade: number, totalFieldGoalsMissed: number, totalThreePointersMade: number, totalThreePointersMissed: number, totalFreeThrows: number, totalFreeThrowsMissed: number, totalAssists: number, totalRebounds: number, totalSteals: number, totalBlocks: number, totalTurnovers: number, totalPoints: number, totalOpponentPoints: number, averages: { __typename?: 'TeamAverageValues', pointsPerGame: number, fieldGoalPercentage: number, threePointPercentage: number, freeThrowPercentage: number, assists: number, rebounds: number, steals: number, blocks: number, turnovers: number }, advanced: { __typename?: 'TeamAdvancedValues', offensiveRating: number, trueShootingPercentage: number, assistToTurnoverRatio: number, netRating: number, effectiveFieldGoalPercentage: number } } };
-
-export type GetWeeklyTeamAveragesQueryVariables = Exact<{
-  input: TeamStatlineInput;
-}>;
-
-
-export type GetWeeklyTeamAveragesQuery = { __typename?: 'Query', getWeeklyTeamAverages: Array<{ __typename?: 'WeeklyTeamAverage', weekStart: string, gamesPlayed: number, totalPoints: number, fieldGoalsMade: number, fieldGoalsMissed: number, threePointersMade: number, threePointersMissed: number, freeThrows: number, freeThrowsMissed: number, assists: number, rebounds: number, steals: number, blocks: number, turnovers: number, averages: { __typename?: 'WeeklyTeamAverageValues', pointsPerGame: number, assistsPerGame: number, reboundsPerGame: number, blocksPerGame: number, stealsPerGame: number, turnoversPerGame: number } }> };
-
-export type SubmitStatlinesMutationVariables = Exact<{
-  input: SubmitStatlinesInput;
-}>;
-
-
-export type SubmitStatlinesMutation = { __typename?: 'Mutation', submitStatlines: { __typename?: 'SubmitStatlinesResult', success: boolean, count: number, opponentStatline?: { __typename?: 'SavedOpponentStatline', gameId: string, name: string, fieldGoalsMade: number, threePointersMade: number, freeThrowsMade: number } | null } };
-
 export type DeleteMemberMutationVariables = Exact<{
   input: DeleteMemberInput;
 }>;
@@ -1206,14 +835,6 @@ export const UpdateFilmDocument = {"kind":"Document","definitions":[{"kind":"Ope
 export const UpdateGameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateGame"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateGameInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"game"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"location"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateGameMutation, UpdateGameMutationVariables>;
 export const UpdateMeetingDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateMeeting"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateMeetingInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateMeeting"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"meeting"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"notes"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateMeetingMutation, UpdateMeetingMutationVariables>;
 export const UpdatePracticeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdatePractice"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdatePracticeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updatePractice"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"practice"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"facility"}},{"kind":"Field","name":{"kind":"Name","value":"practicetype"}}]}}]}}]}}]} as unknown as DocumentNode<UpdatePracticeMutation, UpdatePracticeMutationVariables>;
-export const GetActiveAttendedMembersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetActiveAttendedMembers"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ActiveAttendedMembersInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getActiveAttendedMembers"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"number"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"dateOfBirth"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"dominantHand"}},{"kind":"Field","name":{"kind":"Name","value":"hasOnBoarded"}}]}},{"kind":"Field","name":{"kind":"Name","value":"statlines"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"fieldGoalsMade"}},{"kind":"Field","name":{"kind":"Name","value":"fieldGoalsMissed"}},{"kind":"Field","name":{"kind":"Name","value":"threePointersMade"}},{"kind":"Field","name":{"kind":"Name","value":"threePointersMissed"}},{"kind":"Field","name":{"kind":"Name","value":"freeThrows"}},{"kind":"Field","name":{"kind":"Name","value":"missedFreeThrows"}},{"kind":"Field","name":{"kind":"Name","value":"assists"}},{"kind":"Field","name":{"kind":"Name","value":"steals"}},{"kind":"Field","name":{"kind":"Name","value":"turnovers"}},{"kind":"Field","name":{"kind":"Name","value":"offensiveRebounds"}},{"kind":"Field","name":{"kind":"Name","value":"defensiveRebounds"}},{"kind":"Field","name":{"kind":"Name","value":"blocks"}}]}}]}}]}}]} as unknown as DocumentNode<GetActiveAttendedMembersQuery, GetActiveAttendedMembersQueryVariables>;
-export const GetActivityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetActivity"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetActivityInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getActivity"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"attendees"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"memberId"}},{"kind":"Field","name":{"kind":"Name","value":"attendanceStatus"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"game"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"location"}},{"kind":"Field","name":{"kind":"Name","value":"opponentStatline"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"fieldGoalsMade"}},{"kind":"Field","name":{"kind":"Name","value":"threePointersMade"}},{"kind":"Field","name":{"kind":"Name","value":"freeThrowsMade"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetActivityQuery, GetActivityQueryVariables>;
-export const GetGamesWithBoxScoresDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGamesWithBoxScores"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"TeamStatlineInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getGamesWithBoxScores"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"opponentName"}},{"kind":"Field","name":{"kind":"Name","value":"opponentStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"fieldGoalsMade"}},{"kind":"Field","name":{"kind":"Name","value":"threePointersMade"}},{"kind":"Field","name":{"kind":"Name","value":"freeThrowsMade"}},{"kind":"Field","name":{"kind":"Name","value":"points"}}]}},{"kind":"Field","name":{"kind":"Name","value":"teamTotals"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"fieldGoalsMade"}},{"kind":"Field","name":{"kind":"Name","value":"threePointersMade"}},{"kind":"Field","name":{"kind":"Name","value":"freeThrows"}},{"kind":"Field","name":{"kind":"Name","value":"assists"}},{"kind":"Field","name":{"kind":"Name","value":"offensiveRebounds"}},{"kind":"Field","name":{"kind":"Name","value":"defensiveRebounds"}},{"kind":"Field","name":{"kind":"Name","value":"steals"}},{"kind":"Field","name":{"kind":"Name","value":"blocks"}},{"kind":"Field","name":{"kind":"Name","value":"turnovers"}},{"kind":"Field","name":{"kind":"Name","value":"points"}}]}},{"kind":"Field","name":{"kind":"Name","value":"playerStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"memberId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"fieldGoalsMade"}},{"kind":"Field","name":{"kind":"Name","value":"threePointersMade"}},{"kind":"Field","name":{"kind":"Name","value":"freeThrows"}},{"kind":"Field","name":{"kind":"Name","value":"assists"}},{"kind":"Field","name":{"kind":"Name","value":"offensiveRebounds"}},{"kind":"Field","name":{"kind":"Name","value":"defensiveRebounds"}},{"kind":"Field","name":{"kind":"Name","value":"steals"}},{"kind":"Field","name":{"kind":"Name","value":"blocks"}},{"kind":"Field","name":{"kind":"Name","value":"turnovers"}},{"kind":"Field","name":{"kind":"Name","value":"points"}}]}}]}}]}}]} as unknown as DocumentNode<GetGamesWithBoxScoresQuery, GetGamesWithBoxScoresQueryVariables>;
-export const GetStatlineAveragesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetStatlineAverages"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"TeamStatlineInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getStatlineAverages"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"memberId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"totalPoints"}},{"kind":"Field","name":{"kind":"Name","value":"gamesPlayed"}},{"kind":"Field","name":{"kind":"Name","value":"averages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pointsPerGame"}},{"kind":"Field","name":{"kind":"Name","value":"fieldGoalPercentage"}},{"kind":"Field","name":{"kind":"Name","value":"threePointPercentage"}},{"kind":"Field","name":{"kind":"Name","value":"freeThrowPercentage"}},{"kind":"Field","name":{"kind":"Name","value":"assists"}},{"kind":"Field","name":{"kind":"Name","value":"offensiveRebound"}},{"kind":"Field","name":{"kind":"Name","value":"defensiveRebound"}},{"kind":"Field","name":{"kind":"Name","value":"blocks"}},{"kind":"Field","name":{"kind":"Name","value":"steals"}},{"kind":"Field","name":{"kind":"Name","value":"turnovers"}}]}}]}}]}}]} as unknown as DocumentNode<GetStatlineAveragesQuery, GetStatlineAveragesQueryVariables>;
-export const GetStatsPerGameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetStatsPerGame"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"StatsPerGameInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getStatsPerGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"gameTitle"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"points"}},{"kind":"Field","name":{"kind":"Name","value":"assists"}},{"kind":"Field","name":{"kind":"Name","value":"rebounds"}},{"kind":"Field","name":{"kind":"Name","value":"steals"}}]}}]}}]} as unknown as DocumentNode<GetStatsPerGameQuery, GetStatsPerGameQueryVariables>;
-export const GetTeamStatsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTeamStats"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"TeamStatlineInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getTeamStats"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalGames"}},{"kind":"Field","name":{"kind":"Name","value":"totalFieldGoalsMade"}},{"kind":"Field","name":{"kind":"Name","value":"totalFieldGoalsMissed"}},{"kind":"Field","name":{"kind":"Name","value":"totalThreePointersMade"}},{"kind":"Field","name":{"kind":"Name","value":"totalThreePointersMissed"}},{"kind":"Field","name":{"kind":"Name","value":"totalFreeThrows"}},{"kind":"Field","name":{"kind":"Name","value":"totalFreeThrowsMissed"}},{"kind":"Field","name":{"kind":"Name","value":"totalAssists"}},{"kind":"Field","name":{"kind":"Name","value":"totalRebounds"}},{"kind":"Field","name":{"kind":"Name","value":"totalSteals"}},{"kind":"Field","name":{"kind":"Name","value":"totalBlocks"}},{"kind":"Field","name":{"kind":"Name","value":"totalTurnovers"}},{"kind":"Field","name":{"kind":"Name","value":"totalPoints"}},{"kind":"Field","name":{"kind":"Name","value":"totalOpponentPoints"}},{"kind":"Field","name":{"kind":"Name","value":"averages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pointsPerGame"}},{"kind":"Field","name":{"kind":"Name","value":"fieldGoalPercentage"}},{"kind":"Field","name":{"kind":"Name","value":"threePointPercentage"}},{"kind":"Field","name":{"kind":"Name","value":"freeThrowPercentage"}},{"kind":"Field","name":{"kind":"Name","value":"assists"}},{"kind":"Field","name":{"kind":"Name","value":"rebounds"}},{"kind":"Field","name":{"kind":"Name","value":"steals"}},{"kind":"Field","name":{"kind":"Name","value":"blocks"}},{"kind":"Field","name":{"kind":"Name","value":"turnovers"}}]}},{"kind":"Field","name":{"kind":"Name","value":"advanced"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"offensiveRating"}},{"kind":"Field","name":{"kind":"Name","value":"trueShootingPercentage"}},{"kind":"Field","name":{"kind":"Name","value":"assistToTurnoverRatio"}},{"kind":"Field","name":{"kind":"Name","value":"netRating"}},{"kind":"Field","name":{"kind":"Name","value":"effectiveFieldGoalPercentage"}}]}}]}}]}}]} as unknown as DocumentNode<GetTeamStatsQuery, GetTeamStatsQueryVariables>;
-export const GetWeeklyTeamAveragesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetWeeklyTeamAverages"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"TeamStatlineInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getWeeklyTeamAverages"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"weekStart"}},{"kind":"Field","name":{"kind":"Name","value":"gamesPlayed"}},{"kind":"Field","name":{"kind":"Name","value":"totalPoints"}},{"kind":"Field","name":{"kind":"Name","value":"fieldGoalsMade"}},{"kind":"Field","name":{"kind":"Name","value":"fieldGoalsMissed"}},{"kind":"Field","name":{"kind":"Name","value":"threePointersMade"}},{"kind":"Field","name":{"kind":"Name","value":"threePointersMissed"}},{"kind":"Field","name":{"kind":"Name","value":"freeThrows"}},{"kind":"Field","name":{"kind":"Name","value":"freeThrowsMissed"}},{"kind":"Field","name":{"kind":"Name","value":"assists"}},{"kind":"Field","name":{"kind":"Name","value":"rebounds"}},{"kind":"Field","name":{"kind":"Name","value":"steals"}},{"kind":"Field","name":{"kind":"Name","value":"blocks"}},{"kind":"Field","name":{"kind":"Name","value":"turnovers"}},{"kind":"Field","name":{"kind":"Name","value":"averages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pointsPerGame"}},{"kind":"Field","name":{"kind":"Name","value":"assistsPerGame"}},{"kind":"Field","name":{"kind":"Name","value":"reboundsPerGame"}},{"kind":"Field","name":{"kind":"Name","value":"blocksPerGame"}},{"kind":"Field","name":{"kind":"Name","value":"stealsPerGame"}},{"kind":"Field","name":{"kind":"Name","value":"turnoversPerGame"}}]}}]}}]}}]} as unknown as DocumentNode<GetWeeklyTeamAveragesQuery, GetWeeklyTeamAveragesQueryVariables>;
-export const SubmitStatlinesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SubmitStatlines"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SubmitStatlinesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"submitStatlines"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"count"}},{"kind":"Field","name":{"kind":"Name","value":"opponentStatline"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"gameId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"fieldGoalsMade"}},{"kind":"Field","name":{"kind":"Name","value":"threePointersMade"}},{"kind":"Field","name":{"kind":"Name","value":"freeThrowsMade"}}]}}]}}]}}]} as unknown as DocumentNode<SubmitStatlinesMutation, SubmitStatlinesMutationVariables>;
 export const DeleteMemberDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteMember"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteMemberInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMember"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}]}]}}]} as unknown as DocumentNode<DeleteMemberMutation, DeleteMemberMutationVariables>;
 export const GetMembersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMembers"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MembersInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getMembers"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"number"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attendances"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"memberId"}},{"kind":"Field","name":{"kind":"Name","value":"attendanceStatus"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"activity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"dateOfBirth"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"dominantHand"}},{"kind":"Field","name":{"kind":"Name","value":"hasOnBoarded"}}]}}]}}]}}]} as unknown as DocumentNode<GetMembersQuery, GetMembersQueryVariables>;
 export const GetTeamDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTeam"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetTeamInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getTeam"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"shortId"}},{"kind":"Field","name":{"kind":"Name","value":"routeKey"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"ageGroup"}},{"kind":"Field","name":{"kind":"Name","value":"creatorId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"members"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"number"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"dateOfBirth"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"dominantHand"}},{"kind":"Field","name":{"kind":"Name","value":"hasOnBoarded"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetTeamQuery, GetTeamQueryVariables>;

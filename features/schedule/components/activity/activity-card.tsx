@@ -26,7 +26,7 @@ type ActivityCardProps = {
 };
 
 export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
-  const { teamRef } = useTeam();
+  const { teamSlug } = useTeam();
   const [deleteActivity] = useMutation(DeleteActivityDocument);
 
   const router = useRouter();
@@ -109,7 +109,7 @@ export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
           <Link
             aria-label="Create Box Score"
             href={{
-              pathname: `/team/${teamRef}/schedule/box-score`,
+              pathname: `/${teamSlug}/schedule/box-score`,
               query: { activityId: activity.id },
             }}
             size="sm"
