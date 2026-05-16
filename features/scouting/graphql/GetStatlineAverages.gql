@@ -1,0 +1,20 @@
+query GetStatlineAverages($input: TeamStatlineInput!) {
+  getStatlineAverages(input: $input) {
+    memberId
+    name
+    totalPoints
+    gamesPlayed
+    averages {
+      pointsPerGame
+      fieldGoalPercentage
+      threePointPercentage
+      freeThrowPercentage
+      assists
+      offensiveRebound
+      defensiveRebound
+      blocks
+      steals
+      turnovers
+    }
+  }
+}

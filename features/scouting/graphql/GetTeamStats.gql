@@ -1,0 +1,36 @@
+query GetTeamStats($input: TeamStatlineInput!) {
+  getTeamStats(input: $input) {
+    totalGames
+    totalFieldGoalsMade
+    totalFieldGoalsMissed
+    totalThreePointersMade
+    totalThreePointersMissed
+    totalFreeThrows
+    totalFreeThrowsMissed
+    totalAssists
+    totalRebounds
+    totalSteals
+    totalBlocks
+    totalTurnovers
+    totalPoints
+    totalOpponentPoints
+    averages {
+      pointsPerGame
+      fieldGoalPercentage
+      threePointPercentage
+      freeThrowPercentage
+      assists
+      rebounds
+      steals
+      blocks
+      turnovers
+    }
+    advanced {
+      offensiveRating
+      trueShootingPercentage
+      assistToTurnoverRatio
+      netRating
+      effectiveFieldGoalPercentage
+    }
+  }
+}
