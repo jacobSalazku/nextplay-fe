@@ -1,0 +1,10 @@
+query GetStatsPerGame($input: StatsPerGameInput!) {
+  getStatsPerGame(input: $input) {
+    gameTitle
+    date
+    points
+    assists
+    rebounds
+    steals
+  }
+}

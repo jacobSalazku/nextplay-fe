@@ -1,0 +1,40 @@
+query GetActiveAttendedMembers($input: ActiveAttendedMembersInput!) {
+  getActiveAttendedMembers(input: $input) {
+    id
+    userId
+    teamId
+    role
+    status
+    number
+    position
+    name
+    user {
+      id
+      name
+      image
+      email
+      dateOfBirth
+      phone
+      height
+      weight
+      dominantHand
+      hasOnBoarded
+    }
+    statlines {
+      id
+      activityId
+      fieldGoalsMade
+      fieldGoalsMissed
+      threePointersMade
+      threePointersMissed
+      freeThrows
+      missedFreeThrows
+      assists
+      steals
+      turnovers
+      offensiveRebounds
+      defensiveRebounds
+      blocks
+    }
+  }
+}

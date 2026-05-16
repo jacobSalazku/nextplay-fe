@@ -1,0 +1,26 @@
+query GetWeeklyTeamAverages($input: TeamStatlineInput!) {
+  getWeeklyTeamAverages(input: $input) {
+    weekStart
+    gamesPlayed
+    totalPoints
+    fieldGoalsMade
+    fieldGoalsMissed
+    threePointersMade
+    threePointersMissed
+    freeThrows
+    freeThrowsMissed
+    assists
+    rebounds
+    steals
+    blocks
+    turnovers
+    averages {
+      pointsPerGame
+      assistsPerGame
+      reboundsPerGame
+      blocksPerGame
+      stealsPerGame
+      turnoversPerGame
+    }
+  }
+}
