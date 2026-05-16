@@ -121,7 +121,10 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
     setLastChange(null);
   };
 
-  const onSubmit = async (data: PlayersData) => {
+  const onSubmit = async (
+    data: PlayersData,
+    source: 'manual' | 'autosave' = 'manual',
+  ) => {
     const updatedPlayers: TrackerPlayers = data.players.map((player) => {
       const sanitized = sanitizeStatline(player.statlines?.[0] ?? {});
       return {
@@ -130,25 +133,33 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
       };
     }) as TrackerPlayers;
 
+    const mutationInput = {
+      teamRef,
+      players: updatedPlayers.map((player: TrackerPlayer) => ({
+        memberId: player.id,
+        activityId: activity.id,
+        statlines: [toMutationStatline(player.statlines[0] ?? defaultStatline)],
+      })),
+      opponentStatline: {
+        name: activity.title,
+        fieldGoalsMade: data.opponentStatline.fieldGoalsMade,
+        threePointersMade: data.opponentStatline.threePointersMade,
+        freeThrowsMade: data.opponentStatline.freeThrowsMade,
+        activityId: activity.id,
+      },
+    };
+
+    console.info('[Statline] submitStatlines request', {
+      source,
+      activityId: activity.id,
+      teamRef,
+      playerCount: mutationInput.players.length,
+      payload: mutationInput,
+    });
+
     await createStatline({
       variables: {
-        input: {
-          teamRef,
-          players: updatedPlayers.map((player: TrackerPlayer) => ({
-            memberId: player.id,
-            activityId: activity.id,
-            statlines: [
-              toMutationStatline(player.statlines[0] ?? defaultStatline),
-            ],
-          })),
-          opponentStatline: {
-            name: activity.title,
-            fieldGoalsMade: data.opponentStatline.fieldGoalsMade,
-            threePointersMade: data.opponentStatline.threePointersMade,
-            freeThrowsMade: data.opponentStatline.freeThrowsMade,
-            activityId: activity.id,
-          },
-        },
+        input: mutationInput,
       },
     });
 
@@ -166,7 +177,7 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
     });
   };
 
-  useDebouncedSave(stats, onSubmit, 10000);
+  useDebouncedSave(stats, (snapshot) => onSubmit(snapshot, 'autosave'), 10000);
 
   return (
     <>
@@ -178,7 +189,7 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
         setActivePlayerIndex={setActivePlayerIndex}
         onIncrement={handleChange}
         statsForPlayer={statsForPlayer}
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit((data) => onSubmit(data, 'manual'))}
         opponentStatline={stats.opponentStatline}
         setValue={setValue}
         undoLastChange={handleUndo}
@@ -186,7 +197,7 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
 
       <form
         key={activity.id}
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit((data) => onSubmit(data, 'manual'))}
         className="mx-auto hidden w-full p-4 sm:p-6 lg:block"
       >
         <h2 className="font-righteous mb-6 text-2xl font-bold text-gray-100 sm:text-4xl">
