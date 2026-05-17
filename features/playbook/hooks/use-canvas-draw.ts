@@ -1,5 +1,5 @@
-import { useCallback } from "react";
-import type { DrawingLine, Player } from "../utils/types";
+import { useCallback } from 'react';
+import type { DrawingLine, Player } from '../utils/types';
 
 export const useCanvasDraw = (
   canvasRef: React.RefObject<HTMLCanvasElement>,
@@ -19,14 +19,14 @@ export const useCanvasDraw = (
         ctx.arc(x, y, radius, 0, Math.PI * 2);
         ctx.fillStyle = player.color;
         ctx.fill();
-        ctx.strokeStyle = "#000000";
+        ctx.strokeStyle = '#000000';
         ctx.lineWidth = 2 * scale;
         ctx.stroke();
 
-        ctx.fillStyle = "#ffffff";
+        ctx.fillStyle = '#ffffff';
         ctx.font = `bold ${12 * scale}px Arial`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
         ctx.fillText(player.position, x, y);
       });
     },
@@ -44,7 +44,7 @@ export const useCanvasDraw = (
     const scaleX = canvas.width / 600;
     const scaleY = canvas.height / 400;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -52,10 +52,13 @@ export const useCanvasDraw = (
 
     drawingLines.forEach((line) => {
       if (line.points.length > 2) {
+        const isMovementLine = line.tool === 'movement';
+
         ctx.strokeStyle = line.color;
-        ctx.lineWidth = (line.tool === "pen" ? 3 : 5) * scaleX;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
+        ctx.lineWidth = (isMovementLine ? 4 : 5) * scaleX;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.setLineDash(isMovementLine ? [12 * scaleX, 8 * scaleX] : []);
 
         ctx.beginPath();
         ctx.moveTo(line.points[0]! * scaleX, line.points[1]! * scaleY);
@@ -63,6 +66,7 @@ export const useCanvasDraw = (
           ctx.lineTo(line.points[i]! * scaleX, line.points[i + 1]! * scaleY);
         }
         ctx.stroke();
+        ctx.setLineDash([]);
       }
     });
 

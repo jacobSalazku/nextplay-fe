@@ -26,7 +26,7 @@ type NavigationProps = {
 };
 
 const Navigation: FC<NavigationProps> = ({ children }) => {
-  const { teamRef } = useTeam();
+  const { routeKey } = useTeam();
 
   const { navOpen, setNavOpen, setMobileNavOpen, mobileNavOpen } =
     useNavigationStore();
@@ -34,25 +34,25 @@ const Navigation: FC<NavigationProps> = ({ children }) => {
   const navItems = [
     {
       label: 'Schedule',
-      href: `/team/${teamRef}/schedule`,
+      href: `/team/${routeKey}/schedule`,
       icon: Calendar,
       active: false,
     },
     {
       label: 'Players',
-      href: `/team/${teamRef}/players`,
+      href: `/team/${routeKey}/players`,
       icon: UserIcon,
       active: false,
     },
     {
       label: 'Statistics',
-      href: `/team/${teamRef}/statistics`,
+      href: `/team/${routeKey}/statistics`,
       icon: ChartArea,
       active: false,
     },
     {
       label: 'Playbook',
-      href: `/team/${teamRef}/playbook`,
+      href: `/team/${routeKey}/playbook`,
       icon: BookOpen,
       active: false,
     },
@@ -82,14 +82,14 @@ const Navigation: FC<NavigationProps> = ({ children }) => {
           items={navItems}
           onClose={() => setMobileNavOpen(false)}
           isOpen={navOpen}
-          teamRef={teamRef}
+          routeKey={routeKey}
         />
       )}
       <div className="flex flex-1 overflow-hidden">
         <DesktopNavigation
           items={navItems}
           isOpen={navOpen}
-          teamRef={teamRef}
+          routeKey={routeKey}
           onToggle={() => setNavOpen(!navOpen)}
         >
           {children}

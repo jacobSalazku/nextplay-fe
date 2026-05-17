@@ -8,7 +8,7 @@ type PageProps = {
   searchParams: Promise<{
     id: string;
   }>;
-  params: Promise<{ teamRef: string }>;
+  params: Promise<{ routeKey: string }>;
 };
 
 export async function generateMetadata({
@@ -16,8 +16,8 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { id } = await playerProfileSearchParamsCache.parse(searchParams);
-  const { teamRef } = await params;
-  const member = await getUserProfile({ id: id, teamShortId: teamRef });
+  const { routeKey } = await params;
+  const member = await getUserProfile({ id: id, teamShortId: routeKey });
   const profileName = member.user?.name ?? member.name ?? 'Player';
 
   return {
@@ -32,8 +32,8 @@ export async function generateMetadata({
 
 const PlayerProfile = async ({ searchParams, params }: PageProps) => {
   const { id } = await playerProfileSearchParamsCache.parse(searchParams);
-  const { teamRef } = await params;
-  const data = await getUserProfile({ id: id, teamShortId: teamRef });
+  const { routeKey } = await params;
+  const data = await getUserProfile({ id: id, teamShortId: routeKey });
 
   return <PlayerDetailPanel userProfile={data} />;
 };

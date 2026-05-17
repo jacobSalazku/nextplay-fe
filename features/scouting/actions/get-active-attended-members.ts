@@ -3,14 +3,14 @@ import { executeAuthedGraphQL } from '@/lib/auth/server-authed';
 import { GetActiveAttendedMembersDocument } from '@/graphql/graphql';
 
 export const getActiveAttendedMembers = async (
-  teamRef: string,
+  routeKey: string,
   activityId: string,
 ) => {
   const { getActiveAttendedMembers } = await executeAuthedGraphQL(
     GetActiveAttendedMembersDocument,
     {
       input: {
-        teamRef,
+        routeKey,
         activityId,
       },
     },

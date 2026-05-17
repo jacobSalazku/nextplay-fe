@@ -1,6 +1,6 @@
 const SHORT_ID_PATTERN = /^[a-z0-9]{6,12}$/;
 
-export type ParsedTeamRef = {
+export type ParsedRouteKey = {
   slug: string;
   shortId: string;
 };
@@ -16,8 +16,8 @@ export function slugifyTeamName(value: string): string {
   return slug.length > 0 ? slug : 'team';
 }
 
-export function parseTeamRef(teamRef: string): ParsedTeamRef | null {
-  const normalized = teamRef.trim().toLowerCase();
+export function parseRouteKey(routeKey: string): ParsedRouteKey | null {
+  const normalized = routeKey.trim().toLowerCase();
   const segments = normalized
     .split('-')
     .filter((segment) => segment.length > 0);
@@ -32,10 +32,10 @@ export function parseTeamRef(teamRef: string): ParsedTeamRef | null {
   return { slug, shortId };
 }
 
-export function getTeamShortId(teamRef: string): string | null {
-  return parseTeamRef(teamRef)?.shortId ?? null;
+export function getTeamShortId(routeKey: string): string | null {
+  return parseRouteKey(routeKey)?.shortId ?? null;
 }
 
-export function buildTeamRef(input: { slug: string; shortId: string }): string {
+export function buildRouteKey(input: { slug: string; shortId: string }): string {
   return `${slugifyTeamName(input.slug)}-${input.shortId.toLowerCase()}`;
 }

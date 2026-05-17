@@ -8,7 +8,7 @@ export const getGameplanById = async (input: GetGamePlanByIdInput) => {
   const { getGameplanById } = await executeAuthedGraphQL(
     GetGameplanByIdDocument,
     {
-      input: { teamRef: input.teamRef, id: input.id },
+      input: { routeKey: input.routeKey, id: input.id },
     },
   );
 

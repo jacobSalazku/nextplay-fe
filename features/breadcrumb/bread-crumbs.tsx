@@ -20,7 +20,7 @@ export const Breadcrumb = () => {
 
   const { setOpenLogOutModal } = useNavigationStore();
   const { data: session } = useSession();
-  const { teamSlug, teamRef } = useTeam();
+  const { teamSlug, routeKey } = useTeam();
   const { user } = useUserStore();
 
   const pathname = usePathname();
@@ -53,7 +53,7 @@ export const Breadcrumb = () => {
       <div className="-mr-5 flex items-center gap-2 px-2">
         <Link
           aria-label={teamLabel}
-          href={`/team/${teamRef}`}
+          href={`/team/${routeKey}`}
           className="font-righteous bg:hover-text bg-transparent text-2xl transition-colors duration-200 hover:bg-transparent hover:text-orange-300"
         >
           {teamLabel}

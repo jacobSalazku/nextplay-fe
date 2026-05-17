@@ -1,9 +1,9 @@
 import { executeAuthedGraphQL } from '@/lib/auth/server-authed';
 import { GetPracticesDocument } from '@/graphql/graphql';
 
-export const getPractices = async (teamRef: string) => {
+export const getPractices = async (routeKey: string) => {
   const { getPractices } = await executeAuthedGraphQL(GetPracticesDocument, {
-    input: { teamRef },
+    input: { routeKey },
   });
 
   return getPractices

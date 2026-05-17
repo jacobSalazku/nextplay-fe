@@ -36,7 +36,7 @@ type GameFormProps = {
 };
 
 const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
-  const { teamRef } = useTeam();
+  const { routeKey } = useTeam();
   const [formState, setFormState] = useState<Mode>(mode);
   const [createGame] = useMutation(CreateGameDocument);
   const [updateGame] = useMutation(UpdateGameDocument);
@@ -77,7 +77,7 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
               ...data,
               id: selectedActivity!.id,
               date: date.toISOString(),
-              teamId: teamRef,
+              teamId: routeKey,
               type: ActivityType.Game,
               location: 'HOME',
             },
@@ -95,7 +95,7 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
             input: {
               ...data,
               date: date.toISOString(),
-              teamId: teamRef,
+              teamId: routeKey,
               type: ActivityType.Game,
               location: 'HOME',
             },
@@ -118,9 +118,10 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
   if (isCreateMode && !selectedDate) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm">
-      <div className="max-h-[90vh] w-full max-w-md overflow-auto rounded-lg border border-gray-800 bg-black">
-        <div className="flex items-center justify-between border-b border-gray-800 bg-white px-4 py-3 text-gray-900">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="max-h-[90vh] w-full max-w-md overflow-auto rounded-2xl border border-white/10 bg-linear-to-b from-slate-900/95 to-slate-950 shadow-[0_0_30px_rgba(0,0,0,0.35)]">
+        <div className="relative flex items-center justify-between border-b border-white/10 bg-slate-900/60 px-4 py-3 text-white">
+          <div className="absolute top-0 left-0 h-1 w-full bg-linear-to-r from-orange-500 via-amber-300 to-orange-500 opacity-80" />
           <h2 className="font-righteous text-lg font-normal sm:text-xl">
             {isViewMode
               ? selectedActivity?.title
@@ -130,7 +131,7 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
           </h2>
           <Button
             onClick={onClose}
-            className="bg-transparent py-2 text-xl font-bold text-gray-400 shadow-none hover:bg-gray-900 hover:text-white"
+            className="border border-white/10 bg-transparent py-2 text-xl font-bold text-gray-300 shadow-none hover:bg-slate-900 hover:text-white"
             aria-label="Close Game Form"
           >
             <X className="h-6 w-6" />
@@ -138,11 +139,11 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
         </div>
 
         {(isEditMode || isCreateMode) && (
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-5">
             <Input
               id="title"
               aria-label="Input the name of the opponent team"
-              className="border-gray-700"
+              className="border-white/10 bg-slate-900/70 text-white placeholder:text-gray-500"
               label="Opponent Name"
               labelColor="light"
               type="text"
@@ -154,7 +155,7 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
             <Input
               id="time"
               aria-label="Input the start time of the game"
-              className="border-gray-700"
+              className="border-white/10 bg-slate-900/70 text-white"
               label="Start Time"
               labelColor="light"
               type="time"
@@ -165,7 +166,7 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
             <Input
               id="duration"
               aria-label="Input the duration of the game in hours"
-              className="border-gray-700"
+              className="border-white/10 bg-slate-900/70 text-white placeholder:text-gray-500"
               label="Duration"
               labelColor="light"
               type="number"
@@ -182,7 +183,7 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
             <Input
               id="date"
               aria-label="Input the date of the game"
-              className="border-gray-700"
+              className="border-white/10 bg-slate-900/70 text-white"
               label="Date"
               labelColor="light"
               type="date"
@@ -190,9 +191,9 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
               error={errors.date}
               errorMessage={errors.date?.message}
             />
-            <div className="flex justify-end border-t border-gray-800 pt-4">
+            <div className="flex justify-end border-t border-white/10 pt-5">
               {role && (
-                <Button aria-label={buttonText} type="submit" variant="outline">
+                <Button aria-label={buttonText} type="submit" variant="primary">
                   {buttonText}
                 </Button>
               )}
@@ -202,9 +203,11 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
 
         {isViewMode && selectedActivity && (
           <>
-            <div className="flex flex-col gap-2 space-y-2 p-4 text-sm sm:text-base">
-              <div className="flex flex-col gap-2">
-                <div className="text-xs text-gray-400 sm:text-sm">Type</div>
+            <div className="space-y-3 p-5 text-sm text-white sm:text-base">
+              <div className="rounded-xl border border-white/10 bg-slate-900/80 p-3">
+                <div className="text-xs tracking-wide text-gray-400 uppercase">
+                  Type
+                </div>
                 <div className="inline-block rounded-full py-2 text-xs text-black">
                   <CategoryBadge
                     label={selectedActivity.type}
@@ -213,28 +216,36 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
                 </div>
               </div>
               {selectedActivity.type == ActivityType.Practice && (
-                <div className="flex flex-col space-x-2">
-                  <div className="text-xs text-gray-400 sm:text-sm">
+                <div className="rounded-xl border border-white/10 bg-slate-900/80 p-3">
+                  <div className="text-xs tracking-wide text-gray-400 uppercase">
                     Type of Practice
                   </div>
-                  <div>{selectedActivity.practice?.practicetype}</div>
+                  <div className="text-white/90">
+                    {selectedActivity.practice?.practicetype}
+                  </div>
                 </div>
               )}
-              <div className="flex flex-col space-x-2">
-                <div className="text-xs text-gray-400 sm:text-sm">Time</div>
-                <div>{selectedActivity.time}</div>
+              <div className="rounded-xl border border-white/10 bg-slate-900/80 p-3">
+                <div className="text-xs tracking-wide text-gray-400 uppercase">
+                  Time
+                </div>
+                <div className="text-white/90">{selectedActivity.time}</div>
               </div>
               {selectedActivity.duration && (
-                <div className="flex flex-col space-x-2">
-                  <div className="text-xs text-gray-400 sm:text-sm">
+                <div className="rounded-xl border border-white/10 bg-slate-900/80 p-3">
+                  <div className="text-xs tracking-wide text-gray-400 uppercase">
                     Duration
                   </div>
-                  <div>{selectedActivity.duration}</div>
+                  <div className="text-white/90">
+                    {selectedActivity.duration}
+                  </div>
                 </div>
               )}
-              <div className="flex flex-col space-x-2">
-                <div className="text-xs text-gray-400 sm:text-sm">Date</div>
-                <div>
+              <div className="rounded-xl border border-white/10 bg-slate-900/80 p-3">
+                <div className="text-xs tracking-wide text-gray-400 uppercase">
+                  Date
+                </div>
+                <div className="text-white/90">
                   {format(
                     new Date(selectedActivity.date),
                     'EEEE, MMMM d, yyyy',
@@ -243,7 +254,7 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
               </div>
             </div>
             {role && (
-              <div className="flex justify-end space-x-2 border-t border-gray-800 p-4">
+              <div className="flex justify-end space-x-2 border-t border-white/10 p-5">
                 <Button
                   aria-label="Edit Game Form"
                   onClick={() => {
@@ -259,6 +270,7 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
                     });
                   }}
                   variant="outline"
+                  className="border-white/20 bg-slate-900/80 hover:border-orange-300/40"
                 >
                   Edit Game
                 </Button>

@@ -14,7 +14,7 @@ type DesktopNavProps = {
   isOpen: boolean;
   onToggle: () => void;
   children: React.ReactNode;
-  teamRef?: string;
+  routeKey?: string;
 };
 
 export const DesktopNavigation: FC<DesktopNavProps> = ({

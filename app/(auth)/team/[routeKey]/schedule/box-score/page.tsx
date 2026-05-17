@@ -21,25 +21,25 @@ export const metadata: Metadata = {
 
 type PageProps = {
   searchParams: Promise<SearchParams>;
-  params: Promise<{ teamRef: string }>;
+  params: Promise<{ routeKey: string }>;
 };
 
 async function TeamBoxScores({ params, searchParams }: PageProps) {
-  const { teamRef } = await params;
+  const { routeKey } = await params;
   const { activityId } = await boxScoreSearchParamsCache.parse(searchParams);
 
   if (!activityId) {
-    redirect(`/team/${teamRef}/schedule`);
+    redirect(`/team/${routeKey}/schedule`);
   }
 
-  const currentUser = await getUser(teamRef);
+  const currentUser = await getUser(routeKey);
   if (currentUser.member.role !== 'COACH') {
-    redirect(`/team/${teamRef}/schedule`);
+    redirect(`/team/${routeKey}/schedule`);
   }
 
   const [activity, members] = await Promise.all([
-    getActivity(teamRef, activityId),
-    getActiveAttendedMembers(teamRef, activityId),
+    getActivity(routeKey, activityId),
+    getActiveAttendedMembers(routeKey, activityId),
   ]);
 
   if (members.length === 0) {
@@ -53,13 +53,13 @@ async function TeamBoxScores({ params, searchParams }: PageProps) {
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
-              href={`/team/${teamRef}/schedule`}
+              href={`/team/${routeKey}/schedule`}
               className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-400"
             >
               Back To Schedule
             </a>
             <a
-              href={`/team/${teamRef}/schedule`}
+              href={`/team/${routeKey}/schedule`}
               className="rounded-lg border border-white/20 px-4 py-2 text-sm font-medium text-white/90 hover:bg-white/10"
             >
               Set Attendance First
