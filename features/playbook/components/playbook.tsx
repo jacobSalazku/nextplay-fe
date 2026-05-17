@@ -39,7 +39,7 @@ const PlaybookBookBlock: FC<PageProps> = ({
   gamePlan,
   role,
 }) => {
-  const { teamRef } = useTeam();
+  const { routeKey } = useTeam();
   const router = useRouter();
   const {
     activeCoachTab,
@@ -69,7 +69,7 @@ const PlaybookBookBlock: FC<PageProps> = ({
         await deleteGamePlan({
           variables: {
             input: {
-              teamRef,
+              routeKey,
               gamePlanId: planId,
             },
           },
@@ -79,7 +79,7 @@ const PlaybookBookBlock: FC<PageProps> = ({
         await deletePracticePreparation({
           variables: {
             input: {
-              teamRef,
+              routeKey,
               practicePreparationId: planId,
             },
           },
@@ -158,7 +158,7 @@ const PlaybookBookBlock: FC<PageProps> = ({
                 type="gameplan"
                 onDelete={() => handleDeletePlan(item.id, 'gameplan')}
                 onView={{
-                  pathname: `/team/${teamRef}/playbook/gameplan`,
+                  pathname: `/team/${routeKey}/playbook/gameplan`,
                   query: { id: item.id },
                 }}
               />
@@ -189,7 +189,7 @@ const PlaybookBookBlock: FC<PageProps> = ({
                 type="practice"
                 onDelete={() => handleDeletePlan(practice.id, 'practice')}
                 onView={{
-                  pathname: `/team/${teamRef}/playbook/practice-preparation`,
+                  pathname: `/team/${routeKey}/playbook/practice-preparation`,
                   query: { id: practice.id },
                 }}
               />
@@ -220,7 +220,7 @@ const PlaybookBookBlock: FC<PageProps> = ({
                 <Link
                   aria-label="Add New Play"
                   href={{
-                    pathname: `/team/${teamRef}/playbook/create`,
+                    pathname: `/team/${routeKey}/playbook/create`,
                   }}
                   className="flex items-center justify-center rounded-xl border border-white/10 bg-slate-950/80 px-6 py-6 group-hover:bg-slate-900 md:px-10 md:py-10"
                 >

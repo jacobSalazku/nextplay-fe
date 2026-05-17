@@ -14,7 +14,7 @@ type CreateGamePlanPayload = {
 };
 
 export const useCreateGameplan = (
-  teamRef: string,
+  routeKey: string,
   onClose: () => void,
   resetForm: () => void,
 ) => {
@@ -29,7 +29,7 @@ export const useCreateGameplan = (
         await createGameplan({
           variables: {
             input: {
-              teamRef,
+              routeKey,
               name: payload.name,
               opponent: payload.opponent,
               notes: payload.notes,

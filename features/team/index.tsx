@@ -35,7 +35,7 @@ type PlayerBlockProps = {
 };
 
 export const PlayerBlock: FC<PlayerBlockProps> = ({ team, pendingMembers }) => {
-  const { teamRef } = useTeam();
+  const { routeKey } = useTeam();
   const router = useRouter();
 
   const [acceptRequest, { loading }] = useMutation(AcceptTeamRequestDocument, {
@@ -54,14 +54,14 @@ export const PlayerBlock: FC<PlayerBlockProps> = ({ team, pendingMembers }) => {
   };
 
   const handleAcceptRequest = async (id: string) => {
-    if (!teamRef) return;
+    if (!routeKey) return;
 
     try {
       await acceptRequest({
         variables: {
           input: {
             memberId: id,
-            teamRef,
+            routeKey,
           },
         },
       });
@@ -170,7 +170,7 @@ export const PlayerBlock: FC<PlayerBlockProps> = ({ team, pendingMembers }) => {
                         <Link
                           aria-label="View Player Profile"
                           href={{
-                            pathname: `/team/${teamRef}/players/profile`,
+                            pathname: `/team/${routeKey}/players/profile`,
                             query: { id: member.user.id },
                           }}
                           variant="outline"

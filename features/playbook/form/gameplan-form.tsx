@@ -37,7 +37,7 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
   role,
   playbook,
 }) => {
-  const { teamRef } = useTeam();
+  const { routeKey } = useTeam();
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
   const [selectedPlay, setSelectedPlay] = useState<string[] | null>([]);
   const [formState] = useState<Mode>(mode);
@@ -49,13 +49,13 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
   } = useCoachDashboardStore();
 
   const createGameplan = useCreateGameplan(
-    teamRef,
+    routeKey,
     () => setOpenGamePlan(false),
     () => {
       reset({
         name: '',
         notes: '',
-        teamId: teamRef,
+        teamId: routeKey,
         activityId: '',
         opponent: '',
         playsId: [],
@@ -152,7 +152,7 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
                 reset({
                   name: '',
                   notes: '',
-                  teamId: teamRef,
+                  teamId: routeKey,
                   activityId: '',
                   opponent: '',
                   playsId: [],
@@ -173,7 +173,7 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
                   label="Team ID"
                   {...register('teamId')}
                   placeholder="Enter team ID"
-                  defaultValue={teamRef}
+                  defaultValue={routeKey}
                 />
               </div>
               <Input

@@ -19,14 +19,14 @@ type PlayCardProps = {
 };
 
 export const PlayCard = ({ play, role }: PlayCardProps) => {
-  const { teamRef } = useTeam();
+  const { routeKey } = useTeam();
   const router = useRouter();
   const [deletePlay] = useMutation(DeletePlayDocument);
 
   const handleDelete = async () => {
     try {
       await deletePlay({
-        variables: { input: { teamRef, id: play.id } },
+        variables: { input: { routeKey, id: play.id } },
         refetchQueries: ['GetPlays'],
       });
       router.refresh();
@@ -78,7 +78,7 @@ export const PlayCard = ({ play, role }: PlayCardProps) => {
           variant="light"
           size="sm"
           href={{
-            pathname: `/team/${teamRef}/playbook/play`,
+            pathname: `/team/${routeKey}/playbook/play`,
             query: { id: play.id },
           }}
         >

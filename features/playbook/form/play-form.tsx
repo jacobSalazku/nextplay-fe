@@ -39,7 +39,7 @@ import { RadioGroup } from '@/components/foundation/radio/radio-group';
 import { RadioGroupItem } from '@/components/foundation/radio/radio-group-item';
 
 export function PlayForm() {
-  const { teamRef } = useTeam();
+  const { routeKey } = useTeam();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const router = useRouter();
   const [currentTool, setCurrentTool] = useState<
@@ -156,7 +156,7 @@ export function PlayForm() {
             description: data.description,
             category: normalizedCategory,
             canvas: canvasDataUrl,
-            teamRef,
+            routeKey,
           },
         },
         refetchQueries: ['GetPlays'],
@@ -167,7 +167,7 @@ export function PlayForm() {
         ...toastStyling,
         position: 'top-center',
       });
-      router.push(`/team/${teamRef}/playbook`);
+      router.push(`/team/${routeKey}/playbook`);
       router.refresh();
 
       return play;

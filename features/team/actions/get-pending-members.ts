@@ -1,12 +1,12 @@
 import { executeAuthedGraphQL } from '@/lib/auth/server-authed';
 import { GetPendingMembersDocument } from '@/graphql/graphql';
 
-export const getPendingMembers = async (teamRef: string) => {
+export const getPendingMembers = async (routeKey: string) => {
   const { getPendingMembers } = await executeAuthedGraphQL(
     GetPendingMembersDocument,
     {
       input: {
-        teamRef: teamRef,
+        routeKey: routeKey,
       },
     },
   );

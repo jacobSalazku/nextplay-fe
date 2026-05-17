@@ -18,7 +18,7 @@ export const useCreatePracticePreparation = (
   onClose: () => void,
   resetForm: () => void,
 ) => {
-  const { teamRef } = useTeam();
+  const { routeKey } = useTeam();
   const router = useRouter();
   const { setActiveCoachTab } = useCoachDashboardStore();
   const [createPreparation, { loading }] = useMutation(
@@ -32,7 +32,7 @@ export const useCreatePracticePreparation = (
         await createPreparation({
           variables: {
             input: {
-              teamRef,
+              routeKey,
               name: payload.name,
               focus: payload.focus,
               notes: payload.notes,

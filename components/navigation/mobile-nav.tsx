@@ -9,9 +9,9 @@ type MobileNavProps = {
   items: NavItemType[];
   onClose: () => void;
   isOpen: boolean;
-  teamRef?: string;
+  routeKey?: string;
 };
-export function MobileNav({ items, onClose, isOpen, teamRef }: MobileNavProps) {
+export function MobileNav({ items, onClose, isOpen, routeKey }: MobileNavProps) {
   const { mobileNavOpen, setOpenLogOutModal } = useNavigationStore();
   return (
     <div
@@ -38,7 +38,7 @@ export function MobileNav({ items, onClose, isOpen, teamRef }: MobileNavProps) {
         <div className="flex flex-1 flex-col overflow-hidden">
           <nav className="flex-1 overflow-y-auto">
             <ul className="space-y-1 pt-4">
-              {teamRef &&
+              {routeKey &&
                 items.map((item, idx) => (
                   <NavItem key={idx} {...item} onClick={onClose}>
                     {item.label}

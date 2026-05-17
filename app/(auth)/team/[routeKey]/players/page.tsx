@@ -16,11 +16,11 @@ export const metadata: Metadata = {
 async function PlayerPage({
   params,
 }: {
-  params: Promise<{ teamRef: string }>;
+  params: Promise<{ routeKey: string }>;
 }) {
-  const { teamRef } = await params;
-  const team = await getTeamInforamtion(teamRef);
-  const pendingMembers = await getPendingMembers(teamRef);
+  const { routeKey } = await params;
+  const team = await getTeamInforamtion(routeKey);
+  const pendingMembers = await getPendingMembers(routeKey);
 
   return (
     <div className="flex min-h-screen flex-col items-center overflow-auto text-white w-full">

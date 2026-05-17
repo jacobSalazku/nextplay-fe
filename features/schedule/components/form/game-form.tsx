@@ -36,7 +36,7 @@ type GameFormProps = {
 };
 
 const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
-  const { teamRef } = useTeam();
+  const { routeKey } = useTeam();
   const [formState, setFormState] = useState<Mode>(mode);
   const [createGame] = useMutation(CreateGameDocument);
   const [updateGame] = useMutation(UpdateGameDocument);
@@ -77,7 +77,7 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
               ...data,
               id: selectedActivity!.id,
               date: date.toISOString(),
-              teamId: teamRef,
+              teamId: routeKey,
               type: ActivityType.Game,
               location: 'HOME',
             },
@@ -95,7 +95,7 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
             input: {
               ...data,
               date: date.toISOString(),
-              teamId: teamRef,
+              teamId: routeKey,
               type: ActivityType.Game,
               location: 'HOME',
             },

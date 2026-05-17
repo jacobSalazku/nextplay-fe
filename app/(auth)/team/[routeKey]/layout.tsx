@@ -41,14 +41,14 @@ export default async function TeamLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ teamRef: string }>;
+  params: Promise<{ routeKey: string }>;
 }>) {
-  const { teamRef } = await params;
-  const data = await getUser(teamRef);
+  const { routeKey } = await params;
+  const data = await getUser(routeKey);
 
   return (
     <Providers>
-      <TeamProvider user={data} teamRef={teamRef}>
+      <TeamProvider user={data} routeKey={routeKey}>
         <Navigation>{children}</Navigation>
         <Toaster />
       </TeamProvider>

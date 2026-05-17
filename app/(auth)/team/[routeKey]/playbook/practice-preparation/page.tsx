@@ -4,7 +4,7 @@ import { practiceSearchParamsCache } from '@/utils/search-params';
 
 type PageProps = {
   searchParams: Promise<{ id: string }>;
-  params: Promise<{ teamRef: string }>;
+  params: Promise<{ routeKey: string }>;
 };
 
 export const metadata: Metadata = {
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 
 async function PracticePreparationView({ searchParams, params }: PageProps) {
   const { id } = await practiceSearchParamsCache.parse(searchParams);
-  const { teamRef } = await params;
-  const practicePreparation = await getPracticePreparationById(teamRef, id);
+  const { routeKey } = await params;
+  const practicePreparation = await getPracticePreparationById(routeKey, id);
 
   if (!practicePreparation) {
     return (

@@ -5,7 +5,7 @@ import { gameplanSearchParamsCache } from '@/utils/search-params';
 
 type PageProps = {
   searchParams: Promise<{ id: string }>;
-  params: Promise<{ teamRef: string }>;
+  params: Promise<{ routeKey: string }>;
 };
 
 export const metadata = {
@@ -19,8 +19,8 @@ export const metadata = {
 
 async function GamePlanView({ searchParams, params }: PageProps) {
   const { id } = await gameplanSearchParamsCache.parse(searchParams);
-  const { teamRef } = await params;
-  const gameplan = await getGameplanById({ id: id, teamRef: teamRef });
+  const { routeKey } = await params;
+  const gameplan = await getGameplanById({ id: id, routeKey: routeKey });
 
   if (!gameplan) {
     return (

@@ -7,13 +7,13 @@ import type { PlayersData } from '../multi-statline-tracker';
 import { cn } from '@/utils/tw-merge';
 import { Undo2 } from 'lucide-react';
 import type { UseFormSetValue } from 'react-hook-form';
-import type { Activity } from '@/graphql/graphql';
+import type { GetActivityQuery } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import MobileTeamStatsRow from './mobile-team-stats-row';
 import { StatButton } from './stats-button';
 
 type MobileStatsFormProps = {
-  activity: Activity;
+  activity: GetActivityQuery['getActivity'];
   players: PlayersData['players'];
   activePlayerIndex: number;
   setActivePlayerIndex: (index: number) => void;

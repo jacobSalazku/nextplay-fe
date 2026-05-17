@@ -15,8 +15,8 @@ import { useMutation } from '@apollo/client/react';
 import { useForm, useWatch } from 'react-hook-form';
 import {
   SubmitStatlinesDocument,
-  type Activity,
   type GetActiveAttendedMembersQuery,
+  type GetActivityQuery,
 } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import { Table } from '@/components/foundation/table/table';
@@ -34,7 +34,7 @@ type TrackerPlayers = GetActiveAttendedMembersQuery['getActiveAttendedMembers'];
 type TrackerPlayer = TrackerPlayers[number];
 
 export type PlayersData = {
-  teamRef: string;
+  routeKey: string;
   players: TrackerPlayers;
   activityId: string;
   opponentStatline: OpponentStatsline;
@@ -42,7 +42,7 @@ export type PlayersData = {
 
 type TrackerProps = {
   players: TrackerPlayers;
-  activity: Activity;
+  activity: GetActivityQuery['getActivity'];
 };
 
 function toMutationStatline(statline: StatlineData) {
@@ -63,7 +63,7 @@ function toMutationStatline(statline: StatlineData) {
 }
 
 const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
-  const { teamRef } = useTeam();
+  const { routeKey } = useTeam();
   const [showOpponentStats, setShowOpponentStats] = useState(false);
   const [activePlayerIndex, setActivePlayerIndex] = useState(0);
   const [createStatline] = useMutation(SubmitStatlinesDocument);
@@ -82,7 +82,7 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
   const { control, handleSubmit, setValue, reset, formState } =
     useForm<PlayersData>({
       defaultValues: {
-        teamRef,
+        routeKey,
         players: initialPlayers,
         activityId: activity.id,
         opponentStatline: initialOpponentStatline,
@@ -134,7 +134,7 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
     }) as TrackerPlayers;
 
     const mutationInput = {
-      teamRef,
+      routeKey,
       players: updatedPlayers.map((player: TrackerPlayer) => ({
         memberId: player.id,
         activityId: activity.id,
@@ -152,7 +152,7 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
     console.info('[Statline] submitStatlines request', {
       source,
       activityId: activity.id,
-      teamRef,
+      routeKey,
       playerCount: mutationInput.players.length,
       payload: mutationInput,
     });
@@ -164,7 +164,7 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
     });
 
     reset({
-      teamRef,
+      routeKey,
       players: updatedPlayers,
       activityId: activity.id,
       opponentStatline: {

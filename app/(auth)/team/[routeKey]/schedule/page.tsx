@@ -17,12 +17,12 @@ export const metadata: Metadata = {
 async function SchedulePage({
   params,
 }: {
-  params: Promise<{ teamRef: string }>;
+  params: Promise<{ routeKey: string }>;
 }) {
-  const { teamRef } = await params;
+  const { routeKey } = await params;
   return (
     <Suspense fallback={<ScheduleSkeleton />}>
-      <ScheduleBlock teamRef={teamRef} />
+      <ScheduleBlock routeKey={routeKey} />
     </Suspense>
   );
 }

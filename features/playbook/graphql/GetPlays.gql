@@ -1,7 +1,7 @@
 query GetPlays($input: GetPlaysInput!) {
   getPlays(input: $input) {
     id
-    teamRef
+    routeKey
     name
     category
     description

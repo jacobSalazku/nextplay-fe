@@ -5,11 +5,11 @@ import { toast } from 'sonner';
 import { DeletePracticePreparationDocument } from '@/graphql/graphql';
 
 type DeletePracticePreparationPayload = {
-  teamRef: string;
+  routeKey: string;
   practicePreparationId: string;
 };
 
-export const useDeletePracticePreparation = (teamRef: string) => {
+export const useDeletePracticePreparation = (routeKey: string) => {
   const router = useRouter();
   const [runDelete, { loading }] = useMutation(
     DeletePracticePreparationDocument,
@@ -21,7 +21,7 @@ export const useDeletePracticePreparation = (teamRef: string) => {
       await runDelete({
         variables: {
           input: {
-            teamRef: payload.teamRef,
+            routeKey: payload.routeKey,
             practicePreparationId: payload.practicePreparationId,
           },
         },
@@ -33,7 +33,7 @@ export const useDeletePracticePreparation = (teamRef: string) => {
         ...toastStyling,
       });
 
-      router.push(`/team/${teamRef}/playbook`);
+      router.push(`/team/${routeKey}/playbook`);
       router.refresh();
     },
   };

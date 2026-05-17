@@ -37,7 +37,7 @@ const PracticePreparationForm: FC<PageProps> = ({
   role,
   playbook,
 }) => {
-  const { teamRef } = useTeam();
+  const { routeKey } = useTeam();
   const [selectedPractice, setSelectedPractice] = useState<string | null>(null);
   const [selectedPlay, setSelectedPlay] = useState<string[] | null>([]);
   const [formState] = useState<Mode>(mode);
@@ -51,7 +51,7 @@ const PracticePreparationForm: FC<PageProps> = ({
       reset({
         name: '',
         notes: '',
-        teamId: teamRef,
+        teamId: routeKey,
         activityId: '',
         playsId: [],
       });
@@ -136,7 +136,7 @@ const PracticePreparationForm: FC<PageProps> = ({
                 reset({
                   name: '',
                   notes: '',
-                  teamId: teamRef,
+                  teamId: routeKey,
                   activityId: '',
                   playsId: [],
                 });
@@ -157,7 +157,7 @@ const PracticePreparationForm: FC<PageProps> = ({
                   label="Team ID"
                   {...register('teamId')}
                   placeholder="Enter team ID"
-                  defaultValue={teamRef}
+                  defaultValue={routeKey}
                 />
               </div>
               <Input

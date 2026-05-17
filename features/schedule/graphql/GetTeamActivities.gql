@@ -1,5 +1,5 @@
-query GetTeamActivities($teamRef: String!) {
-  getTeamActivities(teamRef: $teamRef) {
+query GetTeamActivities($routeKey: String!) {
+  getTeamActivities(routeKey: $routeKey) {
     id
     name
     code

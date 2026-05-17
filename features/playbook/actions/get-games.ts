@@ -1,9 +1,9 @@
 import { executeAuthedGraphQL } from '@/lib/auth/server-authed';
 import { GetGamesDocument } from '@/graphql/graphql';
 
-export const getGames = async (teamRef: string) => {
+export const getGames = async (routeKey: string) => {
   const { getGames } = await executeAuthedGraphQL(GetGamesDocument, {
-    input: { teamRef },
+    input: { routeKey },
   });
 
   return getGames;

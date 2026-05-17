@@ -35,7 +35,7 @@ type PracticeProps = {
 };
 
 const PracticeForm: FC<PracticeProps> = ({ mode, onClose, member }) => {
-  const { teamRef } = useTeam();
+  const { routeKey } = useTeam();
   const [formState, setFormState] = useState<Mode>(mode);
   const [createPractice] = useMutation(CreatePracticeDocument);
   const [updatePractice] = useMutation(UpdatePracticeDocument);
@@ -82,7 +82,7 @@ const PracticeForm: FC<PracticeProps> = ({ mode, onClose, member }) => {
               ...data,
               id: selectedActivity!.id,
               date: date.toISOString(),
-              teamId: teamRef,
+              teamId: routeKey,
               type: ActivityType.Practice,
               facility: 'Sportschuur',
             },
@@ -97,7 +97,7 @@ const PracticeForm: FC<PracticeProps> = ({ mode, onClose, member }) => {
             input: {
               ...data,
               date: date.toISOString(),
-              teamId: teamRef,
+              teamId: routeKey,
               type: ActivityType.Practice,
               facility: 'Sportschuur',
             },

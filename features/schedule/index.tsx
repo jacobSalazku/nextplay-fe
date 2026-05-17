@@ -3,8 +3,8 @@ import { getTeam } from './actions/get-team';
 import { ActivityList } from './components/activity/activity-list';
 import { HorizontalCalender } from './components/calender/horizontal-calender';
 
-const ScheduleBlock = async ({ teamRef }: { teamRef: string }) => {
-  const { getTeamActivities } = await getTeam(teamRef);
+const ScheduleBlock = async ({ routeKey }: { routeKey: string }) => {
+  const { getTeamActivities } = await getTeam(routeKey);
 
   const team = getTeamActivities;
   const activities = getTeamActivities.activities;

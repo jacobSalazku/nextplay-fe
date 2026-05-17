@@ -13,7 +13,7 @@ import { withProtectedPage } from '@/lib/auth/with-page-guards';
 import { getUser } from '@/api/user/get-user';
 
 type PageProps = {
-  params: Promise<{ teamRef: string }>;
+  params: Promise<{ routeKey: string }>;
 };
 
 export const metadata: Metadata = {
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 async function PlaybookPage({ params }: PageProps) {
-  const { teamRef } = await params;
+  const { routeKey } = await params;
   const [
     playbook,
     games,
@@ -37,12 +37,12 @@ async function PlaybookPage({ params }: PageProps) {
     practicePreparation,
     currentUser,
   ] = await Promise.all([
-    getPlays(teamRef),
-    getGames(teamRef),
-    getGameplan(teamRef),
-    getPractices(teamRef),
-    getPracticePreparations(teamRef),
-    getUser(teamRef),
+    getPlays(routeKey),
+    getGames(routeKey),
+    getGameplan(routeKey),
+    getPractices(routeKey),
+    getPracticePreparations(routeKey),
+    getUser(routeKey),
   ]);
 
   const role = currentUser.member?.role ?? 'PLAYER';

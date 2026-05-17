@@ -2,11 +2,11 @@
 
 import { createContext, useContext, useEffect } from 'react';
 import { useUserStore } from '@/store/user-store';
-import { parseTeamRef } from '@/lib/helpers/team-ref';
+import { parseRouteKey } from '@/lib/helpers/route-key';
 import { GetUserResponse } from '@/graphql/graphql';
 
 type TeamContextValue = {
-  teamRef: string;
+  routeKey: string;
   teamSlug: string;
   teamShortId: string | null;
 };
@@ -14,15 +14,15 @@ type TeamContextValue = {
 const TeamContext = createContext<TeamContextValue | null>(null);
 
 export function TeamProvider({
-  teamRef,
+  routeKey,
   user,
   children,
 }: {
   user: GetUserResponse;
-  teamRef: string;
+  routeKey: string;
   children: React.ReactNode;
 }) {
-  const parsed = parseTeamRef(teamRef);
+  const parsed = parseRouteKey(routeKey);
 
   const setUser = useUserStore.getState().setUser;
   useEffect(() => {
@@ -32,8 +32,8 @@ export function TeamProvider({
   return (
     <TeamContext.Provider
       value={{
-        teamRef,
-        teamSlug: parsed?.slug ?? teamRef,
+        routeKey,
+        teamSlug: parsed?.slug ?? routeKey,
         teamShortId: parsed?.shortId ?? null,
       }}
     >
