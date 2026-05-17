@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { ResultOf, DocumentTypeDecoration, TypedDocumentNode } from '@graphql-typed-document-node/core';
-import type { FragmentDefinitionNode } from 'graphql/language/ast';
+import { FragmentDefinitionNode } from 'graphql';
 import { Incremental } from './graphql';
 
 
@@ -79,12 +79,9 @@ export function isFragmentReady<TQuery, TFrag>(
 
   if (!deferredFields) return true;
 
-  const fragmentDocument = fragmentNode as unknown as {
-    definitions?: FragmentDefinitionNode[];
-  };
-  const fragDef = fragmentDocument.definitions?.[0];
+  const fragDef = fragmentNode.definitions[0] as FragmentDefinitionNode | undefined;
   const fragName = fragDef?.name?.value;
 
   const fields = (fragName && deferredFields[fragName]) || [];
-  return fields.length > 0 && fields.every((field) => data && field in data);
+  return fields.length > 0 && fields.every(field => data && field in data);
 }
