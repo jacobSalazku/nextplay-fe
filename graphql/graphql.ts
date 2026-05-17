@@ -77,6 +77,12 @@ export type AuthPayload = {
   userId: Scalars['String']['output'];
 };
 
+export enum Category {
+  Defensive = 'DEFENSIVE',
+  Offensive = 'OFFENSIVE',
+  Special = 'SPECIAL'
+}
+
 export type CreateFeedbackInput = {
   coach: Scalars['String']['input'];
   date: Scalars['DateTime']['input'];
@@ -108,6 +114,15 @@ export type CreateGameInput = {
   type: ActivityType;
 };
 
+export type CreateGamePlanInput = {
+  activityId: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  opponent?: InputMaybe<Scalars['String']['input']>;
+  playsId: Array<Scalars['String']['input']>;
+  teamRef: Scalars['String']['input'];
+};
+
 export type CreateMeetingInput = {
   date: Scalars['DateTime']['input'];
   duration: Scalars['Float']['input'];
@@ -116,6 +131,14 @@ export type CreateMeetingInput = {
   time: Scalars['String']['input'];
   title: Scalars['String']['input'];
   type: ActivityType;
+};
+
+export type CreatePlayInput = {
+  canvas: Scalars['String']['input'];
+  category: Category;
+  description: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  teamRef: Scalars['String']['input'];
 };
 
 export type CreatePracticeInput = {
@@ -129,6 +152,15 @@ export type CreatePracticeInput = {
   type: ActivityType;
 };
 
+export type CreatePracticePreparationInput = {
+  activityId: Scalars['String']['input'];
+  focus?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  playsId: Array<Scalars['String']['input']>;
+  teamRef: Scalars['String']['input'];
+};
+
 export type CreateTeamInput = {
   ageGroup: Scalars['String']['input'];
   image?: InputMaybe<Scalars['String']['input']>;
@@ -139,8 +171,23 @@ export type DeleteActivity = {
   id: Scalars['ID']['input'];
 };
 
+export type DeleteGamePlanInput = {
+  gamePlanId: Scalars['String']['input'];
+  teamRef: Scalars['String']['input'];
+};
+
 export type DeleteMemberInput = {
   id: Scalars['String']['input'];
+};
+
+export type DeletePlayInput = {
+  id: Scalars['String']['input'];
+  teamRef: Scalars['String']['input'];
+};
+
+export type DeletePracticePreparationInput = {
+  practicePreparationId: Scalars['String']['input'];
+  teamRef: Scalars['String']['input'];
 };
 
 export type Feedback = {
@@ -159,8 +206,41 @@ export type Film = {
 export type Game = {
   __typename?: 'Game';
   activityId: Scalars['String']['output'];
+  date: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
   location: Location;
   opponentStatline?: Maybe<OpponentStatline>;
+  time: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+};
+
+export type GamePlan = {
+  __typename?: 'GamePlan';
+  activity?: Maybe<GamePlanActivity>;
+  activityId: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
+  opponent?: Maybe<Scalars['String']['output']>;
+  plays: Array<GamePlanPlay>;
+  teamId: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type GamePlanActivity = {
+  __typename?: 'GamePlanActivity';
+  date: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  time: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+};
+
+export type GamePlanPlay = {
+  __typename?: 'GamePlanPlay';
+  category: Category;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
 };
 
 export type GameWithBoxScore = {
@@ -174,6 +254,10 @@ export type GameWithBoxScore = {
   title: Scalars['String']['output'];
 };
 
+export type GetActivitiesInput = {
+  teamRef: Scalars['String']['input'];
+};
+
 export type GetActivityInput = {
   activityId: Scalars['String']['input'];
   teamRef: Scalars['String']['input'];
@@ -184,9 +268,35 @@ export type GetAttendanceByActivitiesInput = {
   memberId: Scalars['String']['input'];
 };
 
+export type GetGamePlanByIdInput = {
+  id: Scalars['String']['input'];
+  teamRef: Scalars['String']['input'];
+};
+
+export type GetGamePlansInput = {
+  teamRef: Scalars['String']['input'];
+};
+
 export type GetMemberProfileInput = {
   id: Scalars['String']['input'];
   teamShortId: Scalars['String']['input'];
+};
+
+export type GetPlayInput = {
+  id: Scalars['String']['input'];
+};
+
+export type GetPlaysInput = {
+  teamRef: Scalars['String']['input'];
+};
+
+export type GetPracticePreparationByIdInput = {
+  id: Scalars['String']['input'];
+  teamRef: Scalars['String']['input'];
+};
+
+export type GetPracticePreparationsInput = {
+  teamRef: Scalars['String']['input'];
 };
 
 export type GetTeamInput = {
@@ -304,11 +414,17 @@ export type Mutation = {
   createFeedback: Activity;
   createFilm: Activity;
   createGame: Activity;
+  createGamePlan: GamePlan;
   createMeeting: Activity;
+  createPlay: Play;
   createPractice: Activity;
+  createPracticePreparation: PracticePreparation;
   createTeam: Team;
   deleteActivity: Activity;
+  deleteGamePlan: GamePlan;
   deleteMember: Scalars['Boolean']['output'];
+  deletePlay: Scalars['Boolean']['output'];
+  deletePracticePreparation: PracticePreparation;
   getAttendanceByActivities: PlayerActivityAttendance;
   joinTeam: JoinTeamResponse;
   login: AuthPayload;
@@ -346,13 +462,28 @@ export type MutationCreateGameArgs = {
 };
 
 
+export type MutationCreateGamePlanArgs = {
+  input: CreateGamePlanInput;
+};
+
+
 export type MutationCreateMeetingArgs = {
   input: CreateMeetingInput;
 };
 
 
+export type MutationCreatePlayArgs = {
+  input: CreatePlayInput;
+};
+
+
 export type MutationCreatePracticeArgs = {
   input: CreatePracticeInput;
+};
+
+
+export type MutationCreatePracticePreparationArgs = {
+  input: CreatePracticePreparationInput;
 };
 
 
@@ -366,8 +497,23 @@ export type MutationDeleteActivityArgs = {
 };
 
 
+export type MutationDeleteGamePlanArgs = {
+  input: DeleteGamePlanInput;
+};
+
+
 export type MutationDeleteMemberArgs = {
   input: DeleteMemberInput;
+};
+
+
+export type MutationDeletePlayArgs = {
+  input: DeletePlayInput;
+};
+
+
+export type MutationDeletePracticePreparationArgs = {
+  input: DeletePracticePreparationInput;
 };
 
 
@@ -467,6 +613,18 @@ export type PendingMember = {
   name?: Maybe<Scalars['String']['output']>;
 };
 
+export type Play = {
+  __typename?: 'Play';
+  canvas: Scalars['String']['output'];
+  category: Category;
+  createdAt: Scalars['DateTime']['output'];
+  description: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  teamRef: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type PlayerActivityAttendance = {
   __typename?: 'PlayerActivityAttendance';
   activity?: Maybe<AttendanceActivity>;
@@ -534,8 +692,41 @@ export type PlayerStatlineEntryInput = {
 export type Practice = {
   __typename?: 'Practice';
   activityId: Scalars['String']['output'];
+  date: Scalars['DateTime']['output'];
   facility: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
   practicetype: Scalars['String']['output'];
+  time: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+};
+
+export type PracticePreparation = {
+  __typename?: 'PracticePreparation';
+  activity?: Maybe<PracticePreparationActivity>;
+  activityId?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  focus?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
+  plays: Array<PracticePreparationPlay>;
+  teamId: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type PracticePreparationActivity = {
+  __typename?: 'PracticePreparationActivity';
+  date: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  time: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+};
+
+export type PracticePreparationPlay = {
+  __typename?: 'PracticePreparationPlay';
+  category: Category;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
 };
 
 export enum PracticeType {
@@ -553,10 +744,18 @@ export type Query = {
   getActivity: Activity;
   getCurrentUser: GetUserResponse;
   getDashboardTeams: Array<TeamDashboard>;
+  getGameplan: Array<GamePlan>;
+  getGameplanById?: Maybe<GamePlan>;
+  getGames: Array<Activity>;
   getGamesWithBoxScores: Array<GameWithBoxScore>;
   getMemberProfile: MemberWithAttendances;
   getMembers: Array<MemberWithAttendances>;
   getPendingMembers: Array<PendingMember>;
+  getPlay?: Maybe<Play>;
+  getPlays: Array<Play>;
+  getPracticePreparationById?: Maybe<PracticePreparation>;
+  getPracticePreparations: Array<PracticePreparation>;
+  getPractices: Array<Activity>;
   getStatlineAverages: Array<PlayerStatlineAverage>;
   getStatsPerGame: Array<StatsPerGame>;
   getTeam: TeamInformation;
@@ -587,6 +786,21 @@ export type QueryGetCurrentUserArgs = {
 };
 
 
+export type QueryGetGameplanArgs = {
+  input: GetGamePlansInput;
+};
+
+
+export type QueryGetGameplanByIdArgs = {
+  input: GetGamePlanByIdInput;
+};
+
+
+export type QueryGetGamesArgs = {
+  input: GetActivitiesInput;
+};
+
+
 export type QueryGetGamesWithBoxScoresArgs = {
   input: TeamStatlineInput;
 };
@@ -604,6 +818,31 @@ export type QueryGetMembersArgs = {
 
 export type QueryGetPendingMembersArgs = {
   input: MembersInput;
+};
+
+
+export type QueryGetPlayArgs = {
+  input: GetPlayInput;
+};
+
+
+export type QueryGetPlaysArgs = {
+  input: GetPlaysInput;
+};
+
+
+export type QueryGetPracticePreparationByIdArgs = {
+  input: GetPracticePreparationByIdInput;
+};
+
+
+export type QueryGetPracticePreparationsArgs = {
+  input: GetPracticePreparationsInput;
+};
+
+
+export type QueryGetPracticesArgs = {
+  input: GetActivitiesInput;
 };
 
 
@@ -1007,6 +1246,104 @@ export type GetTeamForDashboardQueryVariables = Exact<{ [key: string]: never; }>
 
 export type GetTeamForDashboardQuery = { __typename?: 'Query', getDashboardTeams: Array<{ __typename?: 'TeamDashboard', id: string, name: string, slug: string, shortId: string, routeKey: string, ageGroup?: string | null, members: Array<{ __typename?: 'MemberId', id: string }>, activities: Array<{ __typename?: 'Activity', id: string, type: ActivityType, title: string, date: any, time: string }> }> };
 
+export type CreateGamePlanMutationVariables = Exact<{
+  input: CreateGamePlanInput;
+}>;
+
+
+export type CreateGamePlanMutation = { __typename?: 'Mutation', createGamePlan: { __typename?: 'GamePlan', id: string, name: string, opponent?: string | null, notes?: string | null, activityId: string, teamId: string, createdAt: any, updatedAt: any, activity?: { __typename?: 'GamePlanActivity', id: string, title: string, date: any, time: string } | null, plays: Array<{ __typename?: 'GamePlanPlay', id: string, name: string, category: Category }> } };
+
+export type CreatePlayMutationVariables = Exact<{
+  input: CreatePlayInput;
+}>;
+
+
+export type CreatePlayMutation = { __typename?: 'Mutation', createPlay: { __typename?: 'Play', id: string, teamRef: string, name: string, description: string, category: Category, canvas: string, createdAt: any, updatedAt: any } };
+
+export type CreatePracticePreparationMutationVariables = Exact<{
+  input: CreatePracticePreparationInput;
+}>;
+
+
+export type CreatePracticePreparationMutation = { __typename?: 'Mutation', createPracticePreparation: { __typename?: 'PracticePreparation', id: string, name: string, focus?: string | null, notes?: string | null, activityId?: string | null, teamId: string, createdAt: any, updatedAt: any, activity?: { __typename?: 'PracticePreparationActivity', id: string, title: string, date: any, time: string } | null, plays: Array<{ __typename?: 'PracticePreparationPlay', id: string, name: string, category: Category }> } };
+
+export type DeleteGamePlanMutationVariables = Exact<{
+  input: DeleteGamePlanInput;
+}>;
+
+
+export type DeleteGamePlanMutation = { __typename?: 'Mutation', deleteGamePlan: { __typename?: 'GamePlan', id: string, name: string, opponent?: string | null, notes?: string | null, activityId: string, teamId: string, createdAt: any, updatedAt: any, activity?: { __typename?: 'GamePlanActivity', id: string, title: string, date: any, time: string } | null, plays: Array<{ __typename?: 'GamePlanPlay', id: string, name: string, category: Category }> } };
+
+export type DeletePlayMutationVariables = Exact<{
+  input: DeletePlayInput;
+}>;
+
+
+export type DeletePlayMutation = { __typename?: 'Mutation', deletePlay: boolean };
+
+export type DeletePracticePreparationMutationVariables = Exact<{
+  input: DeletePracticePreparationInput;
+}>;
+
+
+export type DeletePracticePreparationMutation = { __typename?: 'Mutation', deletePracticePreparation: { __typename?: 'PracticePreparation', id: string, name: string, focus?: string | null, notes?: string | null, activityId?: string | null, teamId: string, createdAt: any, updatedAt: any, activity?: { __typename?: 'PracticePreparationActivity', id: string, title: string, date: any, time: string } | null, plays: Array<{ __typename?: 'PracticePreparationPlay', id: string, name: string, category: Category }> } };
+
+export type GetGameplanQueryVariables = Exact<{
+  input: GetGamePlansInput;
+}>;
+
+
+export type GetGameplanQuery = { __typename?: 'Query', getGameplan: Array<{ __typename?: 'GamePlan', id: string, name: string, opponent?: string | null, notes?: string | null, activityId: string, teamId: string, createdAt: any, updatedAt: any, activity?: { __typename?: 'GamePlanActivity', id: string, title: string, date: any, time: string } | null, plays: Array<{ __typename?: 'GamePlanPlay', id: string, name: string, category: Category }> }> };
+
+export type GetGameplanByIdQueryVariables = Exact<{
+  input: GetGamePlanByIdInput;
+}>;
+
+
+export type GetGameplanByIdQuery = { __typename?: 'Query', getGameplanById?: { __typename?: 'GamePlan', id: string, name: string, opponent?: string | null, notes?: string | null, activityId: string, teamId: string, createdAt: any, updatedAt: any, activity?: { __typename?: 'GamePlanActivity', id: string, title: string, date: any, time: string } | null, plays: Array<{ __typename?: 'GamePlanPlay', id: string, name: string, category: Category }> } | null };
+
+export type GetGamesQueryVariables = Exact<{
+  input: GetActivitiesInput;
+}>;
+
+
+export type GetGamesQuery = { __typename?: 'Query', getGames: Array<{ __typename?: 'Activity', id: string, date: any, time: string, game?: { __typename?: 'Game', id: string, title: string, date: any, time: string, activityId: string, location: Location, opponentStatline?: { __typename?: 'OpponentStatline', activityId: string, name: string, fieldGoalsMade: number, threePointersMade: number, freeThrowsMade: number } | null } | null }> };
+
+export type GetPlayQueryVariables = Exact<{
+  input: GetPlayInput;
+}>;
+
+
+export type GetPlayQuery = { __typename?: 'Query', getPlay?: { __typename?: 'Play', id: string, teamRef: string, name: string, category: Category, description: string, canvas: string, createdAt: any, updatedAt: any } | null };
+
+export type GetPlaysQueryVariables = Exact<{
+  input: GetPlaysInput;
+}>;
+
+
+export type GetPlaysQuery = { __typename?: 'Query', getPlays: Array<{ __typename?: 'Play', id: string, teamRef: string, name: string, category: Category, description: string, canvas: string, createdAt: any, updatedAt: any }> };
+
+export type GetPracticePreparationByIdQueryVariables = Exact<{
+  input: GetPracticePreparationByIdInput;
+}>;
+
+
+export type GetPracticePreparationByIdQuery = { __typename?: 'Query', getPracticePreparationById?: { __typename?: 'PracticePreparation', id: string, name: string, focus?: string | null, notes?: string | null, activityId?: string | null, teamId: string, createdAt: any, updatedAt: any, activity?: { __typename?: 'PracticePreparationActivity', id: string, title: string, date: any, time: string } | null, plays: Array<{ __typename?: 'PracticePreparationPlay', id: string, name: string, category: Category }> } | null };
+
+export type GetPracticePreparationsQueryVariables = Exact<{
+  input: GetPracticePreparationsInput;
+}>;
+
+
+export type GetPracticePreparationsQuery = { __typename?: 'Query', getPracticePreparations: Array<{ __typename?: 'PracticePreparation', id: string, name: string, focus?: string | null, notes?: string | null, activityId?: string | null, teamId: string, createdAt: any, updatedAt: any, activity?: { __typename?: 'PracticePreparationActivity', id: string, title: string, date: any, time: string } | null, plays: Array<{ __typename?: 'PracticePreparationPlay', id: string, name: string, category: Category }> }> };
+
+export type GetPracticesQueryVariables = Exact<{
+  input: GetActivitiesInput;
+}>;
+
+
+export type GetPracticesQuery = { __typename?: 'Query', getPractices: Array<{ __typename?: 'Activity', practice?: { __typename?: 'Practice', id: string, title: string, date: any, time: string, activityId: string, facility: string, practicetype: string } | null }> };
+
 export type GetTeamActivitiesQueryVariables = Exact<{
   teamRef: Scalars['String']['input'];
 }>;
@@ -1194,6 +1531,20 @@ export const JoinTeamDocument = {"kind":"Document","definitions":[{"kind":"Opera
 export const RejectJoinRequestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RejectJoinRequest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"TeamRequestInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rejectJoinRequest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"memberId"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]} as unknown as DocumentNode<RejectJoinRequestMutation, RejectJoinRequestMutationVariables>;
 export const UpdateUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"dateOfBirth"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"dominantHand"}}]}}]}}]} as unknown as DocumentNode<UpdateUserMutation, UpdateUserMutationVariables>;
 export const GetTeamForDashboardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTeamForDashboard"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getDashboardTeams"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"shortId"}},{"kind":"Field","name":{"kind":"Name","value":"routeKey"}},{"kind":"Field","name":{"kind":"Name","value":"ageGroup"}},{"kind":"Field","name":{"kind":"Name","value":"members"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"activities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"time"}}]}}]}}]}}]} as unknown as DocumentNode<GetTeamForDashboardQuery, GetTeamForDashboardQueryVariables>;
+export const CreateGamePlanDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateGamePlan"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateGamePlanInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createGamePlan"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"opponent"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"activity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"time"}}]}},{"kind":"Field","name":{"kind":"Name","value":"plays"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"category"}}]}}]}}]}}]} as unknown as DocumentNode<CreateGamePlanMutation, CreateGamePlanMutationVariables>;
+export const CreatePlayDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreatePlay"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreatePlayInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createPlay"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"teamRef"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"category"}},{"kind":"Field","name":{"kind":"Name","value":"canvas"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<CreatePlayMutation, CreatePlayMutationVariables>;
+export const CreatePracticePreparationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreatePracticePreparation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreatePracticePreparationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createPracticePreparation"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"focus"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"activity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"time"}}]}},{"kind":"Field","name":{"kind":"Name","value":"plays"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"category"}}]}}]}}]}}]} as unknown as DocumentNode<CreatePracticePreparationMutation, CreatePracticePreparationMutationVariables>;
+export const DeleteGamePlanDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteGamePlan"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteGamePlanInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteGamePlan"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"opponent"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"activity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"time"}}]}},{"kind":"Field","name":{"kind":"Name","value":"plays"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"category"}}]}}]}}]}}]} as unknown as DocumentNode<DeleteGamePlanMutation, DeleteGamePlanMutationVariables>;
+export const DeletePlayDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeletePlay"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeletePlayInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deletePlay"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}]}]}}]} as unknown as DocumentNode<DeletePlayMutation, DeletePlayMutationVariables>;
+export const DeletePracticePreparationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeletePracticePreparation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeletePracticePreparationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deletePracticePreparation"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"focus"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"activity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"time"}}]}},{"kind":"Field","name":{"kind":"Name","value":"plays"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"category"}}]}}]}}]}}]} as unknown as DocumentNode<DeletePracticePreparationMutation, DeletePracticePreparationMutationVariables>;
+export const GetGameplanDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGameplan"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetGamePlansInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getGameplan"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"opponent"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"activity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"time"}}]}},{"kind":"Field","name":{"kind":"Name","value":"plays"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"category"}}]}}]}}]}}]} as unknown as DocumentNode<GetGameplanQuery, GetGameplanQueryVariables>;
+export const GetGameplanByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGameplanById"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetGamePlanByIdInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getGameplanById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"opponent"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"activity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"time"}}]}},{"kind":"Field","name":{"kind":"Name","value":"plays"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"category"}}]}}]}}]}}]} as unknown as DocumentNode<GetGameplanByIdQuery, GetGameplanByIdQueryVariables>;
+export const GetGamesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGames"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetActivitiesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getGames"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"game"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"location"}},{"kind":"Field","name":{"kind":"Name","value":"opponentStatline"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"fieldGoalsMade"}},{"kind":"Field","name":{"kind":"Name","value":"threePointersMade"}},{"kind":"Field","name":{"kind":"Name","value":"freeThrowsMade"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetGamesQuery, GetGamesQueryVariables>;
+export const GetPlayDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPlay"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetPlayInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPlay"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"teamRef"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"category"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"canvas"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetPlayQuery, GetPlayQueryVariables>;
+export const GetPlaysDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPlays"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetPlaysInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPlays"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"teamRef"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"category"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"canvas"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetPlaysQuery, GetPlaysQueryVariables>;
+export const GetPracticePreparationByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPracticePreparationById"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetPracticePreparationByIdInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPracticePreparationById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"focus"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"activity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"time"}}]}},{"kind":"Field","name":{"kind":"Name","value":"plays"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"category"}}]}}]}}]}}]} as unknown as DocumentNode<GetPracticePreparationByIdQuery, GetPracticePreparationByIdQueryVariables>;
+export const GetPracticePreparationsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPracticePreparations"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetPracticePreparationsInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPracticePreparations"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"focus"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"activity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"time"}}]}},{"kind":"Field","name":{"kind":"Name","value":"plays"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"category"}}]}}]}}]}}]} as unknown as DocumentNode<GetPracticePreparationsQuery, GetPracticePreparationsQueryVariables>;
+export const GetPracticesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPractices"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetActivitiesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPractices"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"practice"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"facility"}},{"kind":"Field","name":{"kind":"Name","value":"practicetype"}}]}}]}}]}}]} as unknown as DocumentNode<GetPracticesQuery, GetPracticesQueryVariables>;
 export const GetTeamActivitiesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTeamActivities"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"teamRef"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getTeamActivities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"teamRef"},"value":{"kind":"Variable","name":{"kind":"Name","value":"teamRef"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"routeKey"}},{"kind":"Field","name":{"kind":"Name","value":"shortId"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"ageGroup"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"creatorId"}},{"kind":"Field","name":{"kind":"Name","value":"members"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}}]}},{"kind":"Field","name":{"kind":"Name","value":"activities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"attendees"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"memberId"}},{"kind":"Field","name":{"kind":"Name","value":"attendanceStatus"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetTeamActivitiesQuery, GetTeamActivitiesQueryVariables>;
 export const CreateFeedbackDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateFeedback"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateFeedbackInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createFeedback"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"feedback"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"coach"}}]}}]}}]}}]} as unknown as DocumentNode<CreateFeedbackMutation, CreateFeedbackMutationVariables>;
 export const CreateFilmDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateFilm"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateFilmInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createFilm"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"film"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"notes"}}]}}]}}]}}]} as unknown as DocumentNode<CreateFilmMutation, CreateFilmMutationVariables>;

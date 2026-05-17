@@ -1,0 +1,23 @@
+mutation CreateGamePlan($input: CreateGamePlanInput!) {
+  createGamePlan(input: $input) {
+    id
+    name
+    opponent
+    notes
+    activityId
+    teamId
+    createdAt
+    updatedAt
+    activity {
+      id
+      title
+      date
+      time
+    }
+    plays {
+      id
+      name
+      category
+    }
+  }
+}

@@ -1,0 +1,12 @@
+query GetPlay($input: GetPlayInput!) {
+  getPlay(input: $input) {
+    id
+    teamRef
+    name
+    category
+    description
+    canvas
+    createdAt
+    updatedAt
+  }
+}

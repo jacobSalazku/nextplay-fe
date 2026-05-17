@@ -1,0 +1,13 @@
+query GetPractices($input: GetActivitiesInput!) {
+  getPractices(input: $input) {
+    practice {
+      id
+      title
+      date
+      time
+      activityId
+      facility
+      practicetype
+    }
+  }
+}
