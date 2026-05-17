@@ -10,9 +10,9 @@ export type DrawingLine = {
   id: string;
   points: number[];
   color: string;
-  tool: string;
+  tool: 'pass' | 'movement' | 'draw';
 };
 
-export type CoachDashTab = "gameplan" | "play" | "practice";
+export type CoachDashTab = 'gameplan' | 'play' | 'practice';
 
-export type PlanCardType = "gameplan" | "practice";
+export type PlanCardType = 'gameplan' | 'practice';

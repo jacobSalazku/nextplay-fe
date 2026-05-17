@@ -49,25 +49,27 @@ async function PlaybookPage({ params }: PageProps) {
 
   return (
     <Suspense fallback={<PlaybookLibrarySkeleton />}>
-      <div className="scrollbar-none h-auto max-w-screen-2xl overflow-y-auto">
-        <PlaybookBookBlock
-          practicePreparation={practicePreparation}
-          role={role}
-          playbook={playbook}
-          gamePlan={gameplan}
-        />
-        <GamePlanForm
-          mode="create"
-          role={role}
-          data={games}
-          playbook={playbook}
-        />
-        <PracticePreparationForm
-          mode="create"
-          role={role}
-          practices={practices}
-          playbook={playbook}
-        />
+      <div className="scrollbar-none min-h-screen w-full overflow-x-hidden text-white">
+        <div className="mx-auto w-full max-w-screen-2xl pb-12">
+          <PlaybookBookBlock
+            practicePreparation={practicePreparation}
+            role={role}
+            playbook={playbook}
+            gamePlan={gameplan}
+          />
+          <GamePlanForm
+            mode="create"
+            role={role}
+            data={games}
+            playbook={playbook}
+          />
+          <PracticePreparationForm
+            mode="create"
+            role={role}
+            practices={practices}
+            playbook={playbook}
+          />
+        </div>
       </div>
     </Suspense>
   );

@@ -42,7 +42,9 @@ export function PlayForm() {
   const { teamRef } = useTeam();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const router = useRouter();
-  const [currentTool, setCurrentTool] = useState('move');
+  const [currentTool, setCurrentTool] = useState<
+    'select' | 'pass' | 'movement'
+  >('select');
   const [currentColor, setCurrentColor] = useState('#f97316');
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -99,7 +101,7 @@ export function PlayForm() {
   }, [canvasSize, players, drawingLines, courtImgLoaded, drawCourt]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging && currentTool === 'move') {
+    if (!isDragging && currentTool === 'select') {
       const { x, y } = getEventPosition(e, canvasRef.current);
       const player = getPlayerAtPosition(x, y, players);
       if (canvasRef.current) {
@@ -177,7 +179,8 @@ export function PlayForm() {
 
   return (
     <div className="mx-auto my-auto w-full max-w-7xl space-y-6 p-2 sm:p-4">
-      <div className="flex items-center gap-4 pt-4 pl-4 md:pl-0">
+      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-linear-to-b from-slate-900/95 to-slate-950 px-4 py-5">
+        <div className="absolute top-0 left-0 h-1 w-full bg-linear-to-r from-orange-500 via-amber-300 to-orange-500 opacity-80" />
         <div>
           <h1 className="text-2xl font-bold text-white sm:text-3xl">
             Create New Play
@@ -188,11 +191,12 @@ export function PlayForm() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col-reverse gap-6"
+        className="flex flex-col-reverse gap-6 xl:grid xl:grid-cols-[1.6fr_1fr]"
       >
         <div className="flex w-full flex-1 flex-col gap-4">
-          <Card className="border border-gray-800 bg-gray-950 px-0">
-            <CardHeader>
+          <Card className="overflow-hidden rounded-2xl border border-white/10 bg-linear-to-b from-slate-900/95 to-slate-950 px-0 shadow-[0_0_30px_rgba(0,0,0,0.35)]">
+            <div className="h-1 w-full bg-linear-to-r from-orange-500 via-amber-300 to-orange-500 opacity-80" />
+            <CardHeader className="pt-6">
               <CardTitle className="text-white">Draw Your Play</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -201,9 +205,11 @@ export function PlayForm() {
                   <Button
                     aria-label="Select Tool"
                     key={id}
-                    onClick={() => setCurrentTool(id)}
+                    onClick={() =>
+                      setCurrentTool(id as 'select' | 'pass' | 'movement')
+                    }
                     variant={currentTool === id ? 'primary' : 'outline'}
-                    className="flex items-center justify-center"
+                    className="flex min-w-28 items-center justify-center"
                   >
                     <Icon className="h-4 w-4" /> {label}
                   </Button>
@@ -212,6 +218,7 @@ export function PlayForm() {
                   aria-label="Undo Last Line"
                   variant="outline"
                   onClick={undoLastLine}
+                  className="border-white/20 bg-slate-900/80 hover:border-orange-300/40"
                 >
                   <RotateCcw className="mr-2 h-4 w-4" />
                   Undo Line
@@ -220,6 +227,7 @@ export function PlayForm() {
                   aria-label="Clear Drawings"
                   variant="outline"
                   onClick={clearDrawings}
+                  className="border-white/20 bg-slate-900/80 hover:border-orange-300/40"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Clear Lines
@@ -228,23 +236,38 @@ export function PlayForm() {
                   aria-label="Reset Players"
                   variant="outline"
                   onClick={resetPlayers}
+                  className="border-white/20 bg-slate-900/80 hover:border-orange-300/40"
                 >
                   <RotateCcw className="mr-2 h-4 w-4" />
                   Reset Players
                 </Button>
               </div>
+              <div className="flex flex-wrap items-center gap-4 text-xs text-white/70">
+                <span className="inline-flex items-center gap-2">
+                  <span className="h-[2px] w-8 rounded bg-white" />
+                  Pass line
+                </span>
+                <span className="inline-flex items-center gap-2">
+                  <span className="h-0 w-8 border-t-2 border-dashed border-white" />
+                  Movement line
+                </span>
+              </div>
               <div>
-                <h3 className="mb-2 text-sm text-gray-400">Color</h3>
+                <h3 className="mb-2 text-xs tracking-wide text-gray-400 uppercase">
+                  Color
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {colors.map((color) => (
                     <Button
                       key={color}
+                      variant="ghost"
+                      size="icon"
                       style={{ backgroundColor: color }}
                       className={cn(
-                        'h-8 w-8 rounded-full border-2',
+                        'h-8 w-8 rounded-full border-2 p-0 hover:bg-transparent',
                         currentColor === color
-                          ? 'border-white'
-                          : 'border-gray-700',
+                          ? 'border-white ring-2 ring-white/20'
+                          : 'border-white/20',
                       )}
                       onClick={() => setCurrentColor(color)}
                       aria-label={`Select color ${color}`}
@@ -262,7 +285,7 @@ export function PlayForm() {
                     ref={canvasRef}
                     width={canvasSize.width}
                     height={canvasSize.height}
-                    className="w-full max-w-full rounded border border-gray-700 bg-gray-950"
+                    className="w-full max-w-full rounded-xl border border-white/10 bg-slate-950/80"
                     onMouseDown={startInteraction}
                     onTouchStart={startInteraction}
                     onMouseMove={(e) => {
@@ -284,8 +307,9 @@ export function PlayForm() {
           </Card>
         </div>
         <div className="flex w-full max-w-full min-w-0 flex-col gap-4 lg:w-full">
-          <Card className="border border-gray-800 bg-gray-950">
-            <CardHeader>
+          <Card className="overflow-hidden rounded-2xl border border-white/10 bg-linear-to-b from-slate-900/95 to-slate-950 shadow-[0_0_30px_rgba(0,0,0,0.35)]">
+            <div className="h-1 w-full bg-linear-to-r from-orange-500 via-amber-300 to-orange-500 opacity-80" />
+            <CardHeader className="pt-6">
               <CardTitle className="text-white">Play Details</CardTitle>
               <CardDescription className="text-gray-400">
                 Name and describe your play.
@@ -297,13 +321,14 @@ export function PlayForm() {
                   id="name"
                   label="Name"
                   labelColor="light"
+                  className="border-white/10 bg-slate-900/70 text-white placeholder:text-gray-500"
                   aria-label="Play name input"
                   {...register('name')}
                   error={errors.name}
                   errorMessage={errors.name?.message}
                 />
                 <div className="flex w-full flex-col gap-3">
-                  <span className="text-sm font-medium text-gray-700 dark:text-white">
+                  <span className="text-xs font-semibold tracking-wide text-gray-300 uppercase">
                     Category
                   </span>
                   <div>
@@ -320,12 +345,17 @@ export function PlayForm() {
                           {categories.map((option) => (
                             <div
                               key={option.id}
-                              className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-gray-900 shadow-sm transition hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+                              className={cn(
+                                'flex items-center gap-2 rounded-lg border px-4 py-2 shadow-sm transition',
+                                field.value === option.id
+                                  ? 'border-orange-300/50 bg-orange-500/15 text-white'
+                                  : 'border-white/10 bg-slate-900/60 text-gray-100 hover:border-orange-300/40',
+                              )}
                             >
                               <RadioGroupItem
                                 value={option.id}
                                 id={`position-${option.id}`}
-                                className="rounded-full border border-gray-500 bg-white ring-0 focus:ring-0 data-[state=checked]:bg-gray-900"
+                                className="border-white/30 bg-slate-950 text-white ring-0 focus-visible:ring-orange-300 data-[state=checked]:border-orange-300 data-[state=checked]:bg-orange-300 data-[state=checked]:text-orange-900"
                               />
                               <label
                                 htmlFor={`position-${option.id}`}
@@ -357,11 +387,7 @@ export function PlayForm() {
                 />
                 {errors.description && <p>{errors.description.message}</p>}
               </div>
-              <Button
-                type="submit"
-                variant="primary"
-                className="w-full bg-white text-gray-900 hover:bg-orange-400 hover:text-white"
-              >
+              <Button type="submit" variant="primary" className="w-full">
                 <Save className="mr-2 h-4 w-4" />
                 {isSubmitting ? 'Saving...' : 'Save Play'}
               </Button>

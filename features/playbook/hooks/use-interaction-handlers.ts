@@ -3,9 +3,11 @@ import { getEventPosition } from '../utils/canvas/get-event-position';
 import { getPlayerAtPosition } from '../utils/canvas/get-player-position';
 import type { DrawingLine, Player } from '../utils/types';
 
+type ToolType = 'select' | 'pass' | 'movement';
+
 type InteractionParams = {
   canvasRef: React.RefObject<HTMLCanvasElement>;
-  currentTool: string;
+  currentTool: ToolType;
   currentColor: string;
   players: Player[];
   setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
@@ -37,7 +39,7 @@ export const useInteractionHandlers = ({
       e.preventDefault();
       const { x, y } = getEventPosition(e, canvasRef.current);
 
-      if (currentTool === 'move') {
+      if (currentTool === 'select') {
         const player = getPlayerAtPosition(x, y, players);
         if (player) {
           setIsDragging(true);
@@ -46,7 +48,7 @@ export const useInteractionHandlers = ({
         }
       }
 
-      if (currentTool !== 'move') {
+      if (currentTool !== 'select') {
         setIsDrawing(true);
         const newLine: DrawingLine = {
           id: Date.now().toString(),
@@ -88,7 +90,7 @@ export const useInteractionHandlers = ({
         return;
       }
 
-      if (!isDrawing || currentTool === 'move') return;
+      if (!isDrawing || currentTool === 'select') return;
 
       setDrawingLines((prev) => {
         const newLines = [...prev];

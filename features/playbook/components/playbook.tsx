@@ -1,12 +1,15 @@
 'use client';
 
 import { useCallback, type FC } from 'react';
+import { useRouter } from 'next/navigation';
 import type { CoachDashTab } from '../utils/types';
 import { useTeam } from '@/context/team-context';
+import { toastStyling } from '@/features/toast-notification/styling';
 import { useCoachDashboardStore } from '@/store/use-coach-dashboard-store';
 import { cn } from '@/utils/tw-merge';
 import { useMutation } from '@apollo/client/react';
 import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   DeleteGamePlanDocument,
   DeletePracticePreparationDocument,
@@ -37,6 +40,7 @@ const PlaybookBookBlock: FC<PageProps> = ({
   role,
 }) => {
   const { teamRef } = useTeam();
+  const router = useRouter();
   const {
     activeCoachTab,
     setOpenGamePlan,
@@ -60,81 +64,90 @@ const PlaybookBookBlock: FC<PageProps> = ({
     planId: string,
     type: 'gameplan' | 'practice',
   ) => {
-    if (type === 'gameplan') {
-      await deleteGamePlan({
-        variables: {
-          input: {
-            teamId: teamRef,
-            gamePlanId: planId,
+    try {
+      if (type === 'gameplan') {
+        await deleteGamePlan({
+          variables: {
+            input: {
+              teamRef,
+              gamePlanId: planId,
+            },
           },
-        },
+          refetchQueries: ['GetGameplan'],
+        });
+      } else if (type === 'practice') {
+        await deletePracticePreparation({
+          variables: {
+            input: {
+              teamRef,
+              practicePreparationId: planId,
+            },
+          },
+          refetchQueries: ['GetPracticePreparations'],
+        });
+      }
+
+      router.refresh();
+      toast.success('Deleted successfully', {
+        ...toastStyling,
+        position: 'top-right',
       });
-    } else if (type === 'practice') {
-      await deletePracticePreparation({
-        variables: {
-          input: {
-            teamId: teamRef,
-            gamePlanId: planId,
-          },
-        },
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to delete item', {
+        ...toastStyling,
+        position: 'top-right',
       });
     }
   };
 
   return (
-    <div className="flex flex-col gap-8 space-y-6 overflow-y-auto p-4 sm:p-6 md:px-9">
-      <div className="m-0 flex flex-col justify-between gap-4 py-4 sm:flex-row sm:items-center">
+    <div className="flex w-full flex-col gap-8 px-2 pt-2 md:px-6">
+      <div className="px-2 md:px-0">
         <h1 className="font-righteous text-3xl font-bold text-white sm:text-3xl">
-          Plays Library
+          Playbook Library
         </h1>
+        <p className="mt-1 text-sm text-white/60">
+          Manage your plays, game plans, and practice preparations.
+        </p>
       </div>
       <Tabs
         value={activeCoachTab}
         onValueChange={handleCoachTabChange}
-        className="m-0 flex gap-8 text-sm"
+        className="m-0 flex flex-col gap-6 px-2 text-sm md:px-0"
       >
-        <div className="flex w-full flex-col items-center justify-between gap-4 sm:flex-row">
-          <div className="flex w-full flex-col items-center justify-between gap-4 sm:flex-row md:w-full">
-            <TabsList className="flex w-full justify-between gap-2 px-0 sm:gap-4 md:w-2/3">
-              <TabsTrigger
-                id="gameplan"
-                value={'gameplan'}
-                className={cn(
-                  'group flex w-1/2 flex-1 items-center gap-4 rounded-lg border border-gray-800 bg-gray-900 px-4 py-3 text-left transition-colors duration-500 ease-in-out',
-                  'data-[state=active]:border-transparent data-[state=active]:bg-linear-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400',
-                )}
-              >
-                <div className="flex flex-col transition-colors duration-300 ease-in-out">
-                  <p className="font-semibold">Gameplan</p>
-                </div>
-              </TabsTrigger>
-              <TabsTrigger
-                id="practice"
-                value="practice"
-                className={cn(
-                  'group flex w-1/2 flex-1 items-center gap-4 rounded-lg border border-gray-800 bg-gray-900 px-4 py-3 text-left transition-colors duration-500 ease-in-out',
-                  'data-[state=active]:bg-linear-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400',
-                )}
-              >
-                <div className="flex flex-col transition-colors duration-300 ease-in-out">
-                  <p className="font-semibold">Practice</p>
-                </div>
-              </TabsTrigger>
-              <TabsTrigger
-                id="play"
-                value="play"
-                className={cn(
-                  'group flex w-1/2 flex-1 items-center gap-4 rounded-lg border border-gray-800 bg-gray-900 px-4 py-3 text-left transition-colors duration-500 ease-in-out',
-                  'data-[state=active]:bg-linear-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400',
-                )}
-              >
-                <div className="flex flex-col transition-colors duration-300 ease-in-out">
-                  <p className="font-semibold">Playbook</p>
-                </div>
-              </TabsTrigger>
-            </TabsList>
-          </div>
-        </div>
+        <TabsList className="flex h-auto w-full justify-between gap-2 rounded-2xl border border-white/10 bg-slate-900/60 p-1.5 sm:gap-3 lg:w-2/3">
+          <TabsTrigger
+            id="gameplan"
+            value="gameplan"
+            className={cn(
+              'group flex w-1/2 flex-1 items-center gap-4 rounded-xl border border-transparent bg-transparent px-4 py-3 text-left text-white/70 transition-all duration-300',
+              'data-[state=active]:border-transparent data-[state=active]:bg-linear-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400 data-[state=active]:text-white data-[state=active]:shadow-lg',
+            )}
+          >
+            <span className="font-semibold">Gameplan</span>
+          </TabsTrigger>
+          <TabsTrigger
+            id="practice"
+            value="practice"
+            className={cn(
+              'group flex w-1/2 flex-1 items-center gap-4 rounded-xl border border-transparent bg-transparent px-4 py-3 text-left text-white/70 transition-all duration-300',
+              'data-[state=active]:border-transparent data-[state=active]:bg-linear-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400 data-[state=active]:text-white data-[state=active]:shadow-lg',
+            )}
+          >
+            <span className="font-semibold">Practice</span>
+          </TabsTrigger>
+          <TabsTrigger
+            id="play"
+            value="play"
+            className={cn(
+              'group flex w-1/2 flex-1 items-center gap-4 rounded-xl border border-transparent bg-transparent px-4 py-3 text-left text-white/70 transition-all duration-300',
+              'data-[state=active]:border-transparent data-[state=active]:bg-linear-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400 data-[state=active]:text-white data-[state=active]:shadow-lg',
+            )}
+          >
+            <span className="font-semibold">Playbook</span>
+          </TabsTrigger>
+        </TabsList>
         <TabsContent value="gameplan">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {gamePlan?.map((item, idx) => (
@@ -151,11 +164,11 @@ const PlaybookBookBlock: FC<PageProps> = ({
               />
             ))}
             {role === 'COACH' && (
-              <Card className="group flex h-80 cursor-pointer flex-col items-center justify-center gap-6 border border-gray-800 py-10 text-xs text-white transition-all duration-200 hover:border-white/50">
+              <Card className="group flex h-80 cursor-pointer flex-col items-center justify-center gap-6 rounded-2xl border border-dashed border-white/20 bg-slate-900/50 py-10 text-xs text-white transition-all duration-200 hover:border-orange-300/50 hover:bg-slate-900/80">
                 <Button
                   aria-label="Add New GamePlan"
                   onClick={() => setOpenGamePlan(true)}
-                  className="flex items-center justify-center rounded-lg border-gray-700 bg-gray-900 px-6 py-6 group-hover:bg-gray-700 md:px-10 md:py-10"
+                  className="flex items-center justify-center rounded-xl border border-white/10 bg-slate-950/80 px-6 py-6 group-hover:bg-slate-900 md:px-10 md:py-10"
                 >
                   <Plus className="h-6 w-6" />
                 </Button>
@@ -182,10 +195,10 @@ const PlaybookBookBlock: FC<PageProps> = ({
               />
             ))}
             {role === 'COACH' && (
-              <Card className="group flex h-80 cursor-pointer flex-col items-center justify-center gap-6 border border-gray-800 py-10 text-xs text-white transition-all duration-200 hover:border-white/50">
+              <Card className="group flex h-80 cursor-pointer flex-col items-center justify-center gap-6 rounded-2xl border border-dashed border-white/20 bg-slate-900/50 py-10 text-xs text-white transition-all duration-200 hover:border-orange-300/50 hover:bg-slate-900/80">
                 <Button
                   onClick={() => setOpenPracticePreparation(true)}
-                  className="flex items-center justify-center rounded-lg border-gray-700 bg-gray-900 px-6 py-6 group-hover:bg-gray-700 md:px-10 md:py-10"
+                  className="flex items-center justify-center rounded-xl border border-white/10 bg-slate-950/80 px-6 py-6 group-hover:bg-slate-900 md:px-10 md:py-10"
                 >
                   <Plus className="h-6 w-6" />
                 </Button>
@@ -203,13 +216,13 @@ const PlaybookBookBlock: FC<PageProps> = ({
               <PlayCard key={idx} role={role} play={play} />
             ))}
             {role === 'COACH' && (
-              <Card className="group flex cursor-pointer flex-col items-center justify-center gap-6 border border-gray-800 py-24 text-xs text-white transition-all duration-200 hover:border-white/50">
+              <Card className="group flex cursor-pointer flex-col items-center justify-center gap-6 rounded-2xl border border-dashed border-white/20 bg-slate-900/50 py-24 text-xs text-white transition-all duration-200 hover:border-orange-300/50 hover:bg-slate-900/80">
                 <Link
                   aria-label="Add New Play"
                   href={{
                     pathname: `/team/${teamRef}/playbook/create`,
                   }}
-                  className="flex items-center justify-center rounded-lg border-gray-700 bg-gray-900 px-6 py-6 group-hover:bg-gray-700 md:px-10 md:py-10"
+                  className="flex items-center justify-center rounded-xl border border-white/10 bg-slate-950/80 px-6 py-6 group-hover:bg-slate-900 md:px-10 md:py-10"
                 >
                   <Plus className="h-6 w-6" />
                 </Link>

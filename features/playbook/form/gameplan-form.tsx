@@ -134,13 +134,14 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
   return (
     <>
       {openGamePlan && isCreateMode && (
-        <div className="scroll bar fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/10 p-3 backdrop-blur-xs">
-          <div className="flex w-full max-w-4xl items-center justify-between rounded-t-lg border border-b border-gray-800 bg-white p-2 px-4 py-3">
-            <h2 className="font-righteous text-lg font-normal text-gray-950 sm:text-xl">
+        <div className="scroll bar fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70 p-3 backdrop-blur-sm">
+          <div className="relative flex w-full max-w-4xl items-center justify-between rounded-t-xl border border-white/10 border-b-white/20 bg-linear-to-b from-slate-900 to-slate-950 px-4 py-3">
+            <div className="absolute top-0 left-0 h-1 w-full rounded-t-xl bg-linear-to-r from-orange-500 via-amber-300 to-orange-500 opacity-80" />
+            <h2 className="font-righteous text-lg font-normal text-white sm:text-xl">
               Create GamePlan
             </h2>
             <Button
-              className="bg-transparent py-2 text-xl font-bold text-gray-400 shadow-none hover:bg-gray-900 hover:text-white"
+              className="border border-white/10 bg-transparent py-2 text-xl font-bold text-white/70 shadow-none hover:bg-slate-800 hover:text-white"
               aria-label="Close"
               onClick={() => {
                 setOpenGamePlan(false);
@@ -161,10 +162,10 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
               <X className="h-6 w-6" />
             </Button>
           </div>
-          <div className="scrollbar-none max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-b-lg border border-gray-800 bg-gray-950 px-3 text-white">
+          <div className="scrollbar-none max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-b-xl border border-white/10 border-t-0 bg-linear-to-b from-slate-900/95 to-slate-950 px-3 text-white">
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="flex w-full flex-col px-2 py-3 lg:px-6"
+              className="flex w-full flex-col gap-3 px-2 py-4 lg:px-6"
             >
               <div className="sr-only">
                 <Input
@@ -178,7 +179,7 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
               <Input
                 id="name"
                 aria-label="Input the name the gameplan"
-                className="border-gray-700"
+                className="border-white/10 bg-slate-900/70"
                 label="Gameplan Name"
                 labelColor="light"
                 type="text"
@@ -189,13 +190,15 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
               />
               <div className="flex w-full flex-row gap-4 pt-2 text-sm">
                 <div className="flex w-full flex-col gap-2">
-                  <label>Connect to Game</label>
+                  <label className="text-sm uppercase tracking-wide text-white/70">
+                    Connect to Game
+                  </label>
                   <div
                     className={cn(
                       errors.activityId?.message || errors.opponent?.message
-                        ? 'border-red-800 focus:ring-1 focus:ring-gray-500'
-                        : 'border-gray-700 focus:ring-1 focus:ring-gray-500',
-                      'scrollbar-none flex h-48 max-h-48 w-full flex-col gap-2 overflow-y-auto rounded-lg border p-3',
+                        ? 'border-red-700/70 ring-1 ring-red-700/30'
+                        : 'border-white/10',
+                      'scrollbar-none flex h-48 max-h-48 w-full flex-col gap-2 overflow-y-auto rounded-xl border bg-slate-900/60 p-3',
                     )}
                   >
                     <input type="hidden" {...register('activityId')} />
@@ -205,17 +208,17 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
                         {data.map((a) => (
                           <div
                             key={a.id}
-                            className={`cursor-pointer rounded-lg border border-gray-700 p-3 font-bold text-white transition-colors ${
+                            className={`cursor-pointer rounded-xl border p-3 font-bold text-white transition-colors ${
                               selectedGame === a.id
-                                ? 'border-gray-950 bg-gray-50'
-                                : 'border-gray-200 hover:border-gray-300'
+                                ? 'border-orange-300/50 bg-slate-800/90'
+                                : 'border-white/10 bg-slate-900/60 hover:border-orange-300/40'
                             }`}
                             onClick={() => handleGameSelection(a)}
                           >
                             <div className="flex items-center justify-between">
                               <span
                                 className={cn(
-                                  selectedGame === a.id ? 'text-gray-900' : '',
+                                  selectedGame === a.id ? 'text-white' : '',
                                 )}
                               >
                                 vs {a.game?.opponentStatline?.name}
@@ -223,8 +226,8 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
                               <span
                                 className={cn(
                                   selectedGame === a.id
-                                    ? 'text-gray-900'
-                                    : 'text-gray-400',
+                                    ? 'text-white/90'
+                                    : 'text-white/50',
                                   'text-xs',
                                 )}
                               >
@@ -234,8 +237,8 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
                             <div
                               className={cn(
                                 selectedGame === a.id
-                                  ? 'text-gray-900'
-                                  : 'text-gray-400',
+                                  ? 'text-white/90'
+                                  : 'text-white/60',
                               )}
                             >
                               <Clock className="mr-1 inline h-4 w-4" />
@@ -251,8 +254,10 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
                   </span>
                 </div>
                 <div className="hidden w-full flex-col gap-2 md:flex">
-                  <label>Select play</label>
-                  <div className="scrollbar-none flex h-48 max-h-48 w-full flex-col gap-2 overflow-y-auto rounded-lg border border-gray-700 p-3">
+                  <label className="text-sm uppercase tracking-wide text-white/70">
+                    Select play
+                  </label>
+                  <div className="scrollbar-none flex h-48 max-h-48 w-full flex-col gap-2 overflow-y-auto rounded-xl border border-white/10 bg-slate-900/60 p-3">
                     {playbook && playbook.length > 0 && (
                       <>
                         {playbook.map((play) => (
@@ -260,9 +265,9 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
                             key={play.id}
                             className={cn(
                               selectedPlay?.includes(play.id)
-                                ? 'bg-gray-800'
+                                ? 'border border-orange-300/40 bg-slate-800'
                                 : '',
-                              'flex w-full cursor-pointer flex-row items-center justify-between rounded-lg px-3 py-1.5 text-white transition-colors hover:bg-gray-700',
+                              'flex w-full cursor-pointer flex-row items-center justify-between rounded-lg px-3 py-1.5 text-white transition-colors hover:bg-slate-800/80',
                             )}
                             onClick={() => handlePlaySelection(play)}
                           >
@@ -287,8 +292,10 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
                 </div>
               </div>
               <div className="flex w-full flex-col gap-2 md:hidden">
-                <label>Select play</label>
-                <div className="scrollbar-none flex h-48 max-h-36 w-full flex-col gap-2 overflow-y-auto rounded-lg border border-gray-700 p-3">
+                <label className="text-sm uppercase tracking-wide text-white/70">
+                  Select play
+                </label>
+                <div className="scrollbar-none flex h-48 max-h-36 w-full flex-col gap-2 overflow-y-auto rounded-xl border border-white/10 bg-slate-900/60 p-3">
                   {playbook && playbook.length > 0 && (
                     <>
                       {playbook.map((play) => (
@@ -296,9 +303,9 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
                           key={play.id}
                           className={cn(
                             selectedPlay?.includes(play.id)
-                              ? 'bg-gray-800'
+                              ? 'border border-orange-300/40 bg-slate-800'
                               : '',
-                            'flex w-full cursor-pointer flex-row items-center justify-between rounded-lg px-3 py-1.5 text-white transition-colors hover:bg-gray-700',
+                            'flex w-full cursor-pointer flex-row items-center justify-between rounded-lg px-3 py-1.5 text-white transition-colors hover:bg-slate-800/80',
                           )}
                           onClick={() => handlePlaySelection(play)}
                         >
@@ -325,19 +332,20 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
               <div>
                 <RichTextEditor
                   label="Explain Game Plan"
-                  className="max-h-96 w-full max-w-full"
+                  className="max-h-96 w-full max-w-full border-white/10"
                   content={notesContent ?? ''}
                   onChange={(content) =>
                     setValue('notes', content, { shouldValidate: true })
                   }
                 />
               </div>
-              <div className="bg-g flex justify-end border-t border-gray-800 pt-4">
+              <div className="bg-g flex justify-end border-t border-white/10 pt-4">
                 {isCoach && (
                   <Button
                     aria-label="Submit Game Plan"
                     type="submit"
-                    variant="outline"
+                    variant="primary"
+                    className="min-w-44"
                   >
                     {buttonText}
                   </Button>
