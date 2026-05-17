@@ -1,0 +1,22 @@
+query GetGames($input: GetActivitiesInput!) {
+  getGames(input: $input) {
+    id
+    date
+    time
+    game {
+      id
+      title
+      date
+      time
+      activityId
+      location
+      opponentStatline {
+        activityId
+        name
+        fieldGoalsMade
+        threePointersMade
+        freeThrowsMade
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+mutation CreatePlay($input: CreatePlayInput!) {
+  createPlay(input: $input) {
+    id
+    teamRef
+    name
+    description
+    category
+    canvas
+    createdAt
+    updatedAt
+  }
+}
