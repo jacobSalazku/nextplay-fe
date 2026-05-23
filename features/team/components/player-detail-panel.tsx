@@ -188,7 +188,7 @@ const PlayerDetailPanel = ({
             </div>
 
             {selectedPlayer.attendances.length > 0 ? (
-              <div className="space-y-3">
+              <div className="scrollbar-none max-h-[26rem] space-y-3 overflow-y-auto pr-1">
                 {selectedPlayer.attendances.map((attendance) => (
                   <article
                     key={attendance.id}

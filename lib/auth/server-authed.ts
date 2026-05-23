@@ -1,5 +1,8 @@
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { performGraphQLRequest } from '../apollo/graphql';
+import {
+  type ExecuteGraphQLOptions,
+  performGraphQLRequest,
+} from '../apollo/graphql';
 import { requireAccessToken } from './require-acces-token';
 
 export async function executeAuthedGraphQL<
@@ -8,9 +11,10 @@ export async function executeAuthedGraphQL<
 >(
   document: TypedDocumentNode<TData, TVariables>,
   variables: TVariables,
+  options?: Omit<ExecuteGraphQLOptions, 'accessToken' | 'skipAuth'>,
 ): Promise<TData> {
   const accessToken = await requireAccessToken();
-  return performGraphQLRequest(document, variables, { accessToken });
+  return performGraphQLRequest(document, variables, { ...options, accessToken });
 }
 
 export async function executeAuthedMutation<
@@ -19,7 +23,8 @@ export async function executeAuthedMutation<
 >(
   document: TypedDocumentNode<TData, TVariables>,
   variables: TVariables,
+  options?: Omit<ExecuteGraphQLOptions, 'accessToken' | 'skipAuth'>,
 ): Promise<TData> {
   const accessToken = await requireAccessToken();
-  return performGraphQLRequest(document, variables, { accessToken });
+  return performGraphQLRequest(document, variables, { ...options, accessToken });
 }

@@ -51,14 +51,14 @@ export const CalendarDay: FC<CalendarDayProps> = ({ day, activities }) => {
     <div
       onClick={() => setSelectedDate(day)}
       className={cn(
-        'group flex max-h-full min-h-40 w-full cursor-pointer flex-col items-end justify-start rounded-sm p-1.5 transition-all duration-200 focus:ring-2 focus:ring-white focus:outline-none md:p-2 lg:p-4 xl:h-[13rem]',
+        'group flex max-h-full min-h-40 w-full cursor-pointer flex-col items-end justify-start rounded-md p-1.5 transition-all duration-200 focus:ring-2 focus:ring-orange-200/80 focus:outline-none md:p-2 lg:p-4 xl:h-[13rem]',
         isSelected
-          ? 'border border-white shadow-lg ring ring-white'
-          : 'border border-orange-200/30 hover:bg-orange-200/10',
+          ? 'border border-orange-300/45 bg-orange-500/10 shadow-sm'
+          : 'border border-orange-200/20 bg-white/[0.02] hover:bg-orange-200/10',
       )}
     >
       <div className="inline-flex w-full flex-row items-center justify-between px-1">
-        <span className="text-xs font-medium text-gray-400">
+        <span className="text-xs font-medium tracking-wide text-gray-400 uppercase">
           {format(day, 'EEE')}
         </span>
         <span
@@ -78,7 +78,7 @@ export const CalendarDay: FC<CalendarDayProps> = ({ day, activities }) => {
         />
       ))}
       {extraActivitiesCount && (
-        <div className="text-center text-xs text-gray-400">
+        <div className="mt-1 text-center text-xs text-gray-400">
           +{extraActivitiesCount} more
         </div>
       )}

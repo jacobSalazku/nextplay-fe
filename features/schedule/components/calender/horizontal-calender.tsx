@@ -32,8 +32,8 @@ export function HorizontalCalender({ activities }: HorizontalCalendarProps) {
     setCurrentDate((prevDate) => addDays(prevDate, isMobile ? 3 : 5));
 
   return (
-    <div className="max-h-full min-h-60 w-full rounded-xl border border-orange-200/30 p-3 shadow-2xl transition-colors duration-300 md:p-6">
-      <div className="mb-4 flex items-center justify-between">
+    <div className="max-h-full min-h-60 w-full rounded-xl border border-orange-200/25 bg-gray-950/40 p-3 shadow-xl transition-colors duration-300 md:p-6">
+      <div className="mb-4 flex items-center justify-between border-b border-orange-200/15 pb-3">
         <h2 className="text-lg font-semibold tracking-tight text-gray-100">
           {format(visibleDays[0] ?? new Date(), 'MMM d')} -{' '}
           {format(
@@ -44,14 +44,14 @@ export function HorizontalCalender({ activities }: HorizontalCalendarProps) {
         <div className="flex space-x-2">
           <Button
             onClick={handlePrevious}
-            className="rounded p-1 text-orange-300 shadow-md transition-colors duration-200"
+            className="rounded-md border border-orange-200/20 bg-gray-900/70 p-1 text-orange-200 shadow-sm transition-colors duration-200 hover:bg-orange-200/10"
             aria-label="Previous"
           >
             <ChevronLeft className="h-4 w-4 md:h-5 md:w-5" />
           </Button>
           <Button
             onClick={handleNext}
-            className="rounded p-1 text-orange-300 shadow-md transition-colors duration-200"
+            className="rounded-md border border-orange-200/20 bg-gray-900/70 p-1 text-orange-200 shadow-sm transition-colors duration-200 hover:bg-orange-200/10"
             aria-label="Next"
           >
             <ChevronRight className="h-4 w-4 md:h-5 md:w-5" />

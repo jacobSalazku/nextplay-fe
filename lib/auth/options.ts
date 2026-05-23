@@ -1,9 +1,59 @@
 import { type AuthOptions } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import { LoginDocument, RefreshDocument } from '@/graphql/graphql';
 import { authMutation } from './auth';
 
 const REFRESH_SKEW_MS = 30_000;
+const DEV_AUTH_ENABLED =
+  process.env.NODE_ENV !== 'production' &&
+  (process.env.DEV_AUTH_ENABLED === 'true' ||
+    process.env.NEXT_PUBLIC_DEV_AUTH_ENABLED === 'true');
+const GOOGLE_AUTH_ENABLED = Boolean(
+  process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET,
+);
+
+const providers: NonNullable<AuthOptions['providers']> = [];
+
+if (GOOGLE_AUTH_ENABLED) {
+  providers.push(
+    GoogleProvider({
+      clientId: process.env.AUTH_GOOGLE_ID!,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+    }),
+  );
+}
+
+if (DEV_AUTH_ENABLED) {
+  providers.push(
+    CredentialsProvider({
+      name: 'Dev Email Login',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+      },
+      async authorize(credentials) {
+        const email =
+          typeof credentials?.email === 'string'
+            ? credentials.email.trim().toLowerCase()
+            : '';
+
+        if (!email) return null;
+
+        return {
+          id: email,
+          email,
+          name: email.split('@')[0],
+        };
+      },
+    }),
+  );
+}
+
+if (providers.length === 0) {
+  throw new Error(
+    'No auth provider configured. Enable Google auth or set DEV_AUTH_ENABLED=true in development.',
+  );
+}
 
 function getExpMs(accessToken?: string): number | null {
   if (!accessToken) return null;
@@ -21,18 +71,17 @@ function getExpMs(accessToken?: string): number | null {
 export const authOptions: AuthOptions = {
   secret: process.env.AUTH_SECRET,
   session: { strategy: 'jwt' },
-  providers: [
-    GoogleProvider({
-      clientId: process.env.AUTH_GOOGLE_ID!,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
-    }),
-  ],
+  providers,
   callbacks: {
-    async jwt({ token, account, profile, trigger, session }) {
+    async jwt({ token, account, profile, user, trigger, session }) {
       // first login
-      if (account && profile?.email) {
+      const signInEmail =
+        (typeof profile?.email === 'string' ? profile.email : undefined) ??
+        (typeof user?.email === 'string' ? user.email : undefined);
+
+      if (account && signInEmail) {
         const data = await authMutation(LoginDocument, {
-          email: profile.email,
+          email: signInEmail.trim().toLowerCase(),
         });
 
         return {

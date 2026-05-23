@@ -102,7 +102,7 @@ const PlaybookBookBlock: FC<PageProps> = ({
   };
 
   return (
-    <div className="flex w-full flex-col gap-8 px-2 pt-2 md:px-6">
+    <div className="flex w-full flex-col gap-8 px-2 pt-2 pb-8 md:px-6 md:pb-10">
       <div className="px-2 md:px-0">
         <h1 className="font-righteous text-3xl font-bold text-white sm:text-3xl">
           Playbook Library

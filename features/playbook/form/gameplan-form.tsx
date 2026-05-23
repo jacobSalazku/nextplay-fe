@@ -29,6 +29,7 @@ type GamePlanFormProps = {
   mode: Mode;
   role: string;
   playbook?: Play[];
+  existingGameplanActivityIds?: string[];
 };
 
 const GamePlanForm: FC<GamePlanFormProps> = ({
@@ -36,6 +37,7 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
   mode,
   role,
   playbook,
+  existingGameplanActivityIds = [],
 }) => {
   const { routeKey } = useTeam();
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
@@ -83,6 +85,9 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
   const notesContent = watch('notes');
   const isCreateMode = formState === 'create';
   const isCoach = role === 'COACH';
+  const availableGames = data.filter(
+    (game) => !existingGameplanActivityIds.includes(game.id),
+  );
 
   const buttonText = getButtonText(isSubmitting, formState, 'GamePlan');
 
@@ -203,9 +208,9 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
                   >
                     <input type="hidden" {...register('activityId')} />
                     <input type="hidden" {...register('opponent')} />
-                    {data && data.length > 0 && (
+                    {availableGames.length > 0 && (
                       <>
-                        {data.map((a) => (
+                        {availableGames.map((a) => (
                           <div
                             key={a.id}
                             className={`cursor-pointer rounded-xl border p-3 font-bold text-white transition-colors ${
@@ -247,6 +252,11 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
                           </div>
                         ))}
                       </>
+                    )}
+                    {availableGames.length === 0 && (
+                      <div className="rounded-xl border border-white/10 bg-slate-900/40 p-3 text-sm text-white/60">
+                        No available games. All games already have a gameplan.
+                      </div>
                     )}
                   </div>
                   <span className="text-red-700">
