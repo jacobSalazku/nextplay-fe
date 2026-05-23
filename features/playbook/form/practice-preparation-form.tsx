@@ -29,6 +29,7 @@ type PageProps = {
   mode: Mode;
   role: string;
   playbook?: Play[];
+  existingPreparationActivityIds?: string[];
 };
 
 const PracticePreparationForm: FC<PageProps> = ({
@@ -36,6 +37,7 @@ const PracticePreparationForm: FC<PageProps> = ({
   mode,
   role,
   playbook,
+  existingPreparationActivityIds = [],
 }) => {
   const { routeKey } = useTeam();
   const [selectedPractice, setSelectedPractice] = useState<string | null>(null);
@@ -79,6 +81,9 @@ const PracticePreparationForm: FC<PageProps> = ({
   const notesContent = watch('notes');
   const isCreateMode = formState === 'create';
   const isCoach = role === 'COACH';
+  const availablePractices = practices.filter(
+    (practice) => !existingPreparationActivityIds.includes(practice.activityId),
+  );
 
   const buttonText = getButtonText(isSubmitting, formState, 'GamePlan');
 
@@ -199,9 +204,9 @@ const PracticePreparationForm: FC<PageProps> = ({
                   >
                     <input type="hidden" {...register('activityId')} />
 
-                    {practices && practices.length > 0 && (
+                    {availablePractices.length > 0 && (
                       <>
-                        {practices.map((practice) => (
+                        {availablePractices.map((practice) => (
                           <div
                             key={practice.activityId}
                             className={`cursor-pointer rounded-xl border p-3 text-white transition-colors ${
@@ -250,6 +255,12 @@ const PracticePreparationForm: FC<PageProps> = ({
                           </div>
                         ))}
                       </>
+                    )}
+                    {availablePractices.length === 0 && (
+                      <div className="rounded-xl border border-white/10 bg-slate-900/40 p-3 text-sm text-white/60">
+                        No available practices. All practices already have a
+                        preparation.
+                      </div>
                     )}
                   </div>
                   <span className="text-red-700">
