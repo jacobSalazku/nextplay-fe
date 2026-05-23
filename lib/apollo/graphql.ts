@@ -8,17 +8,29 @@ type GraphQLResponse<T> = {
   data?: T;
   errors?: { message: string }[];
 };
+
+export type GraphQLFetchOptions = {
+  cache?: RequestCache;
+  next?: {
+    revalidate?: number | false;
+    tags?: string[];
+  };
+};
+
+export type ExecuteGraphQLOptions = {
+  emptyDataMessage?: string;
+  accessToken?: string;
+  skipAuth?: boolean;
+  fetchOptions?: GraphQLFetchOptions;
+};
+
 export async function executeGraphQL<
   TData,
   TVariables extends Record<string, unknown>,
 >(
   document: TypedDocumentNode<TData, TVariables>,
   variables: TVariables,
-  options?: {
-    emptyDataMessage?: string;
-    accessToken?: string;
-    skipAuth?: boolean;
-  },
+  options?: ExecuteGraphQLOptions,
 ): Promise<TData> {
   let accessToken = options?.accessToken;
 
@@ -37,7 +49,10 @@ export async function executeGraphQL<
       query: print(document),
       variables,
     }),
-    cache: 'no-store',
+    cache: options?.fetchOptions?.cache ?? 'no-store',
+    ...(options?.fetchOptions?.next && {
+      next: options.fetchOptions.next,
+    }),
   });
 
   const json = (await res.json()) as GraphQLResponse<TData>;
