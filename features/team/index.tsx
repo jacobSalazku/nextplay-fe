@@ -75,7 +75,7 @@ export const PlayerBlock: FC<PlayerBlockProps> = ({ team, pendingMembers }) => {
   };
 
   return (
-    <div className="flex flex-col gap-8 w-full px-2 md:px-6 pt-2">
+    <div className="flex w-full flex-col gap-8 px-2 pt-4 md:px-6 md:pt-2">
       <Card className="w-full overflow-hidden rounded-3xl border py-5 border-white/10 bg-linear-to-b from-slate-900/85 to-slate-950/85 shadow-xl backdrop-blur-sm text-white">
         <CardHeader className="border-b border-white/10 px-4 sm:px-8  py-5">
           <div className="flex flex-col gap-5">

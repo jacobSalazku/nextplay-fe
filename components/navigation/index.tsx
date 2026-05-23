@@ -62,7 +62,7 @@ const Navigation: FC<NavigationProps> = ({ children }) => {
 
   return (
     <div className="flex h-screen flex-col bg-white text-gray-950">
-      <header className="flex items-center justify-between border-b border-orange-200/30 p-4 md:hidden">
+      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-orange-200/30 bg-white/95 p-4 backdrop-blur md:hidden">
         <div className="flex w-full items-center justify-between gap-2">
           <div className="inline-flex items-center gap-2">
             <button

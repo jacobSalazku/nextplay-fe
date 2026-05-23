@@ -23,7 +23,7 @@ async function PlayerPage({
   const pendingMembers = await getPendingMembers(routeKey);
 
   return (
-    <div className="flex min-h-screen flex-col items-center overflow-auto text-white w-full">
+    <div className="h-full w-full overflow-y-auto text-white">
       <PlayerBlock team={team} pendingMembers={pendingMembers} />
     </div>
   );
