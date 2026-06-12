@@ -12,6 +12,7 @@ import { GetTeamActivitiesQuery, Team } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import { ActivityCard } from './activity-card';
 import { ActivityFilter } from './activity-filter';
+import CoachAttendanceListModal from './coach-attendance-list-modal';
 
 type ActivityListProps = {
   activities: GetTeamActivitiesQuery['getTeamActivities']['activities'];
@@ -56,7 +57,7 @@ export function ActivityList({ activities, team }: ActivityListProps) {
 
   return (
     <>
-      <div className="animate-fade-in mt-3 flex flex-col rounded-xl border border-orange-200/30 p-4 shadow-sm duration-300 sm:p-6">
+      <div className="animate-fade-in mt-3 flex flex-col rounded-xl border border-orange-200/30 p-3 shadow-sm duration-300 sm:p-6">
         <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <h2 className="flex items-center text-xl font-semibold text-white">
             <CalendarClock className="mr-2 h-5 text-sm text-gray-400" />
@@ -68,7 +69,7 @@ export function ActivityList({ activities, team }: ActivityListProps) {
           />
         </div>
         {filteredActivities.length > 0 ? (
-          <div className="scrollbar-none max-h-430 overflow-y-auto pr-2 md:max-h-480 md:min-h-96 xl:max-h-600">
+          <div className="scrollbar-none max-h-430 overflow-y-auto md:max-h-480 md:min-h-96 md:pr-2 xl:max-h-600">
             <div className="flex flex-col gap-1">
               {filteredActivities.map((activity) => (
                 <ActivityCard
@@ -80,7 +81,7 @@ export function ActivityList({ activities, team }: ActivityListProps) {
             </div>
           </div>
         ) : (
-          <div className="scrollbar-none mt-4 flex h-96 flex-col items-center justify-center gap-3 rounded-2xl bg-gray-800 p-6 pr-2 md:max-h-72 xl:max-h-96">
+          <div className="scrollbar-none mt-4 flex h-96 flex-col items-center justify-center gap-3 rounded-2xl bg-gray-800 p-4 md:max-h-72 md:p-6 xl:max-h-96">
             <AlertCircle className="mx-auto mb-3 h-10 w-10 text-gray-400 opacity-50" />
             <p className="text-gray-400">
               No activities scheduled for this day
@@ -100,13 +101,13 @@ export function ActivityList({ activities, team }: ActivityListProps) {
         )}
 
         {role && (
-          <div className="mt-auto flex w-full items-end justify-center gap-4 pt-4">
+          <div className="mt-auto grid w-full grid-cols-2 gap-3 pt-4">
             <Button
               aria-label="Create Game"
               onClick={() => setOpenGameModal(true)}
               type="button"
               variant="light"
-              className="w-1/2 py-5"
+              className="w-full py-5"
             >
               Create Game
             </Button>
@@ -115,7 +116,7 @@ export function ActivityList({ activities, team }: ActivityListProps) {
               onClick={() => setOpenPracticeModal(true)}
               type="button"
               variant="outline"
-              className="w-1/2 py-5"
+              className="w-full py-5"
             >
               Create Practice
             </Button>
@@ -155,12 +156,18 @@ export function ActivityList({ activities, team }: ActivityListProps) {
           onClose={() => setOpenPracticeDetails(false)}
         />
       )}
-      {openGameAttendance && (
-        <AttendanceModal member={user.member} mode="Game" />
-      )}
-      {openPracticeAttendance && (
-        <AttendanceModal member={user.member} mode="Practice" />
-      )}
+      {openGameAttendance &&
+        (role ? (
+          <CoachAttendanceListModal team={team} mode="Game" />
+        ) : (
+          <AttendanceModal member={user.member} mode="Game" />
+        ))}
+      {openPracticeAttendance &&
+        (role ? (
+          <CoachAttendanceListModal team={team} mode="Practice" />
+        ) : (
+          <AttendanceModal member={user.member} mode="Practice" />
+        ))}
     </>
   );
 }

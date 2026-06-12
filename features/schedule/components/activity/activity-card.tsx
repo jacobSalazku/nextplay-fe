@@ -82,7 +82,7 @@ export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
   const date = isToday(new Date(activity.date));
 
   return (
-    <div className="group flex flex-col gap-4 rounded-lg border border-gray-800 bg-gray-950 p-4 transition-all hover:border-gray-700 hover:shadow-md sm:flex-row sm:items-center sm:gap-6">
+    <div className="group flex flex-col gap-4 rounded-lg border border-gray-800 bg-gray-950 p-3 transition-all hover:border-gray-700 hover:shadow-md sm:flex-row sm:items-center sm:gap-6 sm:p-4">
       <div className="flex flex-row items-start gap-4 sm:gap-6">
         <div
           className={cn(
@@ -118,6 +118,17 @@ export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
           >
             Create Box Score
           </Link>
+        )}
+        {role && !(activity.type === ActivityType.Game && date) && (
+          <Button
+            aria-label="View Attendance"
+            onClick={handleAttendance}
+            size="sm"
+            variant="default"
+            className="w-full sm:w-auto"
+          >
+            View Attendance
+          </Button>
         )}
 
         {!role && (

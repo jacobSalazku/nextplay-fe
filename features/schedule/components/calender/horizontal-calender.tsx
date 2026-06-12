@@ -2,9 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-is-mobile';
+import { cn } from '@/utils/tw-merge';
 import { addDays, format, subDays } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { cn } from '@/lib/helpers/utils';
 import { GetTeamActivitiesQuery, Team } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import { CalendarDay } from './calendar-day';
