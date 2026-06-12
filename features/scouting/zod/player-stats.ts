@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 const statField = () =>
   z.preprocess((val) => Number(val ?? 0), z.number().int().nonnegative());

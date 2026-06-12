@@ -198,7 +198,7 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
       <form
         key={activity.id}
         onSubmit={handleSubmit((data) => onSubmit(data, 'manual'))}
-        className="mx-auto hidden w-full p-4 sm:p-6 lg:block"
+        className="mx-auto hidden w-full px-4 sm:px-6 lg:block"
       >
         <h2 className="font-righteous mb-6 text-2xl font-bold text-gray-100 sm:text-4xl">
           Player Box Score
