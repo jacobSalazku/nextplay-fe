@@ -2,6 +2,7 @@
 
 import { type FC } from 'react';
 import { useTeam } from '@/context/team-context';
+import { AuthLogoutModal } from '@/features/auth/components/auth-logout';
 import { useNavRoute } from '@/hooks/use-nav-route';
 import { useNavigationStore } from '@/store/use-navigation-store';
 import {
@@ -28,8 +29,13 @@ type NavigationProps = {
 const Navigation: FC<NavigationProps> = ({ children }) => {
   const { routeKey } = useTeam();
 
-  const { navOpen, setNavOpen, setMobileNavOpen, mobileNavOpen } =
-    useNavigationStore();
+  const {
+    navOpen,
+    setNavOpen,
+    setMobileNavOpen,
+    mobileNavOpen,
+    openLogOutModal,
+  } = useNavigationStore();
 
   const navItems = [
     {
@@ -81,7 +87,6 @@ const Navigation: FC<NavigationProps> = ({ children }) => {
         <MobileNav
           items={navItems}
           onClose={() => setMobileNavOpen(false)}
-          isOpen={navOpen}
           routeKey={routeKey}
         />
       )}
@@ -95,6 +100,7 @@ const Navigation: FC<NavigationProps> = ({ children }) => {
           {children}
         </DesktopNavigation>
       </div>
+      {openLogOutModal && <AuthLogoutModal />}
     </div>
   );
 };
