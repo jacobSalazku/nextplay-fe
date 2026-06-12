@@ -1,9 +1,9 @@
 'use client';
 
 import { forwardRef } from 'react';
+import { cn } from '@/utils/tw-merge';
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 import { Circle } from 'lucide-react';
-import { cn } from '@/lib/helpers/utils';
 
 const RadioGroupItem = forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Item>,
