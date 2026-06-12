@@ -5,9 +5,9 @@ import { usePathname } from 'next/navigation';
 import { useTeam } from '@/context/team-context';
 import { useNavigationStore } from '@/store/use-navigation-store';
 import { useUserStore } from '@/store/user-store';
+import { cn } from '@/utils/tw-merge';
 import { ChevronRight, User } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { cn } from '@/lib/helpers/utils';
 import { Button } from '@/components/foundation/button/button';
 import { Link } from '@/components/foundation/button/link';
 

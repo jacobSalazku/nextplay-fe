@@ -1,22 +1,15 @@
-"use client";
+'use client';
 
-import { Table } from "@/components/foundation/table/table";
-import { TableBody } from "@/components/foundation/table/table-body";
-import { TableCell } from "@/components/foundation/table/table-cell";
-import { TableHead } from "@/components/foundation/table/table-head";
-import { TableHeader } from "@/components/foundation/table/table-header";
-import { TableRow } from "@/components/foundation/table/table-row";
-import { cn } from "@/utils/tw-merge";
-import {
-  type ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  type SortingState,
-  useReactTable,
-} from "@tanstack/react-table";
-import { ArrowUpDown, MoveDown, MoveUp } from "lucide-react";
-import { useState } from "react";
+import { usePlayerDataTable } from '@/features/statistics/hooks/use-player-data-table';
+import { cn } from '@/utils/tw-merge';
+import { flexRender, type ColumnDef } from '@tanstack/react-table';
+import { ArrowUpDown, MoveDown, MoveUp } from 'lucide-react';
+import { Table } from '@/components/foundation/table/table';
+import { TableBody } from '@/components/foundation/table/table-body';
+import { TableCell } from '@/components/foundation/table/table-cell';
+import { TableHead } from '@/components/foundation/table/table-head';
+import { TableHeader } from '@/components/foundation/table/table-header';
+import { TableRow } from '@/components/foundation/table/table-row';
 
 type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[];
@@ -27,18 +20,9 @@ export function PlayerAverageDataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  'use no memo';
 
-  const table = useReactTable({
-    data,
-    columns,
-    state: {
-      sorting,
-    },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-  });
+  const table = usePlayerDataTable(data, columns);
 
   return (
     <div className="relative flex w-full flex-col justify-center overflow-hidden rounded-xl border border-orange-500/20 bg-gray-950/95 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
@@ -59,8 +43,8 @@ export function PlayerAverageDataTable<TData, TValue>({
                     key={header.id}
                     onClick={header.column.getToggleSortingHandler()}
                     className={cn(
-                      isSortable ? "cursor-pointer select-none" : "",
-                      "cursor-pointer p-3 text-xs font-bold tracking-[0.12em] text-orange-100/90 uppercase hover:bg-gray-800/30",
+                      isSortable ? 'cursor-pointer select-none' : '',
+                      'cursor-pointer p-3 text-xs font-bold tracking-[0.12em] text-orange-100/90 uppercase hover:bg-gray-800/30',
                     )}
                   >
                     <div className="flex items-center gap-1">
@@ -68,9 +52,9 @@ export function PlayerAverageDataTable<TData, TValue>({
                         header.column.columnDef.header,
                         header.getContext(),
                       )}
-                      {sortDirection === "asc" ? (
+                      {sortDirection === 'asc' ? (
                         <MoveUp className="h-3 w-2 text-orange-300" />
-                      ) : sortDirection === "desc" ? (
+                      ) : sortDirection === 'desc' ? (
                         <MoveDown className="h-3 w-2 text-orange-300" />
                       ) : (
                         <ArrowUpDown className="h-3 w-3 text-orange-100/70" />
@@ -88,12 +72,15 @@ export function PlayerAverageDataTable<TData, TValue>({
               <TableRow
                 key={row.id}
                 className={cn(
-                  "border-gray-800 transition-colors hover:bg-orange-500/8",
-                  index % 2 === 0 ? "bg-gray-950/85" : "bg-gray-900/45",
+                  'border-gray-800 transition-colors hover:bg-orange-500/8',
+                  index % 2 === 0 ? 'bg-gray-950/85' : 'bg-gray-900/45',
                 )}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="px-3 py-2.5 text-sm text-gray-100">
+                  <TableCell
+                    key={cell.id}
+                    className="px-3 py-2.5 text-sm text-gray-100"
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}

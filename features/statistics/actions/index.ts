@@ -1,6 +1,8 @@
 import { cache } from 'react';
 import { executeAuthedGraphQL } from '@/lib/auth/server-authed';
 import {
+  GetGamesWithBoxScoresDocument,
+  GetGamesWithBoxScoresQueryVariables,
   GetStatlineAveragesDocument,
   GetStatlineAveragesQueryVariables,
   GetStatsPerGameDocument,
@@ -13,7 +15,10 @@ import {
 
 const STATS_REVALIDATE_SECONDS = 180;
 
-const buildStatisticsFetchOptions = (routeKey: string, tags: string[] = []) => ({
+const buildStatisticsFetchOptions = (
+  routeKey: string,
+  tags: string[] = [],
+) => ({
   cache: 'force-cache' as const,
   next: {
     revalidate: STATS_REVALIDATE_SECONDS,
@@ -43,15 +48,39 @@ export const getStatlineAverage = cache(
 
 export const getTeamStats = cache(
   async (input: GetTeamStatsQueryVariables['input']) => {
-    const { getTeamStats } = await executeAuthedGraphQL(GetTeamStatsDocument, {
-      input: { routeKey: input.routeKey },
-    }, {
-      fetchOptions: buildStatisticsFetchOptions(input.routeKey, [
-        `statistics:${input.routeKey}:team-stats`,
-      ]),
-    });
+    const { getTeamStats } = await executeAuthedGraphQL(
+      GetTeamStatsDocument,
+      {
+        input: { routeKey: input.routeKey },
+      },
+      {
+        fetchOptions: buildStatisticsFetchOptions(input.routeKey, [
+          `statistics:${input.routeKey}:team-stats`,
+        ]),
+      },
+    );
 
     return getTeamStats;
+  },
+);
+
+export const getGamesWithBoxScores = cache(
+  async (input: GetGamesWithBoxScoresQueryVariables['input']) => {
+    const { getGamesWithBoxScores } = await executeAuthedGraphQL(
+      GetGamesWithBoxScoresDocument,
+      {
+        input: {
+          routeKey: input.routeKey,
+        },
+      },
+      {
+        fetchOptions: buildStatisticsFetchOptions(input.routeKey, [
+          `statistics:${input.routeKey}:games-with-box-scores`,
+        ]),
+      },
+    );
+
+    return getGamesWithBoxScores;
   },
 );
 

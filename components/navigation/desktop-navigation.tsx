@@ -2,11 +2,9 @@
 
 import type { FC } from 'react';
 import type { NavItemType } from '.';
-import { AuthLogoutModal } from '@/features/auth/components/auth-logout';
 import { Breadcrumb } from '@/features/breadcrumb/bread-crumbs';
-import { useNavigationStore } from '@/store/use-navigation-store';
+import { cn } from '@/utils/tw-merge';
 import { ChevronRight } from 'lucide-react';
-import { cn } from '@/lib/helpers/utils';
 import { NavItem } from './nav-item';
 
 type DesktopNavProps = {
@@ -23,8 +21,6 @@ export const DesktopNavigation: FC<DesktopNavProps> = ({
   onToggle,
   children,
 }) => {
-  const { openLogOutModal } = useNavigationStore();
-
   const handleToggle = () => {
     onToggle();
   };
@@ -72,7 +68,6 @@ export const DesktopNavigation: FC<DesktopNavProps> = ({
                 </NavItem>
               </li>
             ))}
-            {openLogOutModal && <AuthLogoutModal />}
           </ul>
         </nav>
       </aside>

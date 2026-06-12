@@ -1,7 +1,6 @@
 'use client';
 
 import { StatisticsCard } from '../stats-card';
-import type { TeamStats } from '@/graphql/graphql';
 import {
   Activity,
   Gauge,
@@ -12,6 +11,7 @@ import {
   Trophy,
   Zap,
 } from 'lucide-react';
+import type { TeamStats } from '@/graphql/graphql';
 
 const TeamStatsOverViewCharts = ({
   teamStatlist,

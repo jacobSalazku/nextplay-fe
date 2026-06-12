@@ -1,7 +1,7 @@
 'use client';
 
 import { forwardRef } from 'react';
-import { cn } from '@/lib/helpers/utils';
+import { cn } from '@/utils/tw-merge';
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 
 const RadioGroup = forwardRef<

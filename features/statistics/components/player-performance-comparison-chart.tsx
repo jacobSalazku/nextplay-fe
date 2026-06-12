@@ -1,13 +1,4 @@
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/card";
-import type { GetStatlineAveragesQuery } from "@/graphql/graphql";
-
-type Statlines = GetStatlineAveragesQuery["getStatlineAverages"];
-import { memo } from "react";
+import { memo } from 'react';
 import {
   Bar,
   BarChart,
@@ -17,7 +8,16 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from "recharts";
+} from 'recharts';
+import type { GetStatlineAveragesQuery } from '@/graphql/graphql';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/card';
+
+type Statlines = GetStatlineAveragesQuery['getStatlineAverages'];
 
 type PerformanceComparisonChartProps = {
   statsList: Statlines;
@@ -39,7 +39,7 @@ export const PerformanceComparisonChart = memo(
 
     return (
       <Card className="relative w-full overflow-hidden border border-orange-500/20 bg-gray-950/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-sm">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-orange-300/70 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-orange-300/70 to-transparent" />
         <CardHeader>
           <CardTitle className="text-2xl tracking-[0.08em] text-white uppercase">
             Player Performance Comparison
@@ -49,7 +49,11 @@ export const PerformanceComparisonChart = memo(
           </CardDescription>
         </CardHeader>
 
-        <ResponsiveContainer className="w-full px-2 pb-2" width="100%" height={320}>
+        <ResponsiveContainer
+          className="w-full px-2 pb-2"
+          width="100%"
+          height={320}
+        >
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="4 4" stroke="#374151" />
             <XAxis
@@ -59,13 +63,18 @@ export const PerformanceComparisonChart = memo(
               tickLine={false}
               axisLine={false}
             />
-            <YAxis stroke="#C9CED6" fontSize={12} tickLine={false} axisLine={false} />
+            <YAxis
+              stroke="#C9CED6"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#0F172A",
-                border: "1px solid rgba(251,146,60,0.35)",
-                borderRadius: "12px",
-                color: "#F8FAFC",
+                backgroundColor: '#0F172A',
+                border: '1px solid rgba(251,146,60,0.35)',
+                borderRadius: '12px',
+                color: '#F8FAFC',
               }}
             />
             <Legend

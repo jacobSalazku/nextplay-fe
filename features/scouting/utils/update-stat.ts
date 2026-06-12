@@ -1,4 +1,4 @@
-import type { StatlineData } from "../zod/player-stats";
+import type { StatlineData } from '../zod/player-stats';
 
 export function calculateStats(stats: StatlineData) {
   // Field Goals

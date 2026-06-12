@@ -2,7 +2,6 @@ import { memo, useState } from 'react';
 import { useWeeklyTeamAverages } from '../../hooks/use-weekly-team-averages';
 import { calculateShootingPercentages } from '../../utils/shooting-percentage';
 import { useTeam } from '@/context/team-context';
-import type { TeamStats } from '@/graphql/graphql';
 import {
   Bar,
   BarChart,
@@ -15,13 +14,9 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import type { TeamStats } from '@/graphql/graphql';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/card';
 import { Button } from '@/components/foundation/button/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/card';
 
 type TeamPerformanceChartProps = {
   title: string;
@@ -72,7 +67,7 @@ const TeamPerformanceChart = memo(function TeamPerformanceChart({
   return (
     <>
       <Card className="relative w-full overflow-hidden border border-orange-500/20 bg-gray-950/95 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-sm">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-orange-300/70 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-orange-300/70 to-transparent" />
         <CardHeader className="py-2">
           <CardTitle className="px-2 py-3 text-2xl tracking-[0.08em] uppercase text-white">
             {title}
@@ -105,7 +100,12 @@ const TeamPerformanceChart = memo(function TeamPerformanceChart({
                 tickLine={false}
                 axisLine={false}
               />
-              <YAxis stroke="#C9CED6" fontSize={12} tickLine={false} axisLine={false} />
+              <YAxis
+                stroke="#C9CED6"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
               <Tooltip
                 contentStyle={{
                   backgroundColor: '#0F172A',
@@ -165,7 +165,7 @@ const TeamPerformanceChart = memo(function TeamPerformanceChart({
         </CardContent>
       </Card>{' '}
       <Card className="relative w-full overflow-hidden border border-orange-500/20 bg-gray-950/95 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-sm">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-orange-300/70 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-orange-300/70 to-transparent" />
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="4 4" stroke="#374151" />
@@ -176,7 +176,12 @@ const TeamPerformanceChart = memo(function TeamPerformanceChart({
               tickLine={false}
               axisLine={false}
             />
-            <YAxis stroke="#C9CED6" fontSize={12} tickLine={false} axisLine={false} />
+            <YAxis
+              stroke="#C9CED6"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
             <Tooltip
               contentStyle={{
                 backgroundColor: '#0F172A',

@@ -118,11 +118,11 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
   if (isCreateMode && !selectedDate) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-      <div className="max-h-[90vh] w-full max-w-md overflow-auto rounded-2xl border border-white/10 bg-linear-to-b from-slate-900/95 to-slate-950 shadow-[0_0_30px_rgba(0,0,0,0.35)]">
-        <div className="relative flex items-center justify-between border-b border-white/10 bg-slate-900/60 px-4 py-3 text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden bg-black/60 p-3 backdrop-blur-sm sm:p-4">
+      <div className="max-h-[90vh] w-full max-w-[calc(100vw-1.5rem)] overflow-y-auto overflow-x-hidden rounded-2xl border border-white/10 bg-linear-to-b from-slate-900/95 to-slate-950 shadow-[0_0_30px_rgba(0,0,0,0.35)] sm:max-w-md">
+        <div className="relative flex min-w-0 items-center justify-between gap-3 border-b border-white/10 bg-slate-900/60 px-4 py-3 text-white">
           <div className="absolute top-0 left-0 h-1 w-full bg-linear-to-r from-orange-500 via-amber-300 to-orange-500 opacity-80" />
-          <h2 className="font-righteous text-lg font-normal sm:text-xl">
+          <h2 className="font-righteous min-w-0 truncate text-lg font-normal sm:text-xl">
             {isViewMode
               ? selectedActivity?.title
               : isEditMode
@@ -131,7 +131,7 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
           </h2>
           <Button
             onClick={onClose}
-            className="border border-white/10 bg-transparent py-2 text-xl font-bold text-gray-300 shadow-none hover:bg-slate-900 hover:text-white"
+            className="shrink-0 border border-white/10 bg-transparent py-2 text-xl font-bold text-gray-300 shadow-none hover:bg-slate-900 hover:text-white"
             aria-label="Close Game Form"
           >
             <X className="h-6 w-6" />
@@ -139,7 +139,10 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
         </div>
 
         {(isEditMode || isCreateMode) && (
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-5">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="min-w-0 w-full space-y-4 p-4 sm:p-5"
+          >
             <Input
               id="title"
               aria-label="Input the name of the opponent team"
@@ -191,9 +194,14 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
               error={errors.date}
               errorMessage={errors.date?.message}
             />
-            <div className="flex justify-end border-t border-white/10 pt-5">
+            <div className="flex min-w-0 justify-end border-t border-white/10 pt-5">
               {role && (
-                <Button aria-label={buttonText} type="submit" variant="primary">
+                <Button
+                  aria-label={buttonText}
+                  type="submit"
+                  variant="primary"
+                  className="w-full sm:w-auto"
+                >
                   {buttonText}
                 </Button>
               )}
@@ -203,7 +211,7 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
 
         {isViewMode && selectedActivity && (
           <>
-            <div className="space-y-3 p-5 text-sm text-white sm:text-base">
+            <div className="min-w-0 space-y-3 p-4 text-sm text-white sm:p-5 sm:text-base">
               <div className="rounded-xl border border-white/10 bg-slate-900/80 p-3">
                 <div className="text-xs tracking-wide text-gray-400 uppercase">
                   Type
@@ -220,7 +228,7 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
                   <div className="text-xs tracking-wide text-gray-400 uppercase">
                     Type of Practice
                   </div>
-                  <div className="text-white/90">
+                  <div className="break-words text-white/90">
                     {selectedActivity.practice?.practicetype}
                   </div>
                 </div>
@@ -245,7 +253,7 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
                 <div className="text-xs tracking-wide text-gray-400 uppercase">
                   Date
                 </div>
-                <div className="text-white/90">
+                <div className="break-words text-white/90">
                   {format(
                     new Date(selectedActivity.date),
                     'EEEE, MMMM d, yyyy',
@@ -254,7 +262,7 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
               </div>
             </div>
             {role && (
-              <div className="flex justify-end space-x-2 border-t border-white/10 p-5">
+              <div className="flex min-w-0 justify-end gap-2 border-t border-white/10 p-4 sm:p-5">
                 <Button
                   aria-label="Edit Game Form"
                   onClick={() => {
@@ -270,7 +278,7 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
                     });
                   }}
                   variant="outline"
-                  className="border-white/20 bg-slate-900/80 hover:border-orange-300/40"
+                  className="w-full border-white/20 bg-slate-900/80 hover:border-orange-300/40 sm:w-auto"
                 >
                   Edit Game
                 </Button>

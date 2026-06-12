@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { cn } from '@/utils/tw-merge';
 import type { LucideIcon } from 'lucide-react';
-import { cn } from '@/lib/helpers/utils';
 
 type NavItemProps = {
   href: string;
