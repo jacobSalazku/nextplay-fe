@@ -3,11 +3,11 @@
 import { useRouter } from 'next/navigation';
 import { positionOptions } from '../utils/constants';
 import { JoinTeamFormData, joinTeamSchema } from '../zod';
+import { cn } from '@/utils/tw-merge';
 import { useMutation } from '@apollo/client/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
-import { cn } from '@/lib/helpers/utils';
 import { JoinTeamDocument } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import { Input } from '@/components/foundation/input';
