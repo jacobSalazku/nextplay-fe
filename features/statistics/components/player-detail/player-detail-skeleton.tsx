@@ -4,7 +4,7 @@ import { SkeletonBox } from '@/components/skeleton/skeleton-box';
 
 export default function PlayerDetailSkeleton() {
   return (
-    <div className="flex h-screen flex-col bg-[radial-gradient(circle_at_top,_rgba(251,146,60,0.14),_transparent_45%)] px-6 py-8 text-white">
+    <div className="flex h-screen flex-col bg-[radial-gradient(circle_at_top,rgba(251,146,60,0.14),transparent_45%)] px-6 py-8 text-white">
       <div className="mb-6 flex items-center justify-between">
         <SkeletonBox className="h-8 w-40" />
         <SkeletonBox className="h-6 w-32 rounded-full" />

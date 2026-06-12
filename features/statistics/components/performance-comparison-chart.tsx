@@ -35,7 +35,7 @@ export const PerformanceComparisonChart = ({
 
   return (
     <Card className="relative overflow-hidden border border-orange-500/20 bg-gray-950/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-sm">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-orange-300/70 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-orange-300/70 to-transparent" />
       <CardHeader>
         <CardTitle className="text-2xl tracking-[0.08em] uppercase text-white">
           Player Performance Comparison
@@ -55,7 +55,12 @@ export const PerformanceComparisonChart = ({
               tickLine={false}
               axisLine={false}
             />
-            <YAxis stroke="#C9CED6" fontSize={12} tickLine={false} axisLine={false} />
+            <YAxis
+              stroke="#C9CED6"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
             <Tooltip
               contentStyle={{
                 backgroundColor: '#0F172A',

@@ -93,7 +93,7 @@ const PlayerAveragesStatsCard = memo(function PlayerAveragesStatsCard({
 
   return (
     <Card className="relative w-full overflow-hidden border border-orange-500/20 bg-gray-950/95 p-2 text-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-sm sm:p-6">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-orange-300/70 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-orange-300/70 to-transparent" />
       <CardHeader className="w-full p-2">
         <CardTitle className="text-white uppercase tracking-[0.12em]">
           Player Statistics

@@ -1,11 +1,6 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/card";
-import { cn } from "@/utils/tw-merge";
-import type { LucideIcon } from "lucide-react";
+import { cn } from '@/utils/tw-merge';
+import type { LucideIcon } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/card';
 
 type StatCardProps = {
   title: string;
@@ -20,7 +15,7 @@ export function StatisticsCard({
   value,
   subtitle,
   icon: Icon,
-  iconColor = "text-orange-200",
+  iconColor = 'text-orange-200',
 }: StatCardProps) {
   return (
     <Card className="group relative overflow-hidden border border-orange-500/12 bg-gray-950/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-orange-400/30 hover:shadow-[0_14px_26px_-20px_rgba(251,146,60,0.45)]">
@@ -33,7 +28,7 @@ export function StatisticsCard({
         </CardTitle>
         {Icon && (
           <span className="rounded-md border border-orange-400/25 bg-black/30 p-1.5">
-            <Icon className={cn(iconColor, "h-4 w-4")} />
+            <Icon className={cn(iconColor, 'h-4 w-4')} />
           </span>
         )}
       </CardHeader>

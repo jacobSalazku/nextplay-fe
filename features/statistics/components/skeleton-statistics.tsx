@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { SkeletonBox } from "@/components/skeleton/skeleton-box";
+import { SkeletonBox } from '@/components/skeleton/skeleton-box';
 
 export default function StatisticsSkeleton() {
   return (
