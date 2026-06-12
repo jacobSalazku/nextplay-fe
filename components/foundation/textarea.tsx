@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { cn } from '@/lib/helpers/utils';
+import { cn } from '@/utils/tw-merge';
 
 function Textarea({ className, ...props }: React.ComponentProps<'textarea'>) {
   return (

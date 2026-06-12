@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { cn } from '@/lib/helpers/utils';
+import { cn } from '@/utils/tw-merge';
 import { cva } from 'class-variance-authority';
 import { type FieldError, type UseFormRegisterReturn } from 'react-hook-form';
 
@@ -20,7 +20,7 @@ const labelColorMap = {
 };
 
 const inputVariants = cva(
-  'w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+  'min-w-0 w-full max-w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-colors disabled:cursor-not-allowed disabled:opacity-50',
   {
     variants: {
       variant: {
@@ -52,7 +52,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     ref,
   ) => {
     return (
-      <div className="space-y-2">
+      <div className="min-w-0 w-full space-y-2">
         <label
           htmlFor={id}
           className={cn(
