@@ -103,8 +103,8 @@ const PlaybookBookBlock: FC<PageProps> = ({
 
   return (
     <div className="flex w-full flex-col gap-8 px-2 pt-2 pb-8 md:px-6 md:pb-10">
-      <div className="px-2 md:px-0">
-        <h1 className="font-righteous text-3xl font-bold text-white sm:text-3xl">
+      <div className="hidden px-2 md:px-0 md:block ">
+        <h1 className="font-righteous text-3xl font-bold text-white sm:text-3xl ">
           Playbook Library
         </h1>
         <p className="mt-1 text-sm text-white/60">
@@ -114,7 +114,7 @@ const PlaybookBookBlock: FC<PageProps> = ({
       <Tabs
         value={activeCoachTab}
         onValueChange={handleCoachTabChange}
-        className="m-0 flex flex-col gap-6 px-2 text-sm md:px-0"
+        className="m-0 pt-6 flex flex-col gap-6 px-2 text-sm md:px-0 md:pt-0"
       >
         <TabsList className="flex h-auto w-full justify-between gap-2 rounded-2xl border border-white/10 bg-slate-900/60 p-1.5 sm:gap-3 lg:w-2/3">
           <TabsTrigger
