@@ -36,6 +36,9 @@ export function getTeamShortId(routeKey: string): string | null {
   return parseRouteKey(routeKey)?.shortId ?? null;
 }
 
-export function buildRouteKey(input: { slug: string; shortId: string }): string {
+export function buildRouteKey(input: {
+  slug: string;
+  shortId: string;
+}): string {
   return `${slugifyTeamName(input.slug)}-${input.shortId.toLowerCase()}`;
 }

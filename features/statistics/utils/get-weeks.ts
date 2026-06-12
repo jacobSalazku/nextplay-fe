@@ -7,8 +7,8 @@ import {
   parse,
   startOfMonth,
   startOfWeek,
-} from "date-fns";
-import type { Week } from "./types";
+} from 'date-fns';
+import type { Week } from './types';
 
 export const getWeeksOfMonth = (year: number, month: number): Week[] => {
   const monthStart = startOfMonth(new Date(year, month - 1));
@@ -24,16 +24,16 @@ export const getWeeksOfMonth = (year: number, month: number): Week[] => {
 
   return weekStarts.map((weekStart, index) => {
     const weekEnd = addDays(weekStart, 6);
-    const startStr = format(weekStart, "MMM d");
-    const endStr = format(weekEnd, "MMM d");
+    const startStr = format(weekStart, 'MMM d');
+    const endStr = format(weekEnd, 'MMM d');
 
     return {
       label: `Week ${index + 1}`,
       start: startStr,
       end: endStr,
       month,
-      startDate: parse(`${startStr} ${year}`, "MMM d yyyy", new Date()),
-      endDate: parse(`${endStr} ${year}`, "MMM d yyyy", new Date()),
+      startDate: parse(`${startStr} ${year}`, 'MMM d yyyy', new Date()),
+      endDate: parse(`${endStr} ${year}`, 'MMM d yyyy', new Date()),
     };
   });
 };
