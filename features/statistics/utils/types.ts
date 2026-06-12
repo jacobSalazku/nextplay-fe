@@ -1,3 +1,5 @@
+import { GetGamesWithBoxScoresQuery, TeamInformation } from '@/graphql/graphql';
+
 export type Week = {
   label: string;
   start: string;
@@ -40,4 +42,15 @@ export type PlayerStatRow = {
   blocks: number;
   steals: number;
   turnovers: number;
+};
+
+export type ExportGameReport =
+  GetGamesWithBoxScoresQuery['getGamesWithBoxScores'][number];
+
+export type ExportBlockProps = {
+  routeKey: string;
+  team: TeamInformation;
+  completedGames: ExportGameReport[];
+  latestGame?: ExportGameReport;
+  totalReports: number;
 };
