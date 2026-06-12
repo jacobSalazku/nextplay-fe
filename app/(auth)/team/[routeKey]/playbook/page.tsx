@@ -50,7 +50,7 @@ async function PlaybookPage({ params }: PageProps) {
   return (
     <Suspense fallback={<PlaybookLibrarySkeleton />}>
       <div className="scrollbar-none h-full w-full overflow-y-auto overflow-x-hidden text-white">
-        <div className="mx-auto w-full max-w-screen-2xl">
+        <div className="mx-auto w-full max-w-screen-4xl">
           <PlaybookBookBlock
             practicePreparation={practicePreparation}
             role={role}
@@ -62,7 +62,9 @@ async function PlaybookPage({ params }: PageProps) {
             role={role}
             data={games}
             playbook={playbook}
-            existingGameplanActivityIds={gameplan.map((plan) => plan.activityId)}
+            existingGameplanActivityIds={gameplan.map(
+              (plan) => plan.activityId,
+            )}
           />
           <PracticePreparationForm
             mode="create"

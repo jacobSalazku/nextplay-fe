@@ -35,7 +35,11 @@ const PlayerProfile = async ({ searchParams, params }: PageProps) => {
   const { routeKey } = await params;
   const data = await getUserProfile({ id: id, teamShortId: routeKey });
 
-  return <PlayerDetailPanel userProfile={data} />;
+  return (
+    <div className="scrollbar-none min-h-0 flex-1 overflow-y-auto pb-24 text-white md:pb-8">
+      <PlayerDetailPanel userProfile={data} />
+    </div>
+  );
 };
 
 export default withProtectedPage(PlayerProfile);
