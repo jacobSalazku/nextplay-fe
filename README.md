@@ -1,36 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏀 NextPlay Frontend – Empowering Youth Basketball 
 
-## Getting Started
+**NextPlay** is an all-in-one platform designed for basketball coaches and youth players to manage training sessions, track performance, and gain valuable game insights. Developed as a graduation project, it aims to simplify team management while helping young athletes improve their skills.
 
-First, run the development server:
+NextPlay enables players to monitor their personal progress, while giving coaches the tools to schedule training sessions, track player statistics, organize team communication, and share tactical plays—all in one place.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- 📊 Individual player statistics (points, assists, rebounds, steals, blocks, etc.)
+- 🧠 Performance insights highlighting each player's strengths and areas for improvement
+- 🏋️ Training management with attendance tracking
+- 🔄 Visual playbook for sharing plays and team strategies
+- 👥 Team and player management
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## 🛠 Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Next.js** – React framework for the frontend
+- **GraphQL** – API for efficient data fetching
+- **Tailwind CSS** – Utility-first CSS framework
+- **NextAuth.js** – Authentication
+- **TypeScript** – End-to-end type safety
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
