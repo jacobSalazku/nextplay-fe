@@ -1,4 +1,4 @@
-# 🏀 NextPlay Frontend – Empowering Youth Basketball 
+# 🏀 NextPlay Frontend 
 
 **NextPlay** is an all-in-one platform designed for basketball coaches and youth players to manage training sessions, track performance, and gain valuable game insights. Developed as a graduation project, it aims to simplify team management while helping young athletes improve their skills.
 
