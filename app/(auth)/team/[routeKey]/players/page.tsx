@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { PlayerBlock } from '@/features/team';
-import { getPendingMembers } from '@/features/team/actions/get-pending-members';
 import { getTeamInforamtion } from '@/features/team/actions/get-team-infomation';
 import { withProtectedPage } from '@/lib/auth/with-page-guards';
 
@@ -20,11 +19,10 @@ async function PlayerPage({
 }) {
   const { routeKey } = await params;
   const team = await getTeamInforamtion(routeKey);
-  const pendingMembers = await getPendingMembers(routeKey);
 
   return (
     <div className="h-full w-full overflow-y-auto text-white">
-      <PlayerBlock team={team} pendingMembers={pendingMembers} />
+      <PlayerBlock team={team} />
     </div>
   );
 }

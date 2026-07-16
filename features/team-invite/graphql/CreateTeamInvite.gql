@@ -1,0 +1,12 @@
+mutation CreateTeamInvite($input: CreateTeamInviteInput!) {
+  createTeamInvite(input: $input) {
+    id
+    token
+    inviteLink
+    teamId
+    expiresAt
+    maxUses
+    usedCount
+    createdBy
+  }
+}

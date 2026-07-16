@@ -1,0 +1,8 @@
+mutation AcceptTeamInvite($input: AcceptTeamInviteInput!) {
+  acceptTeamInvite(input: $input) {
+    status
+    teamId
+    routeKey
+    memberId
+  }
+}
