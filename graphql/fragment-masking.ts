@@ -80,7 +80,9 @@ export function isFragmentReady<TQuery, TFrag>(
   if (!deferredFields) return true;
 
   const fragDef = (
-    fragmentNode as unknown as { definitions?: readonly FragmentDefinitionNode[] }
+    fragmentNode as unknown as {
+      definitions?: readonly FragmentDefinitionNode[];
+    }
   ).definitions?.[0] as FragmentDefinitionNode | undefined;
   const fragName = fragDef?.name?.value;
 

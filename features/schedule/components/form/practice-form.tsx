@@ -217,7 +217,7 @@ const PracticeForm: FC<PracticeProps> = ({ mode, onClose, member }) => {
                   variant="outline"
                   className="w-full border-white/20 bg-slate-900/80 hover:border-orange-300/40 sm:w-auto"
                 >
-                  {buttonText}
+                  Edit Practice
                 </Button>
               </div>
             )}
@@ -324,7 +324,7 @@ const PracticeForm: FC<PracticeProps> = ({ mode, onClose, member }) => {
                   variant="primary"
                   className="w-full sm:w-auto"
                 >
-                  Create Practice
+                  {buttonText}
                 </Button>
               )}
             </div>
