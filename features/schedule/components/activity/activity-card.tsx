@@ -63,7 +63,7 @@ export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
     try {
       await deleteActivity({
         variables: {
-          input: { id },
+          input: { id, routeKey },
         },
       });
 

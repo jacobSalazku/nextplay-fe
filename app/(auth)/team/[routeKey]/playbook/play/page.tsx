@@ -5,6 +5,7 @@ import PlanViewSkeleton from '@/features/playbook/components/skeleton/plan-view-
 import { playbookSearchParamsCache } from '@/utils/search-params';
 
 type PageProps = {
+  params: Promise<{ routeKey: string }>;
   searchParams: Promise<{ id: string }>;
 };
 
@@ -17,9 +18,10 @@ export const metadata = {
   },
 };
 
-async function PlayView({ searchParams }: PageProps) {
+async function PlayView({ params, searchParams }: PageProps) {
+  const { routeKey } = await params;
   const { id } = await playbookSearchParamsCache.parse(searchParams);
-  const play = await getPlay(id);
+  const play = await getPlay(id, routeKey);
 
   if (!play) {
     return (

@@ -38,11 +38,6 @@ export enum AcceptTeamInviteStatus {
   Used = 'USED'
 }
 
-export type AcceptTeamRequestInput = {
-  memberId: Scalars['String']['input'];
-  routeKey: Scalars['String']['input'];
-};
-
 export type ActiveAttendedMembersInput = {
   activityId: Scalars['String']['input'];
   routeKey: Scalars['String']['input'];
@@ -194,6 +189,7 @@ export type CreateTeamInviteInput = {
 
 export type DeleteActivity = {
   id: Scalars['ID']['input'];
+  routeKey: Scalars['String']['input'];
 };
 
 export type DeleteGamePlanInput = {
@@ -203,6 +199,7 @@ export type DeleteGamePlanInput = {
 
 export type DeleteMemberInput = {
   id: Scalars['String']['input'];
+  routeKey: Scalars['String']['input'];
 };
 
 export type DeletePlayInput = {
@@ -291,6 +288,7 @@ export type GetActivityInput = {
 export type GetAttendanceByActivitiesInput = {
   activityId: Scalars['String']['input'];
   memberId: Scalars['String']['input'];
+  routeKey: Scalars['String']['input'];
 };
 
 export type GetGamePlanByIdInput = {
@@ -309,6 +307,7 @@ export type GetMemberProfileInput = {
 
 export type GetPlayInput = {
   id: Scalars['String']['input'];
+  routeKey: Scalars['String']['input'];
 };
 
 export type GetPlaysInput = {
@@ -332,19 +331,6 @@ export type GetUserResponse = {
   __typename?: 'GetUserResponse';
   member: MemberWithAttendances;
   user: UserProfile;
-};
-
-export type JoinTeamInput = {
-  number: Scalars['String']['input'];
-  position: Scalars['String']['input'];
-  teamCode: Scalars['String']['input'];
-};
-
-export type JoinTeamResponse = {
-  __typename?: 'JoinTeamResponse';
-  number: Scalars['String']['output'];
-  position: Scalars['String']['output'];
-  teamCode: Scalars['String']['output'];
 };
 
 export enum Location {
@@ -426,17 +412,9 @@ export type MembersInput = {
   routeKey: Scalars['String']['input'];
 };
 
-export type ModerateJoinRequestResult = {
-  __typename?: 'ModerateJoinRequestResult';
-  memberId: Scalars['String']['output'];
-  status: Status;
-  teamId: Scalars['String']['output'];
-};
-
 export type Mutation = {
   __typename?: 'Mutation';
   acceptTeamInvite: AcceptTeamInviteResponse;
-  acceptTeamRequest: ModerateJoinRequestResult;
   createFeedback: Activity;
   createFilm: Activity;
   createGame: Activity;
@@ -454,11 +432,9 @@ export type Mutation = {
   deletePracticePreparation: PracticePreparation;
   devLogin: AuthPayload;
   getAttendanceByActivities: PlayerActivityAttendance;
-  joinTeam: JoinTeamResponse;
   loginWithGoogle: AuthPayload;
   logout: Scalars['Boolean']['output'];
   refresh: AuthPayload;
-  rejectJoinRequest: ModerateJoinRequestResult;
   submitAttendance: PlayerActivityAttendance;
   submitStatlines: SubmitStatlinesResult;
   updateFeedback: Activity;
@@ -472,11 +448,6 @@ export type Mutation = {
 
 export type MutationAcceptTeamInviteArgs = {
   input: AcceptTeamInviteInput;
-};
-
-
-export type MutationAcceptTeamRequestArgs = {
-  input: AcceptTeamRequestInput;
 };
 
 
@@ -565,11 +536,6 @@ export type MutationGetAttendanceByActivitiesArgs = {
 };
 
 
-export type MutationJoinTeamArgs = {
-  input: JoinTeamInput;
-};
-
-
 export type MutationLoginWithGoogleArgs = {
   idToken: Scalars['String']['input'];
 };
@@ -577,11 +543,6 @@ export type MutationLoginWithGoogleArgs = {
 
 export type MutationRefreshArgs = {
   refreshToken: Scalars['String']['input'];
-};
-
-
-export type MutationRejectJoinRequestArgs = {
-  input: TeamRequestInput;
 };
 
 
@@ -649,13 +610,6 @@ export type OpponentTotalsBoxScore = {
   threePointersMade: Scalars['Float']['output'];
 };
 
-export type PendingMember = {
-  __typename?: 'PendingMember';
-  email?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name?: Maybe<Scalars['String']['output']>;
-};
-
 export type Play = {
   __typename?: 'Play';
   canvas: Scalars['String']['output'];
@@ -685,6 +639,7 @@ export type PlayerActivityAttendanceInput = {
   attendanceStatus: AttendanceStatus;
   memberId: Scalars['String']['input'];
   reason: Scalars['String']['input'];
+  routeKey: Scalars['String']['input'];
 };
 
 export type PlayerBoxScore = {
@@ -793,7 +748,6 @@ export type Query = {
   getGamesWithBoxScores: Array<GameWithBoxScore>;
   getMemberProfile: MemberWithAttendances;
   getMembers: Array<MemberWithAttendances>;
-  getPendingMembers: Array<PendingMember>;
   getPlay?: Maybe<Play>;
   getPlays: Array<Play>;
   getPracticePreparationById?: Maybe<PracticePreparation>;
@@ -855,11 +809,6 @@ export type QueryGetMemberProfileArgs = {
 
 
 export type QueryGetMembersArgs = {
-  input: MembersInput;
-};
-
-
-export type QueryGetPendingMembersArgs = {
   input: MembersInput;
 };
 
@@ -1081,10 +1030,6 @@ export type TeamMemberUser = {
   name?: Maybe<Scalars['String']['output']>;
   teamId: Scalars['String']['output'];
   userId: Scalars['String']['output'];
-};
-
-export type TeamRequestInput = {
-  memberId: Scalars['String']['input'];
 };
 
 export type TeamStatlineInput = {
