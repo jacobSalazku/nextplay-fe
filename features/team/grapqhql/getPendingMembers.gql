@@ -1,7 +1,0 @@
-query GetPendingMembers($input: MembersInput!) {
-  getPendingMembers(input: $input) {
-    id
-    name
-    email
-  }
-}

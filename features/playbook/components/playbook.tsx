@@ -150,19 +150,6 @@ const PlaybookBookBlock: FC<PageProps> = ({
         </TabsList>
         <TabsContent value="gameplan">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {gamePlan?.map((item, idx) => (
-              <PlanCard
-                key={idx}
-                role={role}
-                plan={item}
-                type="gameplan"
-                onDelete={() => handleDeletePlan(item.id, 'gameplan')}
-                onView={{
-                  pathname: `/team/${routeKey}/playbook/gameplan`,
-                  query: { id: item.id },
-                }}
-              />
-            ))}
             {role === 'COACH' && (
               <Card className="group flex h-80 cursor-pointer flex-col items-center justify-center gap-6 rounded-2xl border border-dashed border-white/20 bg-slate-900/50 py-10 text-xs text-white transition-all duration-200 hover:border-orange-300/50 hover:bg-slate-900/80">
                 <Button
@@ -177,23 +164,23 @@ const PlaybookBookBlock: FC<PageProps> = ({
                 </span>
               </Card>
             )}
+            {gamePlan?.map((item, idx) => (
+              <PlanCard
+                key={idx}
+                role={role}
+                plan={item}
+                type="gameplan"
+                onDelete={() => handleDeletePlan(item.id, 'gameplan')}
+                onView={{
+                  pathname: `/team/${routeKey}/playbook/gameplan`,
+                  query: { id: item.id },
+                }}
+              />
+            ))}
           </div>
         </TabsContent>
         <TabsContent value="practice">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {practicePreparation?.map((practice, idx) => (
-              <PlanCard
-                key={idx}
-                role={role}
-                plan={practice}
-                type="practice"
-                onDelete={() => handleDeletePlan(practice.id, 'practice')}
-                onView={{
-                  pathname: `/team/${routeKey}/playbook/practice-preparation`,
-                  query: { id: practice.id },
-                }}
-              />
-            ))}
             {role === 'COACH' && (
               <Card className="group flex h-80 cursor-pointer flex-col items-center justify-center gap-6 rounded-2xl border border-dashed border-white/20 bg-slate-900/50 py-10 text-xs text-white transition-all duration-200 hover:border-orange-300/50 hover:bg-slate-900/80">
                 <Button
@@ -207,14 +194,24 @@ const PlaybookBookBlock: FC<PageProps> = ({
                 </span>
               </Card>
             )}
+            {practicePreparation?.map((practice, idx) => (
+              <PlanCard
+                key={idx}
+                role={role}
+                plan={practice}
+                type="practice"
+                onDelete={() => handleDeletePlan(practice.id, 'practice')}
+                onView={{
+                  pathname: `/team/${routeKey}/playbook/practice-preparation`,
+                  query: { id: practice.id },
+                }}
+              />
+            ))}
           </div>
         </TabsContent>
 
         <TabsContent value="play" className="flex flex-col gap-6">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {playbook?.map((play, idx) => (
-              <PlayCard key={idx} role={role} play={play} />
-            ))}
             {role === 'COACH' && (
               <Card className="group flex cursor-pointer flex-col items-center justify-center gap-6 rounded-2xl border border-dashed border-white/20 bg-slate-900/50 py-24 text-xs text-white transition-all duration-200 hover:border-orange-300/50 hover:bg-slate-900/80">
                 <Link
@@ -231,6 +228,9 @@ const PlaybookBookBlock: FC<PageProps> = ({
                 </span>
               </Card>
             )}
+            {playbook?.map((play, idx) => (
+              <PlayCard key={idx} role={role} play={play} />
+            ))}
           </div>
         </TabsContent>
       </Tabs>
