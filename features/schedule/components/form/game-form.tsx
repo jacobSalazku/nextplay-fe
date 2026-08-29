@@ -11,7 +11,7 @@ import { getTypeBgColor } from '@/utils';
 import { cn } from '@/utils/tw-merge';
 import { useMutation } from '@apollo/client/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format } from 'date-fns';
+import { format, isBefore, startOfToday } from 'date-fns';
 import { X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -63,6 +63,9 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
   const isEditMode = formState === 'edit';
   const isCreateMode = formState === 'create';
   const role = member?.role === 'COACH';
+  const isPastActivity = selectedActivity
+    ? isBefore(new Date(selectedActivity.date), startOfToday())
+    : false;
 
   const buttonText = getButtonText(isSubmitting, formState, 'Game');
 
@@ -261,7 +264,12 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
                 </div>
               </div>
             </div>
-            {role && (
+            {role && isPastActivity && (
+              <div className="border-t border-white/10 p-4 text-sm text-white/55 sm:p-5">
+                Past games cannot be edited.
+              </div>
+            )}
+            {role && !isPastActivity && (
               <div className="flex min-w-0 justify-end gap-2 border-t border-white/10 p-4 sm:p-5">
                 <Button
                   aria-label="Edit Game Form"
