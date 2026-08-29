@@ -1,8 +1,50 @@
-import { type AuthOptions } from 'next-auth';
+import { type Account, type AuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
-import { LoginDocument, RefreshDocument } from '@/graphql/graphql';
+import {
+  DevLoginDocument,
+  LoginWithGoogleDocument,
+  RefreshDocument,
+} from '@/graphql/graphql';
 import { authMutation } from './auth';
+
+type BackendAuthPayload = {
+  accessToken: string;
+  refreshToken: string;
+  hasOnBoarded: boolean;
+  userId: string;
+};
+
+/**
+ * Trades a completed provider sign-in for a backend session.
+ *
+ * Google: forward the ID token; the backend verifies its signature and
+ * audience with Google and derives the email from the verified claims.
+ * Credentials: dev-only email login, forwarded to the guarded devLogin
+ * mutation.
+ */
+async function exchangeProviderSession(
+  account: Account,
+  signInEmail: string | undefined,
+): Promise<BackendAuthPayload | null> {
+  if (account.provider === 'google') {
+    const idToken =
+      typeof account.id_token === 'string' ? account.id_token : undefined;
+    if (!idToken) return null;
+
+    const data = await authMutation(LoginWithGoogleDocument, { idToken });
+    return data.loginWithGoogle;
+  }
+
+  if (account.provider === 'credentials' && signInEmail) {
+    const data = await authMutation(DevLoginDocument, {
+      email: signInEmail.trim().toLowerCase(),
+    });
+    return data.devLogin;
+  }
+
+  return null;
+}
 
 const REFRESH_SKEW_MS = 30_000;
 const DEV_AUTH_ENABLED =
@@ -79,18 +121,24 @@ export const authOptions: AuthOptions = {
         (typeof profile?.email === 'string' ? profile.email : undefined) ??
         (typeof user?.email === 'string' ? user.email : undefined);
 
-      if (account && signInEmail) {
-        const data = await authMutation(LoginDocument, {
-          email: signInEmail.trim().toLowerCase(),
-        });
+      if (account) {
+        const authPayload = await exchangeProviderSession(account, signInEmail);
+
+        if (!authPayload) {
+          return {
+            ...token,
+            accessToken: undefined,
+            error: 'ProviderExchangeFailed',
+          };
+        }
 
         return {
           ...token,
-          accessToken: data.login.accessToken,
-          refreshToken: data.login.refreshToken,
-          accessTokenExpires: getExpMs(data.login.accessToken),
-          hasOnBoarded: data.login.hasOnBoarded,
-          userId: data.login.userId,
+          accessToken: authPayload.accessToken,
+          refreshToken: authPayload.refreshToken,
+          accessTokenExpires: getExpMs(authPayload.accessToken),
+          hasOnBoarded: authPayload.hasOnBoarded,
+          userId: authPayload.userId,
           error: undefined,
         };
       }
