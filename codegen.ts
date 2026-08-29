@@ -18,6 +18,12 @@ const config: CodegenConfig = {
     'api/**/*.{gql,graphql}',
   ],
   ignoreNoDocuments: true,
+  config: {
+    // The backend serialises Date scalars as ISO strings over the wire.
+    // Without this they generate as `any`, silently untyping every
+    // createdAt / date / updatedAt on the frontend.
+    scalars: { DateTime: 'string' },
+  },
   generates: {
     './graphql/': {
       preset: 'client',
