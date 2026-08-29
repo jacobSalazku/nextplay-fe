@@ -1,5 +1,14 @@
-mutation Login($email: String!) {
-    login(email: $email) {
+mutation LoginWithGoogle($idToken: String!) {
+    loginWithGoogle(idToken: $idToken) {
+        accessToken
+        refreshToken
+        hasOnBoarded
+        userId
+    }
+}
+
+mutation DevLogin($email: String!) {
+    devLogin(email: $email) {
         accessToken
         refreshToken
         hasOnBoarded
