@@ -3,6 +3,7 @@
 import { type FC } from 'react';
 import { attendanceStatus } from '../utils/const';
 import { type AttendanceData, type AttendanceStatusOption } from '../zod';
+import { useTeam } from '@/context/team-context';
 import useStore from '@/store/store';
 import { useMutation } from '@apollo/client/react';
 import { format } from 'date-fns';
@@ -28,6 +29,7 @@ const AttendanceModal: FC<AttendanceProps> = ({ mode, member }) => {
   const { selectedActivity, setOpenGameAttendance, setOpenPracticeAttendance } =
     useStore();
 
+  const { routeKey } = useTeam();
   const [submitAttendance] = useMutation(SubmitAttendanceDocument);
 
   const { handleSubmit, register, control, reset } = useForm<AttendanceData>({
@@ -62,6 +64,7 @@ const AttendanceModal: FC<AttendanceProps> = ({ mode, member }) => {
     await submitAttendance({
       variables: {
         input: {
+          routeKey,
           activityId: selectedActivity.id,
           memberId: member.id,
           attendanceStatus: attendance.attendanceStatus,

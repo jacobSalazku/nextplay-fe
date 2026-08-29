@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { getFullPosition } from '../utils';
+import { useTeam } from '@/context/team-context';
 import {
   playerAttendanceStatus,
   playerAttendanceStatusColor,
@@ -43,6 +44,7 @@ const PlayerDetailPanel = ({
 }: {
   userProfile: GetUserProfileQuery['getUserProfile'];
 }) => {
+  const { routeKey } = useTeam();
   const [deletePlayer] = useMutation(DeleteMemberDocument);
   const router = useRouter();
 
@@ -64,7 +66,7 @@ const PlayerDetailPanel = ({
     try {
       await deletePlayer({
         variables: {
-          input: { id },
+          input: { id, routeKey },
         },
       });
 
