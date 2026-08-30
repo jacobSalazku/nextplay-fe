@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { PlayerBlock } from '@/features/team';
-import { getTeamInforamtion } from '@/features/team/actions/get-team-infomation';
+import { getTeamInforamtion } from '@/features/team/queries/get-team-infomation';
 import { withProtectedPage } from '@/lib/auth/with-page-guards';
 
 export const metadata: Metadata = {

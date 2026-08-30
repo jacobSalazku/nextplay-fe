@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
-import { getStatlineAverage } from '@/features/statistics/actions';
 import { PlayerDetailStatistics } from '@/features/statistics/components/player-detail/player-detail-statistics';
+import { getStatlineAverage } from '@/features/statistics/queries';
 import { PlayerStatRow } from '@/features/statistics/utils/types';
 import { boxScoreSearchParamsCache } from '@/utils/search-params';
 import { SearchParams } from 'nuqs/server';

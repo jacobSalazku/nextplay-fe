@@ -7,8 +7,8 @@ import {
   getGamesWithBoxScores,
   getStatlineAverage,
   getTeamStats,
-} from '@/features/statistics/actions';
-import { getTeamInforamtion } from '@/features/team/actions/get-team-infomation';
+} from '@/features/statistics/queries';
+import { getTeamInforamtion } from '@/features/team/queries/get-team-infomation';
 import { renderToStream } from '@react-pdf/renderer';
 
 export const runtime = 'nodejs';

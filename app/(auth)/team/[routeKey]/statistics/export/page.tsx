@@ -1,6 +1,6 @@
-import { getGamesWithBoxScores } from '@/features/statistics/actions';
 import { ExportBlock } from '@/features/statistics/components/export';
-import { getTeamInforamtion } from '@/features/team/actions/get-team-infomation';
+import { getGamesWithBoxScores } from '@/features/statistics/queries';
+import { getTeamInforamtion } from '@/features/team/queries/get-team-infomation';
 import { withProtectedPage } from '@/lib/auth/with-page-guards';
 
 type ExportPageProps = {

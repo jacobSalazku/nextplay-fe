@@ -1,11 +1,11 @@
 import { Suspense } from 'react';
 import StatisticsBlock from '@/features/statistics';
+import StatisticsSkeleton from '@/features/statistics/components/skeleton-statistics';
 import {
   getStatlineAverage,
   getTeamStats,
-} from '@/features/statistics/actions';
-import StatisticsSkeleton from '@/features/statistics/components/skeleton-statistics';
-import { getTeamInforamtion } from '@/features/team/actions/get-team-infomation';
+} from '@/features/statistics/queries';
+import { getTeamInforamtion } from '@/features/team/queries/get-team-infomation';
 import { withProtectedPage } from '@/lib/auth/with-page-guards';
 
 type PageProps = {
