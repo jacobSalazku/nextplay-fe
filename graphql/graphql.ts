@@ -1081,24 +1081,59 @@ export type TeamTotalsBoxScore = {
 
 export type UpdateFeedbackInput = {
   coach?: InputMaybe<Scalars['String']['input']>;
+  date?: InputMaybe<Scalars['DateTime']['input']>;
+  duration?: InputMaybe<Scalars['Float']['input']>;
+  id: Scalars['ID']['input'];
   notes?: InputMaybe<Scalars['String']['input']>;
+  teamId: Scalars['String']['input'];
+  time?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  type: ActivityType;
 };
 
 export type UpdateFilmInput = {
+  date?: InputMaybe<Scalars['DateTime']['input']>;
+  duration?: InputMaybe<Scalars['Float']['input']>;
+  id: Scalars['ID']['input'];
   notes?: InputMaybe<Scalars['String']['input']>;
+  teamId: Scalars['String']['input'];
+  time?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  type: ActivityType;
 };
 
 export type UpdateGameInput = {
+  date?: InputMaybe<Scalars['DateTime']['input']>;
+  duration?: InputMaybe<Scalars['Float']['input']>;
+  id: Scalars['ID']['input'];
   location?: InputMaybe<Location>;
+  teamId: Scalars['String']['input'];
+  time?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  type: ActivityType;
 };
 
 export type UpdateMeetingInput = {
+  date?: InputMaybe<Scalars['DateTime']['input']>;
+  duration?: InputMaybe<Scalars['Float']['input']>;
+  id: Scalars['ID']['input'];
   notes?: InputMaybe<Scalars['String']['input']>;
+  teamId: Scalars['String']['input'];
+  time?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  type: ActivityType;
 };
 
 export type UpdatePracticeInput = {
+  date?: InputMaybe<Scalars['DateTime']['input']>;
+  duration?: InputMaybe<Scalars['Float']['input']>;
   facility?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
   practiceType?: InputMaybe<PracticeType>;
+  teamId: Scalars['String']['input'];
+  time?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  type: ActivityType;
 };
 
 export type UpdateUserInput = {
