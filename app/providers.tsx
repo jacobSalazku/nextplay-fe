@@ -1,17 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { apolloClient } from '@/lib/apollo/apollo-client';
-import { toastStyling } from '@/features/toast-notification/styling';
-import { setGraphqlToken } from '@/lib/graphql/client-token';
 import { ApolloProvider } from '@apollo/client/react';
-import {
-  MutationCache,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider, useSession } from 'next-auth/react';
-import { toast } from 'sonner';
+import { apolloClient } from '@/lib/apollo/apollo-client';
+import { setGraphqlToken } from '@/lib/graphql/client-token';
+import { createQueryClient } from '@/lib/graphql/query-client';
 
 /** Keeps the module-level token in sync with the session — no network call. */
 function GraphqlTokenSync() {
@@ -25,22 +20,7 @@ function GraphqlTokenSync() {
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        // Every mutation failure toasts + logs from here, so individual
-        // `useMutation` calls only add an `onError` for extra behaviour.
-        mutationCache: new MutationCache({
-          onError: (error) => {
-            console.error(error);
-            toast.error(
-              error instanceof Error ? error.message : 'Something went wrong',
-              { ...toastStyling, position: 'top-right' },
-            );
-          },
-        }),
-      }),
-  );
+  const [queryClient] = useState(createQueryClient);
 
   return (
     <SessionProvider refetchOnWindowFocus>
