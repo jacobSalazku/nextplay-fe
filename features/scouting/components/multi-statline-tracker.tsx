@@ -11,12 +11,14 @@ import { sanitizeStatline } from '../utils/sanitize';
 import type { OpponentStatsline, StatlineData } from '../zod/player-stats';
 import { defaultOpponentStatline, defaultStatline } from '../zod/types';
 import { useTeam } from '@/context/team-context';
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from '@tanstack/react-query';
 import { useForm, useWatch } from 'react-hook-form';
+import { gqlRequest } from '@/lib/graphql/client-request';
 import {
   SubmitStatlinesDocument,
   type GetActiveAttendedMembersQuery,
   type GetActivityQuery,
+  type SubmitStatlinesMutationVariables,
 } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import { Table } from '@/components/foundation/table/table';
@@ -66,7 +68,16 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
   const { routeKey } = useTeam();
   const [showOpponentStats, setShowOpponentStats] = useState(false);
   const [activePlayerIndex, setActivePlayerIndex] = useState(0);
-  const [createStatline] = useMutation(SubmitStatlinesDocument);
+
+  const submitStatlines = (input: SubmitStatlinesMutationVariables['input']) =>
+    gqlRequest(SubmitStatlinesDocument, { input });
+  const { mutateAsync: manualSave } = useMutation({
+    mutationFn: submitStatlines,
+  });
+  const { mutateAsync: autoSave } = useMutation({
+    mutationFn: submitStatlines,
+    meta: { skipGlobalErrorToast: true }, // background save — no toast on failure
+  });
   const [lastChange, setLastChange] = useState<{
     playerIndex: number;
     field: Exclude<keyof StatlineData, 'id'>;
@@ -149,19 +160,7 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
       },
     };
 
-    console.info('[Statline] submitStatlines request', {
-      source,
-      activityId: activity.id,
-      routeKey,
-      playerCount: mutationInput.players.length,
-      payload: mutationInput,
-    });
-
-    await createStatline({
-      variables: {
-        input: mutationInput,
-      },
-    });
+    await (source === 'autosave' ? autoSave : manualSave)(mutationInput);
 
     reset({
       routeKey,
@@ -177,7 +176,9 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
     });
   };
 
-  useDebouncedSave(stats, (snapshot) => onSubmit(snapshot, 'autosave'), 10000);
+  // autosave 5s after the last change (a stat-button click counts as a change);
+  // the manual "Submit" stays immediate
+  useDebouncedSave(stats, (snapshot) => onSubmit(snapshot, 'autosave'), 5000);
 
   return (
     <>
