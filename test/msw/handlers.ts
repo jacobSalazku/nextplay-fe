@@ -1,18 +1,28 @@
-import { graphql, HttpResponse, type StrictResponse } from 'msw';
+import {
+  graphql,
+  HttpResponse,
+  type GraphQLResponseBody,
+  type StrictResponse,
+} from 'msw';
 
 /** Matches the endpoint gqlRequest / executeGraphQL post to. */
 export const api = graphql.link('http://localhost:3001/graphql');
 
-// MSW types a GraphQL resolver's return around the real `GraphQLError` class,
-// which rejects a plain `{ message }`. These helpers build the same JSON and
-// hand back a response the resolver signature accepts.
-const asResolverResponse = (body: Record<string, unknown>) =>
-  HttpResponse.json(body) as unknown as StrictResponse<never>;
+type GqlBody = GraphQLResponseBody<Record<string, unknown>>;
 
-export const gqlData = (data: unknown) => asResolverResponse({ data });
+// MSW pins its GraphQL error type to `Partial<GraphQLError>` from a copy of the
+// `graphql` package that doesn't structurally match the one this repo resolves
+// under `moduleResolution: bundler`. The response JSON is correct — this only
+// bridges that type skew.
+const gqlResponse = (
+  body: { data?: unknown } | { errors: { message: string }[] },
+): StrictResponse<GqlBody> =>
+  HttpResponse.json(body) as unknown as StrictResponse<GqlBody>;
+
+export const gqlData = (data: unknown) => gqlResponse({ data });
 
 export const gqlError = (message: string) =>
-  asResolverResponse({ errors: [{ message }] });
+  gqlResponse({ errors: [{ message }] });
 
 /**
  * Default handlers. Individual tests override with `server.use(...)`.

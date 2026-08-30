@@ -1,7 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CreatePlayDocument } from '@/graphql/graphql';
 import { gqlRequest } from './client-request';
-import { setGraphqlToken } from './client-token';
 
 // A minimal fetch stub we can point at any Response per test.
 function stubFetch(impl: () => Promise<Response> | Response) {
@@ -25,10 +24,8 @@ const INPUT = {
 } as never;
 
 describe('gqlRequest', () => {
-  beforeEach(() => setGraphqlToken('test-token')); // skip the getSession() fallback
   afterEach(() => {
     vi.unstubAllGlobals();
-    setGraphqlToken(undefined);
   });
 
   it('returns data on a successful response', async () => {

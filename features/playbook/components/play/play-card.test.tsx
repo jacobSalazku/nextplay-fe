@@ -6,7 +6,6 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { toast } from 'sonner';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { setGraphqlToken } from '@/lib/graphql/client-token';
 import { PlayCard } from './play-card';
 
 const { refresh } = vi.hoisted(() => ({ refresh: vi.fn() }));
@@ -19,7 +18,6 @@ vi.mock('@/context/team-context', () => ({
 }));
 
 describe('PlayCard', () => {
-  setGraphqlToken('test-token');
   afterEach(() => vi.clearAllMocks());
 
   it('shows the play name and summary', () => {

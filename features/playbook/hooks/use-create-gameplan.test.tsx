@@ -5,7 +5,6 @@ import { useCoachDashboardStore } from '@/store/use-coach-dashboard-store';
 import { waitFor } from '@testing-library/react';
 import { toast } from 'sonner';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { setGraphqlToken } from '@/lib/graphql/client-token';
 import { useCreateGameplan } from './use-create-gameplan';
 
 const { refresh } = vi.hoisted(() => ({ refresh: vi.fn() }));
@@ -25,7 +24,6 @@ const PAYLOAD = {
 };
 
 describe('useCreateGameplan', () => {
-  setGraphqlToken('test-token');
   afterEach(() => vi.clearAllMocks());
 
   it('on success: switches tab, closes, resets, refreshes and toasts', async () => {
