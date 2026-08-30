@@ -4,15 +4,12 @@ import { useCoachDashboardStore } from '@/store/use-coach-dashboard-store';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { gqlRequest } from '@/lib/graphql/client-request';
-import { CreateGamePlanDocument } from '@/graphql/graphql';
+import {
+  CreateGamePlanDocument,
+  type CreateGamePlanInput,
+} from '@/graphql/graphql';
 
-type CreateGamePlanPayload = {
-  name: string;
-  opponent: string;
-  notes: string;
-  activityId: string;
-  playsId: string[];
-};
+type CreateGamePlanPayload = Omit<CreateGamePlanInput, 'routeKey'>;
 
 export const useCreateGameplan = (
   routeKey: string,
@@ -24,16 +21,7 @@ export const useCreateGameplan = (
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: (payload: CreateGamePlanPayload) =>
-      gqlRequest(CreateGamePlanDocument, {
-        input: {
-          routeKey,
-          name: payload.name,
-          opponent: payload.opponent,
-          notes: payload.notes,
-          activityId: payload.activityId,
-          playsId: payload.playsId,
-        },
-      }),
+      gqlRequest(CreateGamePlanDocument, { input: { routeKey, ...payload } }),
     onSuccess: () => {
       setActiveCoachTab('gameplan');
       onClose();
