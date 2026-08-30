@@ -119,6 +119,7 @@ const PracticePreparationForm: FC<PageProps> = ({
       focus: data.focus,
     };
 
+    // error toast handled globally by MutationCache; catch to keep isSubmitting accurate
     await createPracticePreparation.mutateAsync(preparation).catch(() => {});
   };
 

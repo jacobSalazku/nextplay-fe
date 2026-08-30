@@ -166,15 +166,14 @@ export function PlayForm() {
       return;
     }
 
+    // error toast handled globally by MutationCache; catch to keep isSubmitting accurate
     await createPlay({
       name: data.name,
       description: data.description,
       category: normalizedCategory,
       canvas: canvasDataUrl,
       routeKey,
-    }).catch(() => {
-      // surfaced by the mutation's onError
-    });
+    }).catch(() => {});
   };
 
   return (
