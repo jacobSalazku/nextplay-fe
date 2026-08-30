@@ -198,13 +198,13 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
       <form
         key={activity.id}
         onSubmit={handleSubmit((data) => onSubmit(data, 'manual'))}
-        className="mx-auto hidden w-full px-4 sm:px-6 lg:block"
+        className="mx-auto hidden w-full px-4 sm:px-6 lg:flex lg:h-full lg:min-h-0 lg:flex-col"
       >
-        <h2 className="font-righteous mb-6 text-2xl font-bold text-gray-100 sm:text-4xl">
+        <h2 className="font-righteous mb-4 text-2xl font-bold text-gray-100 sm:text-4xl lg:shrink-0">
           Player Box Score
         </h2>
 
-        <div className="mb-5">
+        <div className="mb-5 lg:shrink-0">
           <div className="flex w-full items-center justify-between">
             <Button
               variant="outline"
@@ -290,10 +290,13 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
           )}
         </div>
 
-        <div className="rounded-2xl bg-gray-900 p-2 shadow-lg backdrop-blur-lg sm:p-4">
-          <div className="overflow-x-auto rounded-xl border border-gray-950 shadow-sm">
-            <Table className="min-w-[700px] text-sm">
-              <TableHeader>
+        <div className="rounded-2xl bg-gray-900 p-2 shadow-lg backdrop-blur-lg sm:p-4 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
+          <div className="rounded-xl border border-gray-950 shadow-sm lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
+            <Table
+              className="min-w-[700px] text-sm"
+              containerClassName="lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+            >
+              <TableHeader className="bg-gray-950 lg:sticky lg:top-0 lg:z-20">
                 <TableRow className="bg-gray-950 text-xs text-gray-200 uppercase sm:text-sm">
                   <TableHead className="p-2 text-left sm:p-4">Name</TableHead>
                   <TableHead className="p-2 text-center sm:p-4">PTS</TableHead>
@@ -328,8 +331,8 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
                 ))}
               </TableBody>
 
-              <TableFooter className="bg-gray-950 text-gray-300">
-                <TableRow>
+              <TableFooter className="bg-gray-950 text-gray-300 lg:sticky lg:bottom-0 lg:z-20">
+                <TableRow className="bg-gray-950">
                   {totalTeamStats && (
                     <TeamStatsRow totalTeamStats={totalTeamStats} />
                   )}
@@ -339,7 +342,7 @@ const MultiStatlineTracker: FC<TrackerProps> = ({ players, activity }) => {
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6 lg:shrink-0 lg:border-t lg:border-white/10 lg:pt-4">
           {statRows.map(({ key, label }) => (
             <Button
               key={key}

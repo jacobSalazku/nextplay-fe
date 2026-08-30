@@ -1,5 +1,4 @@
 import type { UrlObject } from 'url';
-import type { PlanCardType } from '../../utils/types';
 import { Calendar, Eye, PlayIcon, Trash2 } from 'lucide-react';
 import { GamePlan, PracticePreparation } from '@/graphql/graphql';
 import { Card, CardFooter, CardHeader } from '@/components/card';
@@ -9,9 +8,8 @@ import { CategoryBadge } from '@/components/foundation/category-badge';
 
 type PlanCardProps = {
   plan: GamePlan | PracticePreparation;
-  type: PlanCardType;
   onView: string | UrlObject;
-  onDelete: (plan: GamePlan | PracticePreparation) => void;
+  onDelete: () => void;
   role: string;
 };
 const MAX_VISIBLE_PLAY_BADGES = 2;
@@ -121,7 +119,7 @@ export const PlanCard = ({ plan, onView, onDelete, role }: PlanCardProps) => {
             variant="danger"
             aria-label="Delete Plan"
             size="sm"
-            onClick={() => onDelete(plan)}
+            onClick={onDelete}
           >
             <Trash2 className="mr-1 h-3 w-3" />
             Delete

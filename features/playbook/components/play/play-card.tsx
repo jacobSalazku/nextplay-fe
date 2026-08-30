@@ -4,9 +4,10 @@ import { getCategoryColor } from '../../utils/play-category-color';
 import { useTeam } from '@/context/team-context';
 import { toastStyling } from '@/features/toast-notification/styling';
 import { cn } from '@/utils/tw-merge';
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { gqlRequest } from '@/lib/graphql/client-request';
 import { DeletePlayDocument, Play } from '@/graphql/graphql';
 import { Card, CardContent } from '@/components/card';
 import { Button } from '@/components/foundation/button/button';
@@ -46,32 +47,22 @@ function resolvePlayImageSrc(canvas?: string | null): string {
 export const PlayCard = ({ play, role }: PlayCardProps) => {
   const { routeKey } = useTeam();
   const router = useRouter();
-  const [deletePlay] = useMutation(DeletePlayDocument);
-  const imageSrc = resolvePlayImageSrc(play.canvas);
-  const summary = (play.description ?? '')
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  const handleDelete = async () => {
-    try {
-      await deletePlay({
-        variables: { input: { routeKey, id: play.id } },
-        refetchQueries: ['GetPlays'],
-      });
+  const { mutate: deletePlay } = useMutation({
+    mutationFn: () =>
+      gqlRequest(DeletePlayDocument, { input: { routeKey, id: play.id } }),
+    onSuccess: () => {
       router.refresh();
       toast.success('Play deleted', {
         ...toastStyling,
         position: 'top-right',
       });
-    } catch (error) {
-      console.error(error);
-      toast.error('Failed to delete play', {
-        ...toastStyling,
-        position: 'top-right',
-      });
-    }
-  };
+    },
+  });
+  const imageSrc = resolvePlayImageSrc(play.canvas);
+  const summary = (play.description ?? '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 
   return (
     <Card className="group relative h-full cursor-pointer overflow-hidden rounded-[28px] border border-orange-300/25 bg-slate-900 text-xs text-white shadow-[0_14px_28px_rgba(7,12,25,0.42)] ring-1 ring-black/20 transition-all duration-300 hover:-translate-y-0.5 hover:border-orange-300/50">
@@ -104,7 +95,7 @@ export const PlayCard = ({ play, role }: PlayCardProps) => {
                 variant="danger"
                 size="icon"
                 className="h-9 w-9 rounded-full border border-white/35 bg-slate-900/45 text-white backdrop-blur-md hover:bg-red-600"
-                onClick={handleDelete}
+                onClick={() => deletePlay()}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>

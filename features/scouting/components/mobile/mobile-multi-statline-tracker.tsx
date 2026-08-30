@@ -52,9 +52,9 @@ export const MobileMultiStatlineTracker = ({
     <form
       key={activity.id}
       onSubmit={onSubmit}
-      className="w-full flex-grow space-y-6 overflow-y-auto rounded-xl px-4 pt-4 pb-12 lg:hidden"
+      className="flex w-full flex-grow flex-col overflow-y-auto rounded-xl pb-4 lg:hidden"
     >
-      <div className="scrollbar-none flex gap-2 overflow-x-auto">
+      <div className="scrollbar-none sticky top-0 z-20 flex shrink-0 gap-2 overflow-x-auto border-b border-white/10 bg-gray-950/95 px-4 py-3 backdrop-blur">
         {players.map((player, index) => (
           <Button
             key={index}
@@ -67,154 +67,160 @@ export const MobileMultiStatlineTracker = ({
         ))}
       </div>
 
-      <Button
-        variant="outline"
-        className="mb-4 w-full"
-        onClick={() => setShowOpponentStats((prev) => !prev)}
-      >
-        {showOpponentStats ? 'Hide' : 'Show'} Opponent Stats
-      </Button>
-
-      {showOpponentStats && (
-        <div
-          className={cn(
-            showOpponentStats
-              ? 'max-h-[1000px] opacity-100'
-              : 'max-h-0 opacity-0',
-            'overflow-hidden transition-all duration-500 ease-in-out',
-          )}
+      <div className="space-y-6 px-4 pt-4">
+        <Button
+          variant="outline"
+          className="mb-4 w-full"
+          onClick={() => setShowOpponentStats((prev) => !prev)}
         >
-          <h3 className="mb-4 text-xl font-bold">{activity.title} Stats</h3>
+          {showOpponentStats ? 'Hide' : 'Show'} Opponent Stats
+        </Button>
 
-          <div className="grid grid-cols-3 gap-2 text-center">
+        {showOpponentStats && (
+          <div
+            className={cn(
+              showOpponentStats
+                ? 'max-h-[1000px] opacity-100'
+                : 'max-h-0 opacity-0',
+              'overflow-hidden transition-all duration-500 ease-in-out',
+            )}
+          >
+            <h3 className="mb-4 text-xl font-bold">{activity.title} Stats</h3>
+
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <StatButton
+                statKey="fieldGoalsMade"
+                onIncrement={() =>
+                  setValue(
+                    'opponentStatline.fieldGoalsMade',
+                    (opponentStatline?.fieldGoalsMade ?? 0) + 1,
+                  )
+                }
+                label="2PT Made"
+                value={opponentStatline?.fieldGoalsMade ?? 0}
+              />
+              <StatButton
+                statKey="threePointersMade"
+                onIncrement={() =>
+                  setValue(
+                    'opponentStatline.threePointersMade',
+                    (opponentStatline?.threePointersMade ?? 0) + 1,
+                  )
+                }
+                label="3PT Made"
+                value={opponentStatline?.threePointersMade ?? 0}
+              />
+              <StatButton
+                statKey="freeThrowsMade"
+                onIncrement={() =>
+                  setValue(
+                    'opponentStatline.freeThrowsMade',
+                    (opponentStatline?.freeThrowsMade ?? 0) + 1,
+                  )
+                }
+                label="FT Made"
+                value={opponentStatline?.freeThrowsMade ?? 0}
+              />
+            </div>
+
+            <div className="mt-4 text-center text-white">
+              <p className="font-semibold">
+                Total Opponent Points:{' '}
+                {(opponentStatline?.fieldGoalsMade ?? 0) * 2 +
+                  (opponentStatline?.threePointersMade ?? 0) * 3 +
+                  (opponentStatline?.freeThrowsMade ?? 0)}
+              </p>
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <div className="grid grid-cols-3 gap-2 text-center text-white">
             <StatButton
               statKey="fieldGoalsMade"
               onIncrement={() =>
-                setValue(
-                  'opponentStatline.fieldGoalsMade',
-                  (opponentStatline?.fieldGoalsMade ?? 0) + 1,
-                )
+                onIncrement(activePlayerIndex, 'fieldGoalsMade', 1)
               }
-              label="2PT Made"
-              value={opponentStatline?.fieldGoalsMade ?? 0}
+              label="FG Made"
+              value={fieldGoals.made}
             />
             <StatButton
               statKey="threePointersMade"
               onIncrement={() =>
-                setValue(
-                  'opponentStatline.threePointersMade',
-                  (opponentStatline?.threePointersMade ?? 0) + 1,
-                )
+                onIncrement(activePlayerIndex, 'threePointersMade', 1)
               }
               label="3PT Made"
-              value={opponentStatline?.threePointersMade ?? 0}
+              value={threePointers.made}
             />
             <StatButton
-              statKey="freeThrowsMade"
+              statKey="freeThrows"
               onIncrement={() =>
-                setValue(
-                  'opponentStatline.freeThrowsMade',
-                  (opponentStatline?.freeThrowsMade ?? 0) + 1,
-                )
+                onIncrement(activePlayerIndex, 'freeThrows', 1)
               }
               label="FT Made"
-              value={opponentStatline?.freeThrowsMade ?? 0}
+              value={freeThrows.made}
             />
           </div>
 
-          <div className="mt-4 text-center text-white">
-            <p className="font-semibold">
-              Total Opponent Points:{' '}
-              {(opponentStatline?.fieldGoalsMade ?? 0) * 2 +
-                (opponentStatline?.threePointersMade ?? 0) * 3 +
-                (opponentStatline?.freeThrowsMade ?? 0)}
-            </p>
-          </div>
-        </div>
-      )}
-
-      <div className="space-y-2">
-        <div className="grid grid-cols-3 gap-2 text-center text-white">
-          <StatButton
-            statKey="fieldGoalsMade"
-            onIncrement={() =>
-              onIncrement(activePlayerIndex, 'fieldGoalsMade', 1)
-            }
-            label="FG Made"
-            value={fieldGoals.made}
-          />
-          <StatButton
-            statKey="threePointersMade"
-            onIncrement={() =>
-              onIncrement(activePlayerIndex, 'threePointersMade', 1)
-            }
-            label="3PT Made"
-            value={threePointers.made}
-          />
-          <StatButton
-            statKey="freeThrows"
-            onIncrement={() => onIncrement(activePlayerIndex, 'freeThrows', 1)}
-            label="FT Made"
-            value={freeThrows.made}
-          />
-        </div>
-
-        <div className="grid grid-cols-3 gap-2 text-center text-white">
-          <StatButton
-            statKey="fieldGoalsMissed"
-            onIncrement={() =>
-              onIncrement(activePlayerIndex, 'fieldGoalsMissed', 1)
-            }
-            label="FG Missed"
-            value={fieldGoals.attempted - fieldGoals.made}
-          />
-          <StatButton
-            statKey="threePointersMissed"
-            onIncrement={() =>
-              onIncrement(activePlayerIndex, 'threePointersMissed', 1)
-            }
-            label="3PT Missed"
-            value={threePointers.attempted - threePointers.made}
-          />
-          <StatButton
-            statKey="missedFreeThrows"
-            onIncrement={() =>
-              onIncrement(activePlayerIndex, 'missedFreeThrows', 1)
-            }
-            label="FT Missed"
-            value={freeThrows.attempted - freeThrows.made}
-          />
-        </div>
-
-        <div className="grid grid-cols-3 gap-2 text-center text-white">
-          {otherStats.map(({ key, label }) => (
+          <div className="grid grid-cols-3 gap-2 text-center text-white">
             <StatButton
-              key={key}
-              statKey={key as Exclude<keyof StatlineData, 'id'>}
-              label={label}
-              value={Number(statsForPlayer[key as keyof StatlineData] ?? '')}
-              onIncrement={(key) =>
-                onIncrement(
-                  activePlayerIndex,
-                  key as Exclude<keyof StatlineData, 'id'>,
-                  1,
-                )
+              statKey="fieldGoalsMissed"
+              onIncrement={() =>
+                onIncrement(activePlayerIndex, 'fieldGoalsMissed', 1)
               }
+              label="FG Missed"
+              value={fieldGoals.attempted - fieldGoals.made}
             />
-          ))}
-          <Button
-            variant="light"
-            className="h-full rounded-2xl"
-            onClick={undoLastChange}
-          >
-            <Undo2 className="Undo h-5 w-5" />
-          </Button>
+            <StatButton
+              statKey="threePointersMissed"
+              onIncrement={() =>
+                onIncrement(activePlayerIndex, 'threePointersMissed', 1)
+              }
+              label="3PT Missed"
+              value={threePointers.attempted - threePointers.made}
+            />
+            <StatButton
+              statKey="missedFreeThrows"
+              onIncrement={() =>
+                onIncrement(activePlayerIndex, 'missedFreeThrows', 1)
+              }
+              label="FT Missed"
+              value={freeThrows.attempted - freeThrows.made}
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 text-center text-white">
+            {otherStats.map(({ key, label }) => (
+              <StatButton
+                key={key}
+                statKey={key as Exclude<keyof StatlineData, 'id'>}
+                label={label}
+                value={Number(statsForPlayer[key as keyof StatlineData] ?? '')}
+                onIncrement={(key) =>
+                  onIncrement(
+                    activePlayerIndex,
+                    key as Exclude<keyof StatlineData, 'id'>,
+                    1,
+                  )
+                }
+              />
+            ))}
+            <Button
+              variant="light"
+              className="h-full rounded-2xl"
+              onClick={undoLastChange}
+            >
+              <Undo2 className="Undo h-5 w-5" />
+            </Button>
+          </div>
         </div>
+
+        {totalTeamStats && (
+          <MobileTeamStatsRow totalTeamStats={totalTeamStats} />
+        )}
       </div>
 
-      {totalTeamStats && <MobileTeamStatsRow totalTeamStats={totalTeamStats} />}
-
-      <div className="pt-4">
+      <div className="sticky bottom-0 z-20 mt-auto shrink-0 border-t border-white/10 bg-gray-950/95 px-4 py-3 backdrop-blur">
         <Button type="submit" variant="light" size="full">
           Submit Stats
         </Button>

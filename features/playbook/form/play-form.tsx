@@ -20,12 +20,17 @@ import { useTeam } from '@/context/team-context';
 import { toastStyling } from '@/features/toast-notification/styling';
 import { RichTextEditor } from '@/features/wysiwyg/text-editor';
 import { cn } from '@/utils/tw-merge';
-import { useMutation } from '@apollo/client/react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { RotateCcw, Save, Trash2 } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { Category, CreatePlayDocument } from '@/graphql/graphql';
+import { gqlRequest } from '@/lib/graphql/client-request';
+import {
+  Category,
+  CreatePlayDocument,
+  type CreatePlayInput,
+} from '@/graphql/graphql';
 import {
   Card,
   CardContent,
@@ -52,7 +57,18 @@ export function PlayForm() {
   const [drawingLines, setDrawingLines] = useState<DrawingLine[]>([]);
   const [players, setPlayers] = useState<Player[]>(initialPlayerPosition);
 
-  const [createPlay] = useMutation(CreatePlayDocument);
+  const { mutateAsync: createPlay } = useMutation({
+    mutationFn: (input: CreatePlayInput) =>
+      gqlRequest(CreatePlayDocument, { input }),
+    onSuccess: () => {
+      toast.success('Your Play has been successfully created', {
+        ...toastStyling,
+        position: 'top-center',
+      });
+      router.push(`/team/${routeKey}/playbook`);
+      router.refresh();
+    },
+  });
 
   const {
     register,
@@ -145,36 +161,18 @@ export function PlayForm() {
       categoryMap[data.category] ?? categoryMap[data.category.toLowerCase()];
 
     if (!normalizedCategory) {
-      throw new Error('Invalid play category');
+      toast.error('Invalid play category');
+      return;
     }
 
-    try {
-      const play = await createPlay({
-        variables: {
-          input: {
-            name: data.name,
-            description: data.description,
-            category: normalizedCategory,
-            canvas: canvasDataUrl,
-            routeKey,
-          },
-        },
-        refetchQueries: ['GetPlays'],
-        awaitRefetchQueries: true,
-      });
-
-      toast.success('Your Play has been successfully created', {
-        ...toastStyling,
-        position: 'top-center',
-      });
-      router.push(`/team/${routeKey}/playbook`);
-      router.refresh();
-
-      return play;
-    } catch (error) {
-      console.error(error);
-      toast.error('Something went wrong');
-    }
+    // error toast handled globally by MutationCache; catch to keep isSubmitting accurate
+    await createPlay({
+      name: data.name,
+      description: data.description,
+      category: normalizedCategory,
+      canvas: canvasDataUrl,
+      routeKey,
+    }).catch(() => {});
   };
 
   return (

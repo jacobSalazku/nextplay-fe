@@ -7,9 +7,10 @@ import { useTeam } from '@/context/team-context';
 import { toastStyling } from '@/features/toast-notification/styling';
 import { useCoachDashboardStore } from '@/store/use-coach-dashboard-store';
 import { cn } from '@/utils/tw-merge';
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import { gqlRequest } from '@/lib/graphql/client-request';
 import {
   DeleteGamePlanDocument,
   DeletePracticePreparationDocument,
@@ -48,10 +49,26 @@ const PlaybookBookBlock: FC<PageProps> = ({
     setActiveCoachTab,
   } = useCoachDashboardStore();
 
-  const [deleteGamePlan] = useMutation(DeleteGamePlanDocument);
-  const [deletePracticePreparation] = useMutation(
-    DeletePracticePreparationDocument,
-  );
+  const onDeleteSuccess = () => {
+    router.refresh();
+    toast.success('Deleted successfully', {
+      ...toastStyling,
+      position: 'top-right',
+    });
+  };
+
+  const { mutate: deleteGamePlan } = useMutation({
+    mutationFn: (gamePlanId: string) =>
+      gqlRequest(DeleteGamePlanDocument, { input: { routeKey, gamePlanId } }),
+    onSuccess: onDeleteSuccess,
+  });
+  const { mutate: deletePracticePreparation } = useMutation({
+    mutationFn: (practicePreparationId: string) =>
+      gqlRequest(DeletePracticePreparationDocument, {
+        input: { routeKey, practicePreparationId },
+      }),
+    onSuccess: onDeleteSuccess,
+  });
 
   const handleCoachTabChange = useCallback(
     (value: string) => {
@@ -59,47 +76,6 @@ const PlaybookBookBlock: FC<PageProps> = ({
     },
     [setActiveCoachTab],
   );
-
-  const handleDeletePlan = async (
-    planId: string,
-    type: 'gameplan' | 'practice',
-  ) => {
-    try {
-      if (type === 'gameplan') {
-        await deleteGamePlan({
-          variables: {
-            input: {
-              routeKey,
-              gamePlanId: planId,
-            },
-          },
-          refetchQueries: ['GetGameplan'],
-        });
-      } else if (type === 'practice') {
-        await deletePracticePreparation({
-          variables: {
-            input: {
-              routeKey,
-              practicePreparationId: planId,
-            },
-          },
-          refetchQueries: ['GetPracticePreparations'],
-        });
-      }
-
-      router.refresh();
-      toast.success('Deleted successfully', {
-        ...toastStyling,
-        position: 'top-right',
-      });
-    } catch (error) {
-      console.error(error);
-      toast.error('Failed to delete item', {
-        ...toastStyling,
-        position: 'top-right',
-      });
-    }
-  };
 
   return (
     <div className="flex w-full flex-col gap-8 px-2 pt-2 pb-8 md:px-6 md:pb-10">
@@ -169,8 +145,7 @@ const PlaybookBookBlock: FC<PageProps> = ({
                 key={idx}
                 role={role}
                 plan={item}
-                type="gameplan"
-                onDelete={() => handleDeletePlan(item.id, 'gameplan')}
+                onDelete={() => deleteGamePlan(item.id)}
                 onView={{
                   pathname: `/team/${routeKey}/playbook/gameplan`,
                   query: { id: item.id },
@@ -199,8 +174,7 @@ const PlaybookBookBlock: FC<PageProps> = ({
                 key={idx}
                 role={role}
                 plan={practice}
-                type="practice"
-                onDelete={() => handleDeletePlan(practice.id, 'practice')}
+                onDelete={() => deletePracticePreparation(practice.id)}
                 onView={{
                   pathname: `/team/${routeKey}/playbook/practice-preparation`,
                   query: { id: practice.id },

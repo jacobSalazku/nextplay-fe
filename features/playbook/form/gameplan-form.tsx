@@ -133,7 +133,8 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
       playsId: data.playsId,
     };
 
-    await createGameplan.mutateAsync(gamePlan);
+    // error toast handled globally by MutationCache; catch to keep isSubmitting accurate
+    await createGameplan.mutateAsync(gamePlan).catch(() => {});
   };
 
   return (
