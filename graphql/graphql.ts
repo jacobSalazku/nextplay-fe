@@ -187,6 +187,15 @@ export type CreateTeamInviteInput = {
   routeKey: Scalars['String']['input'];
 };
 
+export type DashboardActivity = {
+  __typename?: 'DashboardActivity';
+  date: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  time: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+  type: ActivityType;
+};
+
 export type DeleteActivity = {
   id: Scalars['ID']['input'];
   routeKey: Scalars['String']['input'];
@@ -431,7 +440,7 @@ export type Mutation = {
   deletePlay: Scalars['Boolean']['output'];
   deletePracticePreparation: PracticePreparation;
   devLogin: AuthPayload;
-  getAttendanceByActivities: PlayerActivityAttendance;
+  getAttendanceByActivities?: Maybe<PlayerActivityAttendance>;
   loginWithGoogle: AuthPayload;
   logout: Scalars['Boolean']['output'];
   refresh: AuthPayload;
@@ -934,14 +943,14 @@ export type SubmitStatlinesResult = {
 
 export type Team = {
   __typename?: 'Team';
-  activities: Array<Activity>;
+  activities?: Maybe<Array<Activity>>;
   ageGroup?: Maybe<Scalars['String']['output']>;
   code: Scalars['String']['output'];
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   creatorId?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   image?: Maybe<Scalars['String']['output']>;
-  members: Array<TeamMemberUser>;
+  members?: Maybe<Array<TeamMemberUser>>;
   name: Scalars['String']['output'];
   routeKey: Scalars['String']['output'];
   shortId: Scalars['String']['output'];
@@ -973,7 +982,7 @@ export type TeamAverageValues = {
 
 export type TeamDashboard = {
   __typename?: 'TeamDashboard';
-  activities: Array<Activity>;
+  activities: Array<DashboardActivity>;
   ageGroup?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   members: Array<MemberId>;
@@ -1111,7 +1120,7 @@ export type User = {
   height?: Maybe<Scalars['Float']['output']>;
   id: Scalars['ID']['output'];
   isBlocked: Scalars['Boolean']['output'];
-  members: Array<Member>;
+  members?: Maybe<Array<Member>>;
   name?: Maybe<Scalars['String']['output']>;
   phone?: Maybe<Scalars['String']['output']>;
   tokenVersion: Scalars['Float']['output'];
@@ -1231,7 +1240,7 @@ export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __type
 export type GetTeamForDashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetTeamForDashboardQuery = { __typename?: 'Query', getDashboardTeams: Array<{ __typename?: 'TeamDashboard', id: string, name: string, slug: string, shortId: string, routeKey: string, ageGroup?: string | null, members: Array<{ __typename?: 'MemberId', id: string }>, activities: Array<{ __typename?: 'Activity', id: string, type: ActivityType, title: string, date: string, time: string }> }> };
+export type GetTeamForDashboardQuery = { __typename?: 'Query', getDashboardTeams: Array<{ __typename?: 'TeamDashboard', id: string, name: string, slug: string, shortId: string, routeKey: string, ageGroup?: string | null, members: Array<{ __typename?: 'MemberId', id: string }>, activities: Array<{ __typename?: 'DashboardActivity', id: string, type: ActivityType, title: string, date: string, time: string }> }> };
 
 export type CreateGamePlanMutationVariables = Exact<{
   input: CreateGamePlanInput;
@@ -1336,7 +1345,7 @@ export type GetTeamActivitiesQueryVariables = Exact<{
 }>;
 
 
-export type GetTeamActivitiesQuery = { __typename?: 'Query', getTeamActivities: { __typename?: 'Team', id: string, name: string, code: string, slug: string, routeKey: string, shortId: string, image?: string | null, ageGroup?: string | null, createdAt?: string | null, updatedAt?: string | null, creatorId?: string | null, members: Array<{ __typename?: 'TeamMemberUser', id: string, name?: string | null, image?: string | null, teamId: string, userId: string }>, activities: Array<{ __typename?: 'Activity', id: string, teamId: string, type: ActivityType, title: string, time: string, duration?: number | null, date: string, createdAt: string, updatedAt: string, attendees: Array<{ __typename?: 'PlayerActivityAttendance', id: string, activityId: string, memberId: string, attendanceStatus: AttendanceStatus, reason?: string | null, createdAt: string, updatedAt: string }> }> } };
+export type GetTeamActivitiesQuery = { __typename?: 'Query', getTeamActivities: { __typename?: 'Team', id: string, name: string, code: string, slug: string, routeKey: string, shortId: string, image?: string | null, ageGroup?: string | null, createdAt?: string | null, updatedAt?: string | null, creatorId?: string | null, members?: Array<{ __typename?: 'TeamMemberUser', id: string, name?: string | null, image?: string | null, teamId: string, userId: string }> | null, activities?: Array<{ __typename?: 'Activity', id: string, teamId: string, type: ActivityType, title: string, time: string, duration?: number | null, date: string, createdAt: string, updatedAt: string, attendees: Array<{ __typename?: 'PlayerActivityAttendance', id: string, activityId: string, memberId: string, attendanceStatus: AttendanceStatus, reason?: string | null, createdAt: string, updatedAt: string }> }> | null } };
 
 export type CreateFeedbackMutationVariables = Exact<{
   input: CreateFeedbackInput;

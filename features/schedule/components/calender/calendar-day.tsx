@@ -25,7 +25,7 @@ export const CalendarDay: FC<CalendarDayProps> = ({ day, activities }) => {
   const isSelected = selectedDate ? isSameDay(day, selectedDate) : false;
   const isToday = isSameDay(day, new Date());
 
-  const activitiesForDay = activities.filter((activity) =>
+  const activitiesForDay = (activities ?? []).filter((activity) =>
     isSameDay(new Date(activity.date), day),
   );
 

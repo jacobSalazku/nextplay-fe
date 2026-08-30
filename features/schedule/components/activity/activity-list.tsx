@@ -41,7 +41,7 @@ export function ActivityList({ activities, team }: ActivityListProps) {
   const role = user?.member?.role === 'COACH';
 
   const filteredActivities = useMemo(() => {
-    const activitiesForDay = activities.filter((activity) =>
+    const activitiesForDay = (activities ?? []).filter((activity) =>
       isSameDay(new Date(activity.date), selectedDate),
     );
 

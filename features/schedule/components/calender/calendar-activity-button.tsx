@@ -4,7 +4,7 @@ import { cn } from '@/utils/tw-merge';
 import { Activity, GetTeamActivitiesQuery } from '@/graphql/graphql';
 
 type ActivityButtonProps = {
-  activity: GetTeamActivitiesQuery['getTeamActivities']['activities'][number];
+  activity: NonNullable<GetTeamActivitiesQuery['getTeamActivities']['activities']>[number];
   onClick: (e: MouseEvent<HTMLButtonElement>, activity: Activity) => void;
 };
 
