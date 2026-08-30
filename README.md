@@ -1,9 +1,8 @@
-# 🏀 NextPlay Frontend 
+# 🏀 NextPlay Frontend
 
 **NextPlay** is an all-in-one platform designed for basketball coaches and youth players to manage training sessions, track performance, and gain valuable game insights. Developed as a graduation project, it aims to simplify team management while helping young athletes improve their skills.
 
 NextPlay enables players to monitor their personal progress, while giving coaches the tools to schedule training sessions, track player statistics, organize team communication, and share tactical plays—all in one place.
-
 
 ## 🚀 Features
 
@@ -13,7 +12,6 @@ NextPlay enables players to monitor their personal progress, while giving coache
 - 🔄 Visual playbook for sharing plays and team strategies
 - 👥 Team and player management
 
-
 ## 🛠 Tech Stack
 
 - **Next.js** – React framework for the frontend
@@ -22,16 +20,20 @@ NextPlay enables players to monitor their personal progress, while giving coache
 - **NextAuth.js** – Authentication
 - **TypeScript** – End-to-end type safety
 
-
 ## Testing
 
-**Stack:** Vitest + `@testing-library/react` + `user-event` + `jest-dom`
-(`jsdom` env), with **MSW** faking the GraphQL backend at the `fetch` layer.
-Specs are `*.test.ts(x)` next to the source.
+**Unit / component:** Vitest + `@testing-library/react` + `user-event` +
+`jest-dom` (`jsdom` env), with **MSW** faking the GraphQL backend at the
+`fetch` layer. Specs are `*.test.ts(x)` next to the source.
+
+**Browser (`e2e/`):** Playwright, for what Vitest can't reach — async Server
+Components, routing, hydration. Its `webServer` builds + starts the app; specs
+stub backend calls with `page.route`.
 
 ```bash
-pnpm test          # run once
+pnpm test          # unit / component, run once
 pnpm test:watch    # watch mode
+pnpm test:e2e      # Playwright (builds the app first)
 ```
 
 ### Every test is AAA — Arrange, Act, Assert
@@ -68,4 +70,3 @@ it('shows a success toast after creating a gameplan', async () => {
   functions and test those; cover full pages with a Playwright e2e later.
 - **Coverage is a diagnostic, not a target.** Priority: `gqlRequest` error
   handling → hooks → interactive components → critical flows.
-

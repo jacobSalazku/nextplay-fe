@@ -41,3 +41,7 @@ yarn-error.log*
 next-env.d.ts
 CLAUDE.md
 ARCHITECTURE.MD
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
