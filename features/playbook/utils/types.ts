@@ -14,5 +14,3 @@ export type DrawingLine = {
 };
 
 export type CoachDashTab = 'gameplan' | 'play' | 'practice';
-
-export type PlanCardType = 'gameplan' | 'practice';

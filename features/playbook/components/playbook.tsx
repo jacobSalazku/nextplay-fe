@@ -145,7 +145,6 @@ const PlaybookBookBlock: FC<PageProps> = ({
                 key={idx}
                 role={role}
                 plan={item}
-                type="gameplan"
                 onDelete={() => deleteGamePlan(item.id)}
                 onView={{
                   pathname: `/team/${routeKey}/playbook/gameplan`,
@@ -175,7 +174,6 @@ const PlaybookBookBlock: FC<PageProps> = ({
                 key={idx}
                 role={role}
                 plan={practice}
-                type="practice"
                 onDelete={() => deletePracticePreparation(practice.id)}
                 onView={{
                   pathname: `/team/${routeKey}/playbook/practice-preparation`,

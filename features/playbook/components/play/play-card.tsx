@@ -64,8 +64,6 @@ export const PlayCard = ({ play, role }: PlayCardProps) => {
     .replace(/\s+/g, ' ')
     .trim();
 
-  const handleDelete = () => deletePlay();
-
   return (
     <Card className="group relative h-full cursor-pointer overflow-hidden rounded-[28px] border border-orange-300/25 bg-slate-900 text-xs text-white shadow-[0_14px_28px_rgba(7,12,25,0.42)] ring-1 ring-black/20 transition-all duration-300 hover:-translate-y-0.5 hover:border-orange-300/50">
       <div className="absolute top-0 left-0 z-30 h-1 w-full bg-linear-to-r from-orange-500 via-amber-300 to-orange-500" />
@@ -97,7 +95,7 @@ export const PlayCard = ({ play, role }: PlayCardProps) => {
                 variant="danger"
                 size="icon"
                 className="h-9 w-9 rounded-full border border-white/35 bg-slate-900/45 text-white backdrop-blur-md hover:bg-red-600"
-                onClick={handleDelete}
+                onClick={() => deletePlay()}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
