@@ -2,19 +2,18 @@
 
 import { type FC } from 'react';
 import { useRouter } from 'next/navigation';
+import { deleteActivity } from '../../actions/mutations';
 import { useTeam } from '@/context/team-context';
 import { deleteToastStyling } from '@/features/toast-notification/styling';
 import useStore from '@/store/store';
 import { getActivityStyle } from '@/utils';
 import { cn } from '@/utils/tw-merge';
-import { useMutation } from '@apollo/client/react';
 import { isToday } from 'date-fns';
 import { Clock, Trash } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Activity,
   ActivityType,
-  DeleteActivityDocument,
   MemberWithAttendances,
 } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
@@ -27,8 +26,6 @@ type ActivityCardProps = {
 
 export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
   const { routeKey } = useTeam();
-  const [deleteActivity] = useMutation(DeleteActivityDocument);
-
   const router = useRouter();
   const {
     setOpenPracticeDetails,
@@ -60,23 +57,17 @@ export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
   };
 
   const handleDeleteActivity = async (id: string) => {
-    try {
-      await deleteActivity({
-        variables: {
-          input: { id, routeKey },
-        },
-      });
-
-      router.refresh();
-
-      toast.success('Activity deleted', {
-        ...deleteToastStyling,
-        position: 'top-center',
-      });
-    } catch (error) {
-      console.error(error);
-      toast.error('Failed to delete activity');
+    const res = await deleteActivity({ id, routeKey });
+    if (!res.ok) {
+      toast.error(res.error);
+      return;
     }
+
+    router.refresh();
+    toast.success('Activity deleted', {
+      ...deleteToastStyling,
+      position: 'top-center',
+    });
   };
 
   const date = isToday(new Date(activity.date));

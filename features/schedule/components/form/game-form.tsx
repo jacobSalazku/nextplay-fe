@@ -2,6 +2,7 @@
 
 import { useState, type FC } from 'react';
 import { useRouter } from 'next/navigation';
+import { createGame, updateGame } from '../../actions/mutations';
 import { getButtonText } from '../../utils/button-text';
 import { gameSchema, type GameData } from '../../zod';
 import { useTeam } from '@/context/team-context';
@@ -9,7 +10,6 @@ import { toastStyling } from '@/features/toast-notification/styling';
 import useStore from '@/store/store';
 import { getTypeBgColor } from '@/utils';
 import { cn } from '@/utils/tw-merge';
-import { useMutation } from '@apollo/client/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format, isBefore, startOfToday } from 'date-fns';
 import { X } from 'lucide-react';
@@ -17,10 +17,9 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import {
   ActivityType,
-  CreateGameDocument,
+  Location,
   MemberWithAttendances,
   Team,
-  UpdateGameDocument,
 } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import { CategoryBadge } from '@/components/foundation/category-badge';
@@ -38,8 +37,6 @@ type GameFormProps = {
 const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
   const { routeKey } = useTeam();
   const [formState, setFormState] = useState<Mode>(mode);
-  const [createGame] = useMutation(CreateGameDocument);
-  const [updateGame] = useMutation(UpdateGameDocument);
   const router = useRouter();
   const { selectedDate, selectedActivity } = useStore();
 
@@ -72,48 +69,43 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
   const onSubmit = async (data: GameData) => {
     const date = new Date(data.date);
 
-    try {
-      if (formState === 'edit') {
-        await updateGame({
-          variables: {
-            input: {
-              ...data,
-              id: selectedActivity!.id,
-              date: date.toISOString(),
-              teamId: routeKey,
-              type: ActivityType.Game,
-              location: 'HOME',
-            },
-          },
-        });
-        router.refresh();
-        setFormState('view');
-        toast.success('Game Updated', {
-          ...toastStyling,
-          position: 'top-center',
-        });
-      } else {
-        await createGame({
-          variables: {
-            input: {
-              ...data,
-              date: date.toISOString(),
-              teamId: routeKey,
-              type: ActivityType.Game,
-              location: 'HOME',
-            },
-          },
-        });
-        onClose();
-        toast.success('Your Game has been successfully created', {
-          ...toastStyling,
-          position: 'top-center',
-        });
-        router.refresh();
+    if (formState === 'edit') {
+      const res = await updateGame({
+        ...data,
+        id: selectedActivity!.id,
+        date: date.toISOString(),
+        teamId: routeKey,
+        type: ActivityType.Game,
+        location: Location.Home,
+      });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
       }
-    } catch (error) {
-      console.error(error);
-      toast.error('Something went wrong');
+      router.refresh();
+      setFormState('view');
+      toast.success('Game Updated', {
+        ...toastStyling,
+        position: 'top-center',
+      });
+    } else {
+      const res = await createGame({
+        ...data,
+        date: date.toISOString(),
+        teamId: routeKey,
+        type: ActivityType.Game,
+        location: Location.Home,
+      });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      onClose();
+      toast.success('Your Game has been successfully created', {
+        ...toastStyling,
+        position: 'top-center',
+      });
+      router.refresh();
     }
   };
 
