@@ -35,7 +35,9 @@ const CoachAttendanceListModal: FC<CoachAttendanceListModalProps> = ({
 
   const attendanceByMemberId = useMemo(
     () =>
-      new Map((team.members ?? []).map((teamMember) => [teamMember.id, teamMember])),
+      new Map(
+        (team.members ?? []).map((teamMember) => [teamMember.id, teamMember]),
+      ),
     [team.members],
   );
 

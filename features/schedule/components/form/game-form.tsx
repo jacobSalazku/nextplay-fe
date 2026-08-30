@@ -2,7 +2,6 @@
 
 import { useState, type FC } from 'react';
 import { useRouter } from 'next/navigation';
-import { createGame, updateGame } from '../../actions/mutations';
 import { getButtonText } from '../../utils/button-text';
 import { gameSchema, type GameData } from '../../zod';
 import { useTeam } from '@/context/team-context';
@@ -11,15 +10,21 @@ import useStore from '@/store/store';
 import { getTypeBgColor } from '@/utils';
 import { cn } from '@/utils/tw-merge';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { format, isBefore, startOfToday } from 'date-fns';
 import { X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { gqlRequest } from '@/lib/graphql/client-request';
 import {
   ActivityType,
+  CreateGameDocument,
   Location,
   MemberWithAttendances,
   Team,
+  UpdateGameDocument,
+  type CreateGameMutationVariables,
+  type UpdateGameMutationVariables,
 } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import { CategoryBadge } from '@/components/foundation/category-badge';
@@ -56,6 +61,15 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
     },
   });
 
+  const { mutateAsync: createGame } = useMutation({
+    mutationFn: (input: CreateGameMutationVariables['input']) =>
+      gqlRequest(CreateGameDocument, { input }),
+  });
+  const { mutateAsync: updateGame } = useMutation({
+    mutationFn: (input: UpdateGameMutationVariables['input']) =>
+      gqlRequest(UpdateGameDocument, { input }),
+  });
+
   const isViewMode = formState === 'view';
   const isEditMode = formState === 'edit';
   const isCreateMode = formState === 'create';
@@ -70,17 +84,17 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
     const date = new Date(data.date);
 
     if (formState === 'edit') {
-      const res = await updateGame({
-        ...data,
-        id: selectedActivity!.id,
-        date: date.toISOString(),
-        teamId: routeKey,
-        type: ActivityType.Game,
-        location: Location.Home,
-      });
-      if (!res.ok) {
-        toast.error(res.error);
-        return;
+      try {
+        await updateGame({
+          ...data,
+          id: selectedActivity!.id,
+          date: date.toISOString(),
+          teamId: routeKey,
+          type: ActivityType.Game,
+          location: Location.Home,
+        });
+      } catch {
+        return; // the global handler already toasted
       }
       router.refresh();
       setFormState('view');
@@ -89,15 +103,15 @@ const GameForm: FC<GameFormProps> = ({ onClose, mode, member }) => {
         position: 'top-center',
       });
     } else {
-      const res = await createGame({
-        ...data,
-        date: date.toISOString(),
-        teamId: routeKey,
-        type: ActivityType.Game,
-        location: Location.Home,
-      });
-      if (!res.ok) {
-        toast.error(res.error);
+      try {
+        await createGame({
+          ...data,
+          date: date.toISOString(),
+          teamId: routeKey,
+          type: ActivityType.Game,
+          location: Location.Home,
+        });
+      } catch {
         return;
       }
       onClose();

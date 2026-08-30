@@ -1,25 +1,23 @@
-import { useQuery } from '@apollo/client/react';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { gqlRequest } from '@/lib/graphql/client-request';
 import {
   GetStatsPerGameDocument,
-  GetStatsPerGameQuery,
-  GetStatsPerGameQueryVariables,
+  type GetStatsPerGameQueryVariables,
 } from '@/graphql/graphql';
 
 export function useStatsPerGame(input: GetStatsPerGameQueryVariables['input']) {
-  const { data, loading, error } = useQuery<
-    GetStatsPerGameQuery,
-    GetStatsPerGameQueryVariables
-  >(GetStatsPerGameDocument, {
-    variables: { input },
-    skip: !input.routeKey || !input.memberId,
-    fetchPolicy: 'cache-first',
-    nextFetchPolicy: 'cache-first',
-    returnPartialData: true,
+  const enabled = Boolean(input.routeKey && input.memberId);
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['statsPerGame', input],
+    queryFn: () => gqlRequest(GetStatsPerGameDocument, { input }),
+    enabled,
+    placeholderData: keepPreviousData,
   });
 
   return {
     statsPerGame: data?.getStatsPerGame ?? [],
-    loading,
-    error,
+    loading: isLoading,
+    error: error ?? undefined,
   };
 }

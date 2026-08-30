@@ -3,13 +3,12 @@
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { teamInviteStatusCopy } from '../utils/status-copy';
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from '@tanstack/react-query';
 import { CheckCircle2, Loader2, ShieldAlert, TicketX } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import { gqlRequest } from '@/lib/graphql/client-request';
 import {
   AcceptTeamInviteDocument,
-  AcceptTeamInviteMutation,
-  AcceptTeamInviteMutationVariables,
   AcceptTeamInviteStatus,
 } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
@@ -22,22 +21,22 @@ export function AcceptTeamInviteCard({ token }: AcceptTeamInviteCardProps) {
   const router = useRouter();
   const { update } = useSession();
   const hasSubmittedRef = useRef(false);
-  const [acceptTeamInvite, { data, loading, error }] = useMutation<
-    AcceptTeamInviteMutation,
-    AcceptTeamInviteMutationVariables
-  >(AcceptTeamInviteDocument);
+  const {
+    mutate: acceptTeamInvite,
+    data,
+    isPending: loading,
+    error,
+  } = useMutation({
+    mutationFn: (inviteToken: string) =>
+      gqlRequest(AcceptTeamInviteDocument, { input: { token: inviteToken } }),
+    meta: { skipGlobalErrorToast: true }, // this card renders its own error state
+  });
 
   useEffect(() => {
     if (hasSubmittedRef.current) return;
     hasSubmittedRef.current = true;
 
-    void acceptTeamInvite({
-      variables: {
-        input: {
-          token,
-        },
-      },
-    });
+    acceptTeamInvite(token);
   }, [acceptTeamInvite, token]);
 
   useEffect(() => {

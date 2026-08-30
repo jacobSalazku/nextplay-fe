@@ -3,18 +3,23 @@
 import { useRouter } from 'next/navigation';
 import { submitUpdateUser } from '../actions/update-user';
 import { UpdateUserData, updateUserSchema } from '../zod';
-import { useMutation } from '@apollo/client/react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
-import { UpdateUserDocument } from '@/graphql/graphql';
+import { gqlRequest } from '@/lib/graphql/client-request';
+import { UpdateUserDocument, type UpdateUserInput } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import { Input } from '@/components/foundation/input';
 import { RadioGroup } from '@/components/foundation/radio/radio-group';
 import { RadioGroupItem } from '@/components/foundation/radio/radio-group-item';
 
 const UserUpdateForm = () => {
-  const [runUpdateUser] = useMutation(UpdateUserDocument);
+  const { mutateAsync: runUpdateUser } = useMutation({
+    mutationFn: (input: UpdateUserInput) =>
+      gqlRequest(UpdateUserDocument, { input }),
+    meta: { skipGlobalErrorToast: true },
+  });
   const router = useRouter();
   const { data: session, status, update } = useSession();
 
