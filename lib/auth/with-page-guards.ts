@@ -4,7 +4,7 @@ import { type ReactNode } from 'react';
 import {
   requireAccessToken,
   requireNotOnboarded,
-} from './require-acces-token';
+} from './require-access-token';
 
 type ServerPage<Props extends object = object> = (
   props: Props,
