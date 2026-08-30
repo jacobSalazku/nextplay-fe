@@ -43,7 +43,11 @@ vi.mock('next-auth/react', async (importOriginal) => {
   return {
     ...actual,
     getSession: vi.fn(() => Promise.resolve(session)),
-    useSession: vi.fn(() => ({ data: session, status: 'authenticated' })),
+    useSession: vi.fn(() => ({
+      data: session,
+      status: 'authenticated',
+      update: vi.fn(() => Promise.resolve(session)),
+    })),
   };
 });
 
