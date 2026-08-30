@@ -12,6 +12,18 @@ vi.mock('next/image', () => ({
     createElement('img', { ...props, alt: props.alt ?? '' }),
 }));
 
+// A logged-in session, so getSession() / useSession() don't try to hit
+// /api/auth/session (which MSW would then reject as unhandled).
+vi.mock('next-auth/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('next-auth/react')>();
+  const session = { accessToken: 'test-token', user: { id: 'u1' } };
+  return {
+    ...actual,
+    getSession: vi.fn(() => Promise.resolve(session)),
+    useSession: vi.fn(() => ({ data: session, status: 'authenticated' })),
+  };
+});
+
 // A request with no matching handler is a test bug, not a silent pass.
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 
