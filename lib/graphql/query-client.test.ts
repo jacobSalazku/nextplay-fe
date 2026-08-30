@@ -6,10 +6,14 @@ import { createQueryClient } from './query-client';
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
 /** Run one mutation through the client's shared MutationCache. */
-async function runFailingMutation(reason: unknown) {
+async function runFailingMutation(
+  reason: unknown,
+  meta?: { skipGlobalErrorToast?: boolean },
+) {
   const client = createQueryClient();
   const observer = new MutationObserver(client, {
     mutationFn: () => Promise.reject(reason),
+    meta,
   });
   await observer.mutate().catch(() => undefined);
 }
@@ -33,6 +37,18 @@ describe('createQueryClient — global mutation error handling', () => {
       'Something went wrong',
       expect.anything(),
     );
+  });
+
+  it('skips the toast (but still logs) when meta.skipGlobalErrorToast is set', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    await runFailingMutation(new Error('handled inline'), {
+      skipGlobalErrorToast: true,
+    });
+
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(spy).toHaveBeenCalled();
+    spy.mockRestore();
   });
 
   it('logs the error', async () => {

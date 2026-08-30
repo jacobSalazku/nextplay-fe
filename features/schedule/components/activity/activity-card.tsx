@@ -2,18 +2,20 @@
 
 import { type FC } from 'react';
 import { useRouter } from 'next/navigation';
-import { deleteActivity } from '../../actions/mutations';
 import { useTeam } from '@/context/team-context';
 import { deleteToastStyling } from '@/features/toast-notification/styling';
 import useStore from '@/store/store';
 import { getActivityStyle } from '@/utils';
 import { cn } from '@/utils/tw-merge';
+import { useMutation } from '@tanstack/react-query';
 import { isToday } from 'date-fns';
 import { Clock, Trash } from 'lucide-react';
 import { toast } from 'sonner';
+import { gqlRequest } from '@/lib/graphql/client-request';
 import {
   Activity,
   ActivityType,
+  DeleteActivityDocument,
   MemberWithAttendances,
 } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
@@ -56,19 +58,19 @@ export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
     }
   };
 
-  const handleDeleteActivity = async (id: string) => {
-    const res = await deleteActivity({ id, routeKey });
-    if (!res.ok) {
-      toast.error(res.error);
-      return;
-    }
+  const { mutate: deleteActivity } = useMutation({
+    mutationFn: (id: string) =>
+      gqlRequest(DeleteActivityDocument, { input: { id, routeKey } }),
+    onSuccess: () => {
+      router.refresh();
+      toast.success('Activity deleted', {
+        ...deleteToastStyling,
+        position: 'top-center',
+      });
+    },
+  });
 
-    router.refresh();
-    toast.success('Activity deleted', {
-      ...deleteToastStyling,
-      position: 'top-center',
-    });
-  };
+  const handleDeleteActivity = (id: string) => deleteActivity(id);
 
   const date = isToday(new Date(activity.date));
 

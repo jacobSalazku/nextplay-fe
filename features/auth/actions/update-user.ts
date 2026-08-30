@@ -1,14 +1,12 @@
 import { UpdateUserData } from '../zod';
+import type { UpdateUserInput } from '@/graphql/graphql';
 
 type SessionLike = { accessToken?: string; error?: string };
 type SubmitParams = {
   status: 'loading' | 'authenticated' | 'unauthenticated';
   session: SessionLike | null | undefined;
   data: UpdateUserData;
-  runUpdateUser: (args: {
-    variables: { input: UpdateUserData };
-    context: { headers: { Authorization: string } };
-  }) => Promise<unknown>;
+  runUpdateUser: (input: UpdateUserInput) => Promise<unknown>;
   update: (data?: { hasOnBoarded: boolean }) => Promise<unknown>;
   router: {
     push: (url: string) => void;
@@ -45,16 +43,9 @@ export async function submitUpdateUser({
 
   try {
     await runUpdateUser({
-      variables: {
-        input: {
-          ...data,
-          height: Number(data.height),
-          weight: Number(data.weight),
-        },
-      },
-      context: {
-        headers: { Authorization: `Bearer ${session.accessToken}` },
-      },
+      ...data,
+      height: Number(data.height),
+      weight: Number(data.weight),
     });
 
     await update({ hasOnBoarded: true });

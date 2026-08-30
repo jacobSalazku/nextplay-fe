@@ -10,10 +10,11 @@ import {
 } from '@/features/attendance/utils/attendance-status';
 import { deleteToastStyling } from '@/features/toast-notification/styling';
 import { cn } from '@/utils/tw-merge';
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { Calendar, UserIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { gqlRequest } from '@/lib/graphql/client-request';
 import {
   DeleteMemberDocument,
   GetUserProfileQuery,
@@ -45,8 +46,18 @@ const PlayerDetailPanel = ({
   userProfile: GetUserProfileQuery['getUserProfile'];
 }) => {
   const { routeKey } = useTeam();
-  const [deletePlayer] = useMutation(DeleteMemberDocument);
   const router = useRouter();
+  const { mutate: deletePlayer } = useMutation({
+    mutationFn: (id: string) =>
+      gqlRequest(DeleteMemberDocument, { input: { id, routeKey } }),
+    onSuccess: () => {
+      router.refresh();
+      toast.success('Player removed from team', {
+        ...deleteToastStyling,
+        position: 'top-center',
+      });
+    },
+  });
 
   if (!userProfile) {
     return <div className="p-6 text-center text-white">Player not found.</div>;
@@ -62,24 +73,7 @@ const PlayerDetailPanel = ({
       : 'Unknown position';
   const roleLabel = selectedPlayer.role === Role.Coach ? 'Coach' : 'Player';
 
-  const handleDeletePlayer = async (id: string) => {
-    try {
-      await deletePlayer({
-        variables: {
-          input: { id, routeKey },
-        },
-      });
-
-      router.refresh();
-      toast.success('Player removed from team', {
-        ...deleteToastStyling,
-        position: 'top-center',
-      });
-    } catch (error) {
-      console.log(error);
-      toast.error('Failed to remove player');
-    }
-  };
+  const handleDeletePlayer = (id: string) => deletePlayer(id);
 
   return (
     <div className="relative mx-auto w-full max-w-5xl px-4 py-8 text-white sm:px-6 lg:px-8">

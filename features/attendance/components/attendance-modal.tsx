@@ -5,13 +5,16 @@ import { attendanceStatus } from '../utils/const';
 import { type AttendanceData, type AttendanceStatusOption } from '../zod';
 import { useTeam } from '@/context/team-context';
 import useStore from '@/store/store';
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { X } from 'lucide-react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
+import { gqlRequest } from '@/lib/graphql/client-request';
 import {
+  AttendanceStatus,
   MemberWithAttendances,
   SubmitAttendanceDocument,
+  type SubmitAttendanceMutationVariables,
 } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import { RadioGroup } from '@/components/foundation/radio/radio-group';
@@ -30,7 +33,10 @@ const AttendanceModal: FC<AttendanceProps> = ({ mode, member }) => {
     useStore();
 
   const { routeKey } = useTeam();
-  const [submitAttendance] = useMutation(SubmitAttendanceDocument);
+  const { mutateAsync: submitAttendance } = useMutation({
+    mutationFn: (input: SubmitAttendanceMutationVariables['input']) =>
+      gqlRequest(SubmitAttendanceDocument, { input }),
+  });
 
   const { handleSubmit, register, control, reset } = useForm<AttendanceData>({
     defaultValues: {
@@ -62,15 +68,12 @@ const AttendanceModal: FC<AttendanceProps> = ({ mode, member }) => {
     }
 
     await submitAttendance({
-      variables: {
-        input: {
-          routeKey,
-          activityId: selectedActivity.id,
-          memberId: member.id,
-          attendanceStatus: attendance.attendanceStatus,
-          reason: attendance.reason ?? '',
-        },
-      },
+      routeKey,
+      activityId: selectedActivity.id,
+      memberId: member.id,
+      // the form's zod enum values are exactly the AttendanceStatus values
+      attendanceStatus: attendance.attendanceStatus as AttendanceStatus,
+      reason: attendance.reason ?? '',
     });
 
     if (isGame) setOpenGameAttendance(false);

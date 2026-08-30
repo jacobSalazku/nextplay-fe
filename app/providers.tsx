@@ -1,10 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ApolloProvider } from '@apollo/client/react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider, useSession } from 'next-auth/react';
-import { apolloClient } from '@/lib/apollo/apollo-client';
 import { setGraphqlToken } from '@/lib/graphql/client-token';
 import { createQueryClient } from '@/lib/graphql/query-client';
 
@@ -26,8 +24,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <SessionProvider refetchOnWindowFocus>
       <QueryClientProvider client={queryClient}>
         <GraphqlTokenSync />
-        {/* ApolloProvider stays until every mutation is migrated to TanStack Query. */}
-        <ApolloProvider client={apolloClient}>{children}</ApolloProvider>
+        {children}
       </QueryClientProvider>
     </SessionProvider>
   );

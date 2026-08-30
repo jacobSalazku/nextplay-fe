@@ -5,6 +5,29 @@ import { afterAll, afterEach, beforeAll, beforeEach, vi } from 'vitest';
 import { setGraphqlToken } from '@/lib/graphql/client-token';
 import { server } from './msw/server';
 
+// jsdom gaps that Radix-based components (radio groups, dialogs, …) touch.
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+if (!Element.prototype.scrollIntoView) {
+  Element.prototype.scrollIntoView = () => {};
+}
+if (!window.matchMedia) {
+  window.matchMedia = (query) =>
+    ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    }) as MediaQueryList;
+}
+
 // next/image pulls in the whole Next image pipeline; a plain <img> is enough
 // for behaviour tests and doesn't depend on the Next runtime.
 vi.mock('next/image', () => ({
@@ -20,7 +43,11 @@ vi.mock('next-auth/react', async (importOriginal) => {
   return {
     ...actual,
     getSession: vi.fn(() => Promise.resolve(session)),
-    useSession: vi.fn(() => ({ data: session, status: 'authenticated' })),
+    useSession: vi.fn(() => ({
+      data: session,
+      status: 'authenticated',
+      update: vi.fn(() => Promise.resolve(session)),
+    })),
   };
 });
 
