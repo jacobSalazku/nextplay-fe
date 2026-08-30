@@ -3,11 +3,16 @@
 import type { ComponentProps } from 'react';
 import { cn } from '@/utils/tw-merge';
 
-const Table = ({ className, ...props }: ComponentProps<'table'>) => {
+type TableProps = ComponentProps<'table'> & {
+  /** Extra classes for the scroll container that wraps the table. */
+  containerClassName?: string;
+};
+
+const Table = ({ className, containerClassName, ...props }: TableProps) => {
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto"
+      className={cn('relative w-full overflow-x-auto', containerClassName)}
     >
       <table
         data-slot="table"
