@@ -1,4 +1,4 @@
-import { print } from '@apollo/client/utilities';
+import { type DocumentNode, print } from 'graphql/language';
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 
 type GraphQLResponse<T> = {
@@ -19,7 +19,7 @@ export async function authMutation<
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      query: print(document),
+      query: print(document as unknown as DocumentNode),
       variables,
     }),
     cache: 'no-store',

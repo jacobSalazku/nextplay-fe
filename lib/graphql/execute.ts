@@ -1,8 +1,8 @@
-import { authOptions } from '../auth/options';
-import { OperationVariables, TypedDocumentNode } from '@apollo/client';
-import { print } from '@apollo/client/utilities';
+import 'server-only';
+import { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import { print, type DocumentNode } from 'graphql/language';
 import { getServerSession } from 'next-auth';
-import { createApolloClient } from './server-client';
+import { authOptions } from '@/lib/auth/options';
 
 type GraphQLResponse<T> = {
   data?: T;
@@ -24,6 +24,10 @@ export type ExecuteGraphQLOptions = {
   fetchOptions?: GraphQLFetchOptions;
 };
 
+/**
+ * The single server-side GraphQL transport. Runs during RSC render / route
+ * handlers only. Client components go through Server Actions, never this.
+ */
 export async function executeGraphQL<
   TData,
   TVariables extends Record<string, unknown>,
@@ -46,7 +50,7 @@ export async function executeGraphQL<
       ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
     },
     body: JSON.stringify({
-      query: print(document),
+      query: print(document as unknown as DocumentNode),
       variables,
     }),
     cache: options?.fetchOptions?.cache ?? 'no-store',
@@ -69,27 +73,3 @@ export async function executeGraphQL<
 
   return json.data;
 }
-
-export async function performMutation<
-  TData,
-  TVariables extends OperationVariables,
->(
-  document: TypedDocumentNode<TData, TVariables>,
-  variables: TVariables,
-): Promise<TData> {
-  const client = await createApolloClient();
-
-  const { data } = await client.mutate<TData, TVariables>({
-    mutation: document,
-    variables,
-  });
-
-  if (!data) {
-    throw new Error('No data returned from mutation');
-  }
-
-  return data as TData;
-}
-
-export const performGraphQLRequest = executeGraphQL;
-export const performGraphQLMutation = performMutation;

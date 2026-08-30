@@ -1,3 +1,4 @@
+import 'server-only';
 import { executeAuthedGraphQL } from '@/lib/auth/server-authed';
 import { GetUserDocument } from '@/graphql/graphql';
 
