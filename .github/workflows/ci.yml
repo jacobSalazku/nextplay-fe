@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  # codegen.ts throws if this is unset; the value is only used when codegen
+  # pulls the schema from a live endpoint, which CI never does.
+  NEXT_PUBLIC_GRAPHQL_ENDPOINT: http://localhost:3001/graphql
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm exec eslint .
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Build
+        run: pnpm build
+        env:
+          AUTH_SECRET: ci-build-only
+          NEXTAUTH_SECRET: ci-build-only
+
+      # Cross-repo schema drift: regenerate the typed client from the
+      # backend's committed schema and fail if graphql/ changed. Needs a PAT
+      # with read access to nextplay-be while that repo is private.
+      - name: GraphQL types match the backend schema
+        if: ${{ secrets.NEXTPLAY_BE_TOKEN != '' }}
+        run: |
+          curl -sfL \
+            -H "Authorization: token ${{ secrets.NEXTPLAY_BE_TOKEN }}" \
+            -H "Accept: application/vnd.github.raw" \
+            "https://api.github.com/repos/jacobSalazku/nextplay-be/contents/graphql/schema.graphql?ref=main" \
+            -o schema.be.graphql
+          pnpm exec graphql-codegen --config codegen.ts --overwrite --schema schema.be.graphql
+          rm schema.be.graphql
+          git diff --exit-code graphql/graphql.ts graphql/gql.ts

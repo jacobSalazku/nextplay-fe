@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
     "codegen": "graphql-codegen --config codegen.ts",
+    "codegen:check": "pnpm codegen && git diff --exit-code graphql/graphql.ts graphql/gql.ts",
     "studio": ""
   },
   "dependencies": {

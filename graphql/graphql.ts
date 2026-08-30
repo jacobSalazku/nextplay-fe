@@ -15,7 +15,7 @@ export type Scalars = {
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
-  DateTime: { input: any; output: any; }
+  DateTime: { input: string; output: string; }
 };
 
 export type AcceptTeamInviteInput = {
@@ -1179,7 +1179,7 @@ export type GetUserQueryVariables = Exact<{
 }>;
 
 
-export type GetUserQuery = { __typename?: 'Query', getCurrentUser: { __typename?: 'GetUserResponse', user: { __typename?: 'UserProfile', id: string, name?: string | null, email?: string | null, dateOfBirth?: any | null, phone?: string | null, height?: number | null, weight?: number | null, dominantHand?: string | null, hasOnBoarded?: boolean | null }, member: { __typename?: 'MemberWithAttendances', id: string, userId: string, teamId: string, role: Role, status: Status, number?: string | null, position?: string | null, attendances: Array<{ __typename?: 'PlayerActivityAttendance', id: string, activityId: string, memberId: string, attendanceStatus: AttendanceStatus, reason?: string | null, createdAt: any, updatedAt: any, activity?: { __typename?: 'AttendanceActivity', id: string, title: string, time: string, date: any } | null }> } } };
+export type GetUserQuery = { __typename?: 'Query', getCurrentUser: { __typename?: 'GetUserResponse', user: { __typename?: 'UserProfile', id: string, name?: string | null, email?: string | null, dateOfBirth?: string | null, phone?: string | null, height?: number | null, weight?: number | null, dominantHand?: string | null, hasOnBoarded?: boolean | null }, member: { __typename?: 'MemberWithAttendances', id: string, userId: string, teamId: string, role: Role, status: Status, number?: string | null, position?: string | null, attendances: Array<{ __typename?: 'PlayerActivityAttendance', id: string, activityId: string, memberId: string, attendanceStatus: AttendanceStatus, reason?: string | null, createdAt: string, updatedAt: string, activity?: { __typename?: 'AttendanceActivity', id: string, title: string, time: string, date: string } | null }> } } };
 
 export type CreateTeamMutationVariables = Exact<{
   input: CreateTeamInput;
@@ -1226,40 +1226,40 @@ export type UpdateUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', name?: string | null, dateOfBirth?: any | null, phone?: string | null, height?: number | null, weight?: number | null, dominantHand?: string | null } };
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', name?: string | null, dateOfBirth?: string | null, phone?: string | null, height?: number | null, weight?: number | null, dominantHand?: string | null } };
 
 export type GetTeamForDashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetTeamForDashboardQuery = { __typename?: 'Query', getDashboardTeams: Array<{ __typename?: 'TeamDashboard', id: string, name: string, slug: string, shortId: string, routeKey: string, ageGroup?: string | null, members: Array<{ __typename?: 'MemberId', id: string }>, activities: Array<{ __typename?: 'Activity', id: string, type: ActivityType, title: string, date: any, time: string }> }> };
+export type GetTeamForDashboardQuery = { __typename?: 'Query', getDashboardTeams: Array<{ __typename?: 'TeamDashboard', id: string, name: string, slug: string, shortId: string, routeKey: string, ageGroup?: string | null, members: Array<{ __typename?: 'MemberId', id: string }>, activities: Array<{ __typename?: 'Activity', id: string, type: ActivityType, title: string, date: string, time: string }> }> };
 
 export type CreateGamePlanMutationVariables = Exact<{
   input: CreateGamePlanInput;
 }>;
 
 
-export type CreateGamePlanMutation = { __typename?: 'Mutation', createGamePlan: { __typename?: 'GamePlan', id: string, name: string, opponent?: string | null, notes?: string | null, activityId: string, teamId: string, createdAt: any, updatedAt: any, activity?: { __typename?: 'GamePlanActivity', id: string, title: string, date: any, time: string } | null, plays: Array<{ __typename?: 'GamePlanPlay', id: string, name: string, category: Category }> } };
+export type CreateGamePlanMutation = { __typename?: 'Mutation', createGamePlan: { __typename?: 'GamePlan', id: string, name: string, opponent?: string | null, notes?: string | null, activityId: string, teamId: string, createdAt: string, updatedAt: string, activity?: { __typename?: 'GamePlanActivity', id: string, title: string, date: string, time: string } | null, plays: Array<{ __typename?: 'GamePlanPlay', id: string, name: string, category: Category }> } };
 
 export type CreatePlayMutationVariables = Exact<{
   input: CreatePlayInput;
 }>;
 
 
-export type CreatePlayMutation = { __typename?: 'Mutation', createPlay: { __typename?: 'Play', id: string, routeKey: string, name: string, description: string, category: Category, canvas: string, createdAt: any, updatedAt: any } };
+export type CreatePlayMutation = { __typename?: 'Mutation', createPlay: { __typename?: 'Play', id: string, routeKey: string, name: string, description: string, category: Category, canvas: string, createdAt: string, updatedAt: string } };
 
 export type CreatePracticePreparationMutationVariables = Exact<{
   input: CreatePracticePreparationInput;
 }>;
 
 
-export type CreatePracticePreparationMutation = { __typename?: 'Mutation', createPracticePreparation: { __typename?: 'PracticePreparation', id: string, name: string, focus?: string | null, notes?: string | null, activityId?: string | null, teamId: string, createdAt: any, updatedAt: any, activity?: { __typename?: 'PracticePreparationActivity', id: string, title: string, date: any, time: string } | null, plays: Array<{ __typename?: 'PracticePreparationPlay', id: string, name: string, category: Category }> } };
+export type CreatePracticePreparationMutation = { __typename?: 'Mutation', createPracticePreparation: { __typename?: 'PracticePreparation', id: string, name: string, focus?: string | null, notes?: string | null, activityId?: string | null, teamId: string, createdAt: string, updatedAt: string, activity?: { __typename?: 'PracticePreparationActivity', id: string, title: string, date: string, time: string } | null, plays: Array<{ __typename?: 'PracticePreparationPlay', id: string, name: string, category: Category }> } };
 
 export type DeleteGamePlanMutationVariables = Exact<{
   input: DeleteGamePlanInput;
 }>;
 
 
-export type DeleteGamePlanMutation = { __typename?: 'Mutation', deleteGamePlan: { __typename?: 'GamePlan', id: string, name: string, opponent?: string | null, notes?: string | null, activityId: string, teamId: string, createdAt: any, updatedAt: any, activity?: { __typename?: 'GamePlanActivity', id: string, title: string, date: any, time: string } | null, plays: Array<{ __typename?: 'GamePlanPlay', id: string, name: string, category: Category }> } };
+export type DeleteGamePlanMutation = { __typename?: 'Mutation', deleteGamePlan: { __typename?: 'GamePlan', id: string, name: string, opponent?: string | null, notes?: string | null, activityId: string, teamId: string, createdAt: string, updatedAt: string, activity?: { __typename?: 'GamePlanActivity', id: string, title: string, date: string, time: string } | null, plays: Array<{ __typename?: 'GamePlanPlay', id: string, name: string, category: Category }> } };
 
 export type DeletePlayMutationVariables = Exact<{
   input: DeletePlayInput;
@@ -1273,105 +1273,105 @@ export type DeletePracticePreparationMutationVariables = Exact<{
 }>;
 
 
-export type DeletePracticePreparationMutation = { __typename?: 'Mutation', deletePracticePreparation: { __typename?: 'PracticePreparation', id: string, name: string, focus?: string | null, notes?: string | null, activityId?: string | null, teamId: string, createdAt: any, updatedAt: any, activity?: { __typename?: 'PracticePreparationActivity', id: string, title: string, date: any, time: string } | null, plays: Array<{ __typename?: 'PracticePreparationPlay', id: string, name: string, category: Category }> } };
+export type DeletePracticePreparationMutation = { __typename?: 'Mutation', deletePracticePreparation: { __typename?: 'PracticePreparation', id: string, name: string, focus?: string | null, notes?: string | null, activityId?: string | null, teamId: string, createdAt: string, updatedAt: string, activity?: { __typename?: 'PracticePreparationActivity', id: string, title: string, date: string, time: string } | null, plays: Array<{ __typename?: 'PracticePreparationPlay', id: string, name: string, category: Category }> } };
 
 export type GetGameplanQueryVariables = Exact<{
   input: GetGamePlansInput;
 }>;
 
 
-export type GetGameplanQuery = { __typename?: 'Query', getGameplan: Array<{ __typename?: 'GamePlan', id: string, name: string, opponent?: string | null, notes?: string | null, activityId: string, teamId: string, createdAt: any, updatedAt: any, activity?: { __typename?: 'GamePlanActivity', id: string, title: string, date: any, time: string } | null, plays: Array<{ __typename?: 'GamePlanPlay', id: string, name: string, category: Category }> }> };
+export type GetGameplanQuery = { __typename?: 'Query', getGameplan: Array<{ __typename?: 'GamePlan', id: string, name: string, opponent?: string | null, notes?: string | null, activityId: string, teamId: string, createdAt: string, updatedAt: string, activity?: { __typename?: 'GamePlanActivity', id: string, title: string, date: string, time: string } | null, plays: Array<{ __typename?: 'GamePlanPlay', id: string, name: string, category: Category }> }> };
 
 export type GetGameplanByIdQueryVariables = Exact<{
   input: GetGamePlanByIdInput;
 }>;
 
 
-export type GetGameplanByIdQuery = { __typename?: 'Query', getGameplanById?: { __typename?: 'GamePlan', id: string, name: string, opponent?: string | null, notes?: string | null, activityId: string, teamId: string, createdAt: any, updatedAt: any, activity?: { __typename?: 'GamePlanActivity', id: string, title: string, date: any, time: string } | null, plays: Array<{ __typename?: 'GamePlanPlay', id: string, name: string, category: Category }> } | null };
+export type GetGameplanByIdQuery = { __typename?: 'Query', getGameplanById?: { __typename?: 'GamePlan', id: string, name: string, opponent?: string | null, notes?: string | null, activityId: string, teamId: string, createdAt: string, updatedAt: string, activity?: { __typename?: 'GamePlanActivity', id: string, title: string, date: string, time: string } | null, plays: Array<{ __typename?: 'GamePlanPlay', id: string, name: string, category: Category }> } | null };
 
 export type GetGamesQueryVariables = Exact<{
   input: GetActivitiesInput;
 }>;
 
 
-export type GetGamesQuery = { __typename?: 'Query', getGames: Array<{ __typename?: 'Activity', id: string, date: any, time: string, game?: { __typename?: 'Game', id: string, title: string, date: any, time: string, activityId: string, location: Location, opponentStatline?: { __typename?: 'OpponentStatline', activityId: string, name: string, fieldGoalsMade: number, threePointersMade: number, freeThrowsMade: number } | null } | null }> };
+export type GetGamesQuery = { __typename?: 'Query', getGames: Array<{ __typename?: 'Activity', id: string, date: string, time: string, game?: { __typename?: 'Game', id: string, title: string, date: string, time: string, activityId: string, location: Location, opponentStatline?: { __typename?: 'OpponentStatline', activityId: string, name: string, fieldGoalsMade: number, threePointersMade: number, freeThrowsMade: number } | null } | null }> };
 
 export type GetPlayQueryVariables = Exact<{
   input: GetPlayInput;
 }>;
 
 
-export type GetPlayQuery = { __typename?: 'Query', getPlay?: { __typename?: 'Play', id: string, routeKey: string, name: string, category: Category, description: string, canvas: string, createdAt: any, updatedAt: any } | null };
+export type GetPlayQuery = { __typename?: 'Query', getPlay?: { __typename?: 'Play', id: string, routeKey: string, name: string, category: Category, description: string, canvas: string, createdAt: string, updatedAt: string } | null };
 
 export type GetPlaysQueryVariables = Exact<{
   input: GetPlaysInput;
 }>;
 
 
-export type GetPlaysQuery = { __typename?: 'Query', getPlays: Array<{ __typename?: 'Play', id: string, routeKey: string, name: string, category: Category, description: string, canvas: string, createdAt: any, updatedAt: any }> };
+export type GetPlaysQuery = { __typename?: 'Query', getPlays: Array<{ __typename?: 'Play', id: string, routeKey: string, name: string, category: Category, description: string, canvas: string, createdAt: string, updatedAt: string }> };
 
 export type GetPracticePreparationByIdQueryVariables = Exact<{
   input: GetPracticePreparationByIdInput;
 }>;
 
 
-export type GetPracticePreparationByIdQuery = { __typename?: 'Query', getPracticePreparationById?: { __typename?: 'PracticePreparation', id: string, name: string, focus?: string | null, notes?: string | null, activityId?: string | null, teamId: string, createdAt: any, updatedAt: any, activity?: { __typename?: 'PracticePreparationActivity', id: string, title: string, date: any, time: string } | null, plays: Array<{ __typename?: 'PracticePreparationPlay', id: string, name: string, category: Category }> } | null };
+export type GetPracticePreparationByIdQuery = { __typename?: 'Query', getPracticePreparationById?: { __typename?: 'PracticePreparation', id: string, name: string, focus?: string | null, notes?: string | null, activityId?: string | null, teamId: string, createdAt: string, updatedAt: string, activity?: { __typename?: 'PracticePreparationActivity', id: string, title: string, date: string, time: string } | null, plays: Array<{ __typename?: 'PracticePreparationPlay', id: string, name: string, category: Category }> } | null };
 
 export type GetPracticePreparationsQueryVariables = Exact<{
   input: GetPracticePreparationsInput;
 }>;
 
 
-export type GetPracticePreparationsQuery = { __typename?: 'Query', getPracticePreparations: Array<{ __typename?: 'PracticePreparation', id: string, name: string, focus?: string | null, notes?: string | null, activityId?: string | null, teamId: string, createdAt: any, updatedAt: any, activity?: { __typename?: 'PracticePreparationActivity', id: string, title: string, date: any, time: string } | null, plays: Array<{ __typename?: 'PracticePreparationPlay', id: string, name: string, category: Category }> }> };
+export type GetPracticePreparationsQuery = { __typename?: 'Query', getPracticePreparations: Array<{ __typename?: 'PracticePreparation', id: string, name: string, focus?: string | null, notes?: string | null, activityId?: string | null, teamId: string, createdAt: string, updatedAt: string, activity?: { __typename?: 'PracticePreparationActivity', id: string, title: string, date: string, time: string } | null, plays: Array<{ __typename?: 'PracticePreparationPlay', id: string, name: string, category: Category }> }> };
 
 export type GetPracticesQueryVariables = Exact<{
   input: GetActivitiesInput;
 }>;
 
 
-export type GetPracticesQuery = { __typename?: 'Query', getPractices: Array<{ __typename?: 'Activity', practice?: { __typename?: 'Practice', id: string, title: string, date: any, time: string, activityId: string, facility: string, practicetype: string } | null }> };
+export type GetPracticesQuery = { __typename?: 'Query', getPractices: Array<{ __typename?: 'Activity', practice?: { __typename?: 'Practice', id: string, title: string, date: string, time: string, activityId: string, facility: string, practicetype: string } | null }> };
 
 export type GetTeamActivitiesQueryVariables = Exact<{
   routeKey: Scalars['String']['input'];
 }>;
 
 
-export type GetTeamActivitiesQuery = { __typename?: 'Query', getTeamActivities: { __typename?: 'Team', id: string, name: string, code: string, slug: string, routeKey: string, shortId: string, image?: string | null, ageGroup?: string | null, createdAt?: any | null, updatedAt?: any | null, creatorId?: string | null, members: Array<{ __typename?: 'TeamMemberUser', id: string, name?: string | null, image?: string | null, teamId: string, userId: string }>, activities: Array<{ __typename?: 'Activity', id: string, teamId: string, type: ActivityType, title: string, time: string, duration?: number | null, date: any, createdAt: any, updatedAt: any, attendees: Array<{ __typename?: 'PlayerActivityAttendance', id: string, activityId: string, memberId: string, attendanceStatus: AttendanceStatus, reason?: string | null, createdAt: any, updatedAt: any }> }> } };
+export type GetTeamActivitiesQuery = { __typename?: 'Query', getTeamActivities: { __typename?: 'Team', id: string, name: string, code: string, slug: string, routeKey: string, shortId: string, image?: string | null, ageGroup?: string | null, createdAt?: string | null, updatedAt?: string | null, creatorId?: string | null, members: Array<{ __typename?: 'TeamMemberUser', id: string, name?: string | null, image?: string | null, teamId: string, userId: string }>, activities: Array<{ __typename?: 'Activity', id: string, teamId: string, type: ActivityType, title: string, time: string, duration?: number | null, date: string, createdAt: string, updatedAt: string, attendees: Array<{ __typename?: 'PlayerActivityAttendance', id: string, activityId: string, memberId: string, attendanceStatus: AttendanceStatus, reason?: string | null, createdAt: string, updatedAt: string }> }> } };
 
 export type CreateFeedbackMutationVariables = Exact<{
   input: CreateFeedbackInput;
 }>;
 
 
-export type CreateFeedbackMutation = { __typename?: 'Mutation', createFeedback: { __typename?: 'Activity', id: string, title: string, time: string, date: any, type: ActivityType, feedback?: { __typename?: 'Feedback', notes: string, coach: string } | null } };
+export type CreateFeedbackMutation = { __typename?: 'Mutation', createFeedback: { __typename?: 'Activity', id: string, title: string, time: string, date: string, type: ActivityType, feedback?: { __typename?: 'Feedback', notes: string, coach: string } | null } };
 
 export type CreateFilmMutationVariables = Exact<{
   input: CreateFilmInput;
 }>;
 
 
-export type CreateFilmMutation = { __typename?: 'Mutation', createFilm: { __typename?: 'Activity', id: string, title: string, time: string, date: any, type: ActivityType, film?: { __typename?: 'Film', notes: string } | null } };
+export type CreateFilmMutation = { __typename?: 'Mutation', createFilm: { __typename?: 'Activity', id: string, title: string, time: string, date: string, type: ActivityType, film?: { __typename?: 'Film', notes: string } | null } };
 
 export type CreateGameMutationVariables = Exact<{
   input: CreateGameInput;
 }>;
 
 
-export type CreateGameMutation = { __typename?: 'Mutation', createGame: { __typename?: 'Activity', id: string, title: string, time: string, date: any, duration?: number | null, type: ActivityType, game?: { __typename?: 'Game', location: Location } | null } };
+export type CreateGameMutation = { __typename?: 'Mutation', createGame: { __typename?: 'Activity', id: string, title: string, time: string, date: string, duration?: number | null, type: ActivityType, game?: { __typename?: 'Game', location: Location } | null } };
 
 export type CreateMeetingMutationVariables = Exact<{
   input: CreateMeetingInput;
 }>;
 
 
-export type CreateMeetingMutation = { __typename?: 'Mutation', createMeeting: { __typename?: 'Activity', id: string, title: string, time: string, date: any, duration?: number | null, type: ActivityType, meeting?: { __typename?: 'Meeting', notes: string } | null } };
+export type CreateMeetingMutation = { __typename?: 'Mutation', createMeeting: { __typename?: 'Activity', id: string, title: string, time: string, date: string, duration?: number | null, type: ActivityType, meeting?: { __typename?: 'Meeting', notes: string } | null } };
 
 export type CreatePracticeMutationVariables = Exact<{
   input: CreatePracticeInput;
 }>;
 
 
-export type CreatePracticeMutation = { __typename?: 'Mutation', createPractice: { __typename?: 'Activity', title: string, time: string, date: any, duration?: number | null, type: ActivityType, practice?: { __typename?: 'Practice', facility: string, practicetype: string } | null } };
+export type CreatePracticeMutation = { __typename?: 'Mutation', createPractice: { __typename?: 'Activity', title: string, time: string, date: string, duration?: number | null, type: ActivityType, practice?: { __typename?: 'Practice', facility: string, practicetype: string } | null } };
 
 export type DeleteActivityMutationVariables = Exact<{
   input: DeleteActivity;
@@ -1385,56 +1385,56 @@ export type UpdateFeedbackMutationVariables = Exact<{
 }>;
 
 
-export type UpdateFeedbackMutation = { __typename?: 'Mutation', updateFeedback: { __typename?: 'Activity', id: string, title: string, time: string, date: any, type: ActivityType, teamId: string, feedback?: { __typename?: 'Feedback', notes: string, coach: string } | null } };
+export type UpdateFeedbackMutation = { __typename?: 'Mutation', updateFeedback: { __typename?: 'Activity', id: string, title: string, time: string, date: string, type: ActivityType, teamId: string, feedback?: { __typename?: 'Feedback', notes: string, coach: string } | null } };
 
 export type UpdateFilmMutationVariables = Exact<{
   input: UpdateFilmInput;
 }>;
 
 
-export type UpdateFilmMutation = { __typename?: 'Mutation', updateFilm: { __typename?: 'Activity', id: string, title: string, time: string, date: any, type: ActivityType, teamId: string, film?: { __typename?: 'Film', notes: string } | null } };
+export type UpdateFilmMutation = { __typename?: 'Mutation', updateFilm: { __typename?: 'Activity', id: string, title: string, time: string, date: string, type: ActivityType, teamId: string, film?: { __typename?: 'Film', notes: string } | null } };
 
 export type UpdateGameMutationVariables = Exact<{
   input: UpdateGameInput;
 }>;
 
 
-export type UpdateGameMutation = { __typename?: 'Mutation', updateGame: { __typename?: 'Activity', id: string, title: string, time: string, date: any, duration?: number | null, type: ActivityType, teamId: string, game?: { __typename?: 'Game', location: Location } | null } };
+export type UpdateGameMutation = { __typename?: 'Mutation', updateGame: { __typename?: 'Activity', id: string, title: string, time: string, date: string, duration?: number | null, type: ActivityType, teamId: string, game?: { __typename?: 'Game', location: Location } | null } };
 
 export type UpdateMeetingMutationVariables = Exact<{
   input: UpdateMeetingInput;
 }>;
 
 
-export type UpdateMeetingMutation = { __typename?: 'Mutation', updateMeeting: { __typename?: 'Activity', id: string, title: string, time: string, date: any, duration?: number | null, type: ActivityType, teamId: string, meeting?: { __typename?: 'Meeting', notes: string } | null } };
+export type UpdateMeetingMutation = { __typename?: 'Mutation', updateMeeting: { __typename?: 'Activity', id: string, title: string, time: string, date: string, duration?: number | null, type: ActivityType, teamId: string, meeting?: { __typename?: 'Meeting', notes: string } | null } };
 
 export type UpdatePracticeMutationVariables = Exact<{
   input: UpdatePracticeInput;
 }>;
 
 
-export type UpdatePracticeMutation = { __typename?: 'Mutation', updatePractice: { __typename?: 'Activity', id: string, title: string, time: string, date: any, duration?: number | null, type: ActivityType, teamId: string, practice?: { __typename?: 'Practice', facility: string, practicetype: string } | null } };
+export type UpdatePracticeMutation = { __typename?: 'Mutation', updatePractice: { __typename?: 'Activity', id: string, title: string, time: string, date: string, duration?: number | null, type: ActivityType, teamId: string, practice?: { __typename?: 'Practice', facility: string, practicetype: string } | null } };
 
 export type GetActiveAttendedMembersQueryVariables = Exact<{
   input: ActiveAttendedMembersInput;
 }>;
 
 
-export type GetActiveAttendedMembersQuery = { __typename?: 'Query', getActiveAttendedMembers: Array<{ __typename?: 'MemberWithStatlines', id: string, userId: string, teamId: string, role: Role, status: Status, number?: string | null, position?: string | null, name?: string | null, user?: { __typename?: 'UserDetail', id: string, name?: string | null, image?: string | null, email?: string | null, dateOfBirth?: any | null, phone?: string | null, height?: number | null, weight?: number | null, dominantHand?: string | null, hasOnBoarded: boolean } | null, statlines: Array<{ __typename?: 'MemberStatline', id: string, activityId: string, fieldGoalsMade: number, fieldGoalsMissed: number, threePointersMade: number, threePointersMissed: number, freeThrows: number, missedFreeThrows: number, assists: number, steals: number, turnovers: number, offensiveRebounds: number, defensiveRebounds: number, blocks: number }> }> };
+export type GetActiveAttendedMembersQuery = { __typename?: 'Query', getActiveAttendedMembers: Array<{ __typename?: 'MemberWithStatlines', id: string, userId: string, teamId: string, role: Role, status: Status, number?: string | null, position?: string | null, name?: string | null, user?: { __typename?: 'UserDetail', id: string, name?: string | null, image?: string | null, email?: string | null, dateOfBirth?: string | null, phone?: string | null, height?: number | null, weight?: number | null, dominantHand?: string | null, hasOnBoarded: boolean } | null, statlines: Array<{ __typename?: 'MemberStatline', id: string, activityId: string, fieldGoalsMade: number, fieldGoalsMissed: number, threePointersMade: number, threePointersMissed: number, freeThrows: number, missedFreeThrows: number, assists: number, steals: number, turnovers: number, offensiveRebounds: number, defensiveRebounds: number, blocks: number }> }> };
 
 export type GetActivityQueryVariables = Exact<{
   input: GetActivityInput;
 }>;
 
 
-export type GetActivityQuery = { __typename?: 'Query', getActivity: { __typename?: 'Activity', id: string, title: string, time: string, type: ActivityType, duration?: number | null, date: any, createdAt: any, updatedAt: any, teamId: string, attendees: Array<{ __typename?: 'PlayerActivityAttendance', id: string, activityId: string, memberId: string, attendanceStatus: AttendanceStatus, reason?: string | null, createdAt: any, updatedAt: any }>, game?: { __typename?: 'Game', activityId: string, location: Location, opponentStatline?: { __typename?: 'OpponentStatline', activityId: string, name: string, fieldGoalsMade: number, threePointersMade: number, freeThrowsMade: number } | null } | null } };
+export type GetActivityQuery = { __typename?: 'Query', getActivity: { __typename?: 'Activity', id: string, title: string, time: string, type: ActivityType, duration?: number | null, date: string, createdAt: string, updatedAt: string, teamId: string, attendees: Array<{ __typename?: 'PlayerActivityAttendance', id: string, activityId: string, memberId: string, attendanceStatus: AttendanceStatus, reason?: string | null, createdAt: string, updatedAt: string }>, game?: { __typename?: 'Game', activityId: string, location: Location, opponentStatline?: { __typename?: 'OpponentStatline', activityId: string, name: string, fieldGoalsMade: number, threePointersMade: number, freeThrowsMade: number } | null } | null } };
 
 export type GetGamesWithBoxScoresQueryVariables = Exact<{
   input: TeamStatlineInput;
 }>;
 
 
-export type GetGamesWithBoxScoresQuery = { __typename?: 'Query', getGamesWithBoxScores: Array<{ __typename?: 'GameWithBoxScore', activityId: string, title: string, date: any, opponentName: string, opponentStats: { __typename?: 'OpponentTotalsBoxScore', fieldGoalsMade: number, threePointersMade: number, freeThrowsMade: number, points: number }, teamTotals: { __typename?: 'TeamTotalsBoxScore', fieldGoalsMade: number, threePointersMade: number, freeThrows: number, assists: number, offensiveRebounds: number, defensiveRebounds: number, steals: number, blocks: number, turnovers: number, points: number }, playerStats: Array<{ __typename?: 'PlayerBoxScore', memberId: string, name?: string | null, fieldGoalsMade: number, threePointersMade: number, freeThrows: number, assists: number, offensiveRebounds: number, defensiveRebounds: number, steals: number, blocks: number, turnovers: number, points: number }> }> };
+export type GetGamesWithBoxScoresQuery = { __typename?: 'Query', getGamesWithBoxScores: Array<{ __typename?: 'GameWithBoxScore', activityId: string, title: string, date: string, opponentName: string, opponentStats: { __typename?: 'OpponentTotalsBoxScore', fieldGoalsMade: number, threePointersMade: number, freeThrowsMade: number, points: number }, teamTotals: { __typename?: 'TeamTotalsBoxScore', fieldGoalsMade: number, threePointersMade: number, freeThrows: number, assists: number, offensiveRebounds: number, defensiveRebounds: number, steals: number, blocks: number, turnovers: number, points: number }, playerStats: Array<{ __typename?: 'PlayerBoxScore', memberId: string, name?: string | null, fieldGoalsMade: number, threePointersMade: number, freeThrows: number, assists: number, offensiveRebounds: number, defensiveRebounds: number, steals: number, blocks: number, turnovers: number, points: number }> }> };
 
 export type GetStatlineAveragesQueryVariables = Exact<{
   input: TeamStatlineInput;
@@ -1448,7 +1448,7 @@ export type GetStatsPerGameQueryVariables = Exact<{
 }>;
 
 
-export type GetStatsPerGameQuery = { __typename?: 'Query', getStatsPerGame: Array<{ __typename?: 'StatsPerGame', gameTitle: string, date?: any | null, points: number, assists: number, rebounds: number, steals: number }> };
+export type GetStatsPerGameQuery = { __typename?: 'Query', getStatsPerGame: Array<{ __typename?: 'StatsPerGame', gameTitle: string, date?: string | null, points: number, assists: number, rebounds: number, steals: number }> };
 
 export type GetTeamStatsQueryVariables = Exact<{
   input: TeamStatlineInput;
@@ -1483,7 +1483,7 @@ export type CreateTeamInviteMutationVariables = Exact<{
 }>;
 
 
-export type CreateTeamInviteMutation = { __typename?: 'Mutation', createTeamInvite: { __typename?: 'TeamInviteResponse', id: string, token: string, inviteLink: string, teamId: string, expiresAt: any, maxUses: number, usedCount: number, createdBy: string } };
+export type CreateTeamInviteMutation = { __typename?: 'Mutation', createTeamInvite: { __typename?: 'TeamInviteResponse', id: string, token: string, inviteLink: string, teamId: string, expiresAt: string, maxUses: number, usedCount: number, createdBy: string } };
 
 export type DeleteMemberMutationVariables = Exact<{
   input: DeleteMemberInput;
@@ -1497,21 +1497,21 @@ export type GetMembersQueryVariables = Exact<{
 }>;
 
 
-export type GetMembersQuery = { __typename?: 'Query', getMembers: Array<{ __typename?: 'MemberWithAttendances', id: string, userId: string, teamId: string, role: Role, status: Status, number?: string | null, position?: string | null, name?: string | null, attendances: Array<{ __typename?: 'PlayerActivityAttendance', id: string, activityId: string, memberId: string, attendanceStatus: AttendanceStatus, reason?: string | null, createdAt: any, updatedAt: any, activity?: { __typename?: 'AttendanceActivity', id: string, title: string, time: string, date: any } | null }>, user?: { __typename?: 'UserDetail', id: string, name?: string | null, email?: string | null, image?: string | null, dateOfBirth?: any | null, phone?: string | null, height?: number | null, weight?: number | null, dominantHand?: string | null, hasOnBoarded: boolean } | null }> };
+export type GetMembersQuery = { __typename?: 'Query', getMembers: Array<{ __typename?: 'MemberWithAttendances', id: string, userId: string, teamId: string, role: Role, status: Status, number?: string | null, position?: string | null, name?: string | null, attendances: Array<{ __typename?: 'PlayerActivityAttendance', id: string, activityId: string, memberId: string, attendanceStatus: AttendanceStatus, reason?: string | null, createdAt: string, updatedAt: string, activity?: { __typename?: 'AttendanceActivity', id: string, title: string, time: string, date: string } | null }>, user?: { __typename?: 'UserDetail', id: string, name?: string | null, email?: string | null, image?: string | null, dateOfBirth?: string | null, phone?: string | null, height?: number | null, weight?: number | null, dominantHand?: string | null, hasOnBoarded: boolean } | null }> };
 
 export type GetTeamQueryVariables = Exact<{
   input: GetTeamInput;
 }>;
 
 
-export type GetTeamQuery = { __typename?: 'Query', getTeam: { __typename?: 'TeamInformation', id: string, name: string, code: string, slug: string, shortId: string, routeKey: string, image?: string | null, ageGroup?: string | null, creatorId: string, createdAt: any, updatedAt: any, members: Array<{ __typename?: 'TeamMemberInfo', id: string, teamId: string, name?: string | null, number?: string | null, position?: string | null, image?: string | null, user: { __typename?: 'UserDetail', id: string, name?: string | null, email?: string | null, image?: string | null, dateOfBirth?: any | null, phone?: string | null, height?: number | null, weight?: number | null, dominantHand?: string | null, hasOnBoarded: boolean } }> } };
+export type GetTeamQuery = { __typename?: 'Query', getTeam: { __typename?: 'TeamInformation', id: string, name: string, code: string, slug: string, shortId: string, routeKey: string, image?: string | null, ageGroup?: string | null, creatorId: string, createdAt: string, updatedAt: string, members: Array<{ __typename?: 'TeamMemberInfo', id: string, teamId: string, name?: string | null, number?: string | null, position?: string | null, image?: string | null, user: { __typename?: 'UserDetail', id: string, name?: string | null, email?: string | null, image?: string | null, dateOfBirth?: string | null, phone?: string | null, height?: number | null, weight?: number | null, dominantHand?: string | null, hasOnBoarded: boolean } }> } };
 
 export type GetUserProfileQueryVariables = Exact<{
   input: GetMemberProfileInput;
 }>;
 
 
-export type GetUserProfileQuery = { __typename?: 'Query', getUserProfile: { __typename?: 'MemberWithAttendances', id: string, userId: string, teamId: string, role: Role, status: Status, number?: string | null, position?: string | null, name?: string | null, user?: { __typename?: 'UserDetail', id: string, name?: string | null, email?: string | null, image?: string | null, dateOfBirth?: any | null, phone?: string | null, height?: number | null, weight?: number | null, dominantHand?: string | null, hasOnBoarded: boolean } | null, attendances: Array<{ __typename?: 'PlayerActivityAttendance', id: string, activityId: string, memberId: string, attendanceStatus: AttendanceStatus, reason?: string | null, createdAt: any, updatedAt: any, activity?: { __typename?: 'AttendanceActivity', id: string, title: string, time: string, date: any } | null }> } };
+export type GetUserProfileQuery = { __typename?: 'Query', getUserProfile: { __typename?: 'MemberWithAttendances', id: string, userId: string, teamId: string, role: Role, status: Status, number?: string | null, position?: string | null, name?: string | null, user?: { __typename?: 'UserDetail', id: string, name?: string | null, email?: string | null, image?: string | null, dateOfBirth?: string | null, phone?: string | null, height?: number | null, weight?: number | null, dominantHand?: string | null, hasOnBoarded: boolean } | null, attendances: Array<{ __typename?: 'PlayerActivityAttendance', id: string, activityId: string, memberId: string, attendanceStatus: AttendanceStatus, reason?: string | null, createdAt: string, updatedAt: string, activity?: { __typename?: 'AttendanceActivity', id: string, title: string, time: string, date: string } | null }> } };
 
 
 export const GetUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"teamShortId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCurrentUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"teamShortId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"teamShortId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"dateOfBirth"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"dominantHand"}},{"kind":"Field","name":{"kind":"Name","value":"hasOnBoarded"}}]}},{"kind":"Field","name":{"kind":"Name","value":"member"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"number"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"attendances"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"activityId"}},{"kind":"Field","name":{"kind":"Name","value":"memberId"}},{"kind":"Field","name":{"kind":"Name","value":"attendanceStatus"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"activity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"time"}},{"kind":"Field","name":{"kind":"Name","value":"date"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetUserQuery, GetUserQueryVariables>;
