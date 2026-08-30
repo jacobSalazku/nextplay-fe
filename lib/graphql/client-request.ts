@@ -1,18 +1,46 @@
 'use client';
 
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { type DocumentNode, print } from 'graphql/language';
+import { print, type DocumentNode } from 'graphql/language';
 import { getGraphqlToken } from './client-token';
 
 type GraphQLResponse<T> = {
-  data?: T;
+  data?: T | null;
   errors?: { message: string }[];
 };
 
+/** NestJS error body: auth guards, throttler, 5xx. */
+type HttpErrorBody = {
+  statusCode?: number;
+  message?: string | string[];
+  error?: string;
+};
+
+/** Read the body once; tolerate empty or non-JSON. */
+async function readBody(res: Response): Promise<unknown> {
+  const text = await res.text();
+  if (!text) return undefined;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text; // proxy HTML error page, gateway timeout, etc.
+  }
+}
+
+function httpErrorMessage(status: number, body: unknown): string {
+  if (body && typeof body === 'object') {
+    const { message } = body as HttpErrorBody;
+    if (Array.isArray(message) && message.length) return message.join(', ');
+    if (typeof message === 'string' && message) return message;
+  }
+  if (typeof body === 'string' && body.trim()) return body.trim();
+  return `Request failed (${status})`;
+}
+
 /**
- * The single client-side GraphQL transport, used by TanStack Query
- * `mutationFn` / `queryFn`. Throws `Error(message)` on a GraphQL error so
- * `useMutation`'s `onError` receives the real backend message.
+ * The single client-side GraphQL transport for TanStack Query
+ * `mutationFn` / `queryFn`. Always throws `Error(message)` on failure so
+ * `useMutation`'s `onError` can surface it directly.
  */
 export async function gqlRequest<
   TData,
@@ -23,25 +51,38 @@ export async function gqlRequest<
 ): Promise<TData> {
   const token = getGraphqlToken();
 
-  const res = await fetch(process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({
-      query: print(document as unknown as DocumentNode),
-      variables,
-    }),
-  });
-
-  const json = (await res.json()) as GraphQLResponse<TData>;
-
-  if (json.errors?.length) {
-    throw new Error(json.errors[0].message);
+  let res: Response;
+  try {
+    res = await fetch(process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({
+        // branded TypedDocumentNode isn't structurally a DocumentNode for `print`
+        query: print(document as unknown as DocumentNode),
+        variables,
+      }),
+    });
+  } catch {
+    throw new Error('Network error — check your connection and try again.');
   }
-  if (!json.data) {
-    throw new Error('GraphQL request returned no data');
+
+  const body = await readBody(res);
+  const json: GraphQLResponse<TData> =
+    body && typeof body === 'object' ? (body as GraphQLResponse<TData>) : {};
+
+  // a GraphQL error envelope may arrive with 200 or 400
+  if (json.errors?.length) {
+    throw new Error(json.errors.map((e) => e.message).join(', '));
+  }
+  // any other non-2xx: HTTP-layer rejection, no GraphQL envelope
+  if (!res.ok) {
+    throw new Error(httpErrorMessage(res.status, body));
+  }
+  if (json.data == null) {
+    throw new Error('GraphQL request returned no data.');
   }
 
   return json.data;
