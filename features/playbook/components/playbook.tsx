@@ -7,9 +7,10 @@ import { useTeam } from '@/context/team-context';
 import { toastStyling } from '@/features/toast-notification/styling';
 import { useCoachDashboardStore } from '@/store/use-coach-dashboard-store';
 import { cn } from '@/utils/tw-merge';
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import { gqlRequest } from '@/lib/graphql/client-request';
 import {
   DeleteGamePlanDocument,
   DeletePracticePreparationDocument,
@@ -48,10 +49,31 @@ const PlaybookBookBlock: FC<PageProps> = ({
     setActiveCoachTab,
   } = useCoachDashboardStore();
 
-  const [deleteGamePlan] = useMutation(DeleteGamePlanDocument);
-  const [deletePracticePreparation] = useMutation(
-    DeletePracticePreparationDocument,
-  );
+  const onDeleteSuccess = () => {
+    router.refresh();
+    toast.success('Deleted successfully', {
+      ...toastStyling,
+      position: 'top-right',
+    });
+  };
+  const onDeleteError = (error: Error) => {
+    toast.error(error.message, { ...toastStyling, position: 'top-right' });
+  };
+
+  const { mutate: deleteGamePlan } = useMutation({
+    mutationFn: (gamePlanId: string) =>
+      gqlRequest(DeleteGamePlanDocument, { input: { routeKey, gamePlanId } }),
+    onSuccess: onDeleteSuccess,
+    onError: onDeleteError,
+  });
+  const { mutate: deletePracticePreparation } = useMutation({
+    mutationFn: (practicePreparationId: string) =>
+      gqlRequest(DeletePracticePreparationDocument, {
+        input: { routeKey, practicePreparationId },
+      }),
+    onSuccess: onDeleteSuccess,
+    onError: onDeleteError,
+  });
 
   const handleCoachTabChange = useCallback(
     (value: string) => {
@@ -60,45 +82,9 @@ const PlaybookBookBlock: FC<PageProps> = ({
     [setActiveCoachTab],
   );
 
-  const handleDeletePlan = async (
-    planId: string,
-    type: 'gameplan' | 'practice',
-  ) => {
-    try {
-      if (type === 'gameplan') {
-        await deleteGamePlan({
-          variables: {
-            input: {
-              routeKey,
-              gamePlanId: planId,
-            },
-          },
-          refetchQueries: ['GetGameplan'],
-        });
-      } else if (type === 'practice') {
-        await deletePracticePreparation({
-          variables: {
-            input: {
-              routeKey,
-              practicePreparationId: planId,
-            },
-          },
-          refetchQueries: ['GetPracticePreparations'],
-        });
-      }
-
-      router.refresh();
-      toast.success('Deleted successfully', {
-        ...toastStyling,
-        position: 'top-right',
-      });
-    } catch (error) {
-      console.error(error);
-      toast.error('Failed to delete item', {
-        ...toastStyling,
-        position: 'top-right',
-      });
-    }
+  const handleDeletePlan = (planId: string, type: 'gameplan' | 'practice') => {
+    if (type === 'gameplan') deleteGamePlan(planId);
+    else if (type === 'practice') deletePracticePreparation(planId);
   };
 
   return (

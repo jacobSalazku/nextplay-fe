@@ -119,7 +119,7 @@ const PracticePreparationForm: FC<PageProps> = ({
       focus: data.focus,
     };
 
-    await createPracticePreparation.mutateAsync(preparation);
+    await createPracticePreparation.mutateAsync(preparation).catch(() => {});
   };
 
   return (

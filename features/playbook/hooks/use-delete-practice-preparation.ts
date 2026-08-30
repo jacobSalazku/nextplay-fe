@@ -1,7 +1,8 @@
 import { useRouter } from 'next/navigation';
 import { toastStyling } from '@/features/toast-notification/styling';
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { gqlRequest } from '@/lib/graphql/client-request';
 import { DeletePracticePreparationDocument } from '@/graphql/graphql';
 
 type DeletePracticePreparationPayload = {
@@ -11,30 +12,27 @@ type DeletePracticePreparationPayload = {
 
 export const useDeletePracticePreparation = (routeKey: string) => {
   const router = useRouter();
-  const [runDelete, { loading }] = useMutation(
-    DeletePracticePreparationDocument,
-  );
 
-  return {
-    isPending: loading,
-    mutateAsync: async (payload: DeletePracticePreparationPayload) => {
-      await runDelete({
-        variables: {
-          input: {
-            routeKey: payload.routeKey,
-            practicePreparationId: payload.practicePreparationId,
-          },
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: (payload: DeletePracticePreparationPayload) =>
+      gqlRequest(DeletePracticePreparationDocument, {
+        input: {
+          routeKey: payload.routeKey,
+          practicePreparationId: payload.practicePreparationId,
         },
-        refetchQueries: ['GetPracticePreparations'],
-      });
-
+      }),
+    onSuccess: () => {
       toast.success('Preparation has been deleted', {
-        position: 'top-right',
         ...toastStyling,
+        position: 'top-right',
       });
-
       router.push(`/team/${routeKey}/playbook`);
       router.refresh();
     },
-  };
+    onError: (error) => {
+      toast.error(error.message, { ...toastStyling, position: 'top-right' });
+    },
+  });
+
+  return { isPending, mutateAsync };
 };

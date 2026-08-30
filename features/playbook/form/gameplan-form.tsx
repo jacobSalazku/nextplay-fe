@@ -133,7 +133,7 @@ const GamePlanForm: FC<GamePlanFormProps> = ({
       playsId: data.playsId,
     };
 
-    await createGameplan.mutateAsync(gamePlan);
+    await createGameplan.mutateAsync(gamePlan).catch(() => {});
   };
 
   return (
