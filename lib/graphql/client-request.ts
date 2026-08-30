@@ -14,13 +14,13 @@ type GraphQLResponse<T> = {
   errors?: { message: string }[];
 };
 
-/** NestJS error body: auth guards, throttler, 5xx. */
+// NestJS error body: auth guards, throttler, 5xx.
 type HttpErrorBody = {
   message?: string | string[];
   error?: string;
 };
 
-/** `print` is pure per document — cache it so hot mutations don't re-serialise. */
+/`print` is pure per document — cache it so hot mutations don't re-serialise.
 const printCache = new WeakMap<object, string>();
 
 function printDocument(document: object): string {
@@ -33,7 +33,7 @@ function printDocument(document: object): string {
   return query;
 }
 
-/** Read the body once; tolerate empty or non-JSON. */
+// Read the body once; tolerate empty or non-JSON.
 async function readBody(res: Response): Promise<unknown> {
   const text = await res.text();
   if (!text) return undefined;
@@ -56,9 +56,9 @@ function httpErrorMessage(status: number, body: unknown): string {
 }
 
 /**
- * The single client-side GraphQL transport for TanStack Query
- * `mutationFn` / `queryFn`. Always throws `Error(message)` on failure so
- * `useMutation`'s `onError` can surface it directly.
+ The single client-side GraphQL transport for TanStack Query
+ `mutationFn` / `queryFn`. Always throws `Error(message)` on failure so
+ `useMutation`'s `onError` can surface it directly.
  */
 export async function gqlRequest<
   TData,
