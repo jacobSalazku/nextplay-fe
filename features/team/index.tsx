@@ -3,13 +3,13 @@
 import { useState, type FC } from 'react';
 import { toastStyling } from '../toast-notification/styling';
 import { useTeam } from '@/context/team-context';
-import { useMutation } from '@apollo/client/react';
+import { useMutation } from '@tanstack/react-query';
 import { Check, Copy, LinkIcon, Loader2, UserPlus, Users } from 'lucide-react';
 import { toast } from 'sonner';
+import { gqlRequest } from '@/lib/graphql/client-request';
 import {
   CreateTeamInviteDocument,
   CreateTeamInviteMutation,
-  CreateTeamInviteMutationVariables,
   TeamInformation,
 } from '@/graphql/graphql';
 import {
@@ -40,10 +40,11 @@ export const PlayerBlock: FC<PlayerBlockProps> = ({ team }) => {
   >(null);
   const [hasCopiedInvite, setHasCopiedInvite] = useState(false);
 
-  const [createTeamInvite, { loading: creatingInvite }] = useMutation<
-    CreateTeamInviteMutation,
-    CreateTeamInviteMutationVariables
-  >(CreateTeamInviteDocument);
+  const { mutateAsync: createTeamInvite, isPending: creatingInvite } =
+    useMutation({
+      mutationFn: (rk: string) =>
+        gqlRequest(CreateTeamInviteDocument, { input: { routeKey: rk } }),
+    });
 
   const handleCreateInvite = async () => {
     const resolvedRouteKey = routeKey ?? team.routeKey;
@@ -53,29 +54,15 @@ export const PlayerBlock: FC<PlayerBlockProps> = ({ team }) => {
       return;
     }
 
-    try {
-      const response = await createTeamInvite({
-        variables: {
-          input: {
-            routeKey: resolvedRouteKey,
-          },
-        },
-      });
+    const createdInvite = await createTeamInvite(resolvedRouteKey)
+      .then((res) => res.createTeamInvite)
+      .catch(() => null); // the global handler already toasted
 
-      const createdInvite = response.data?.createTeamInvite;
+    if (!createdInvite) return;
 
-      if (!createdInvite) {
-        toast.error('No invite link returned.');
-        return;
-      }
-
-      setInvite(createdInvite);
-      setHasCopiedInvite(false);
-      toast.success('Invite link created', toastStyling);
-    } catch (error) {
-      console.error(error);
-      toast.error('Failed to create invite link.');
-    }
+    setInvite(createdInvite);
+    setHasCopiedInvite(false);
+    toast.success('Invite link created', toastStyling);
   };
 
   const handleCopyInvite = async () => {
