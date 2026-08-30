@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import Image from 'next/image';
-import { getPlay } from '@/features/playbook/actions/get-play';
 import PlanViewSkeleton from '@/features/playbook/components/skeleton/plan-view-skeleton';
+import { getPlay } from '@/features/playbook/queries/get-play';
 import { playbookSearchParamsCache } from '@/utils/search-params';
 
 type PageProps = {

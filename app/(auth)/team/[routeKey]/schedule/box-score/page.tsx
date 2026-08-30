@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { getActivity } from '@/features/schedule/actions/get-activity';
-import { getActiveAttendedMembers } from '@/features/scouting/actions/get-active-attended-members';
+import { getActivity } from '@/features/schedule/queries/get-activity';
 import Skeleton from '@/features/scouting/components/mobile/skeleton';
 import { MultiStatlineTracker } from '@/features/scouting/components/multi-statline-tracker';
+import { getActiveAttendedMembers } from '@/features/scouting/queries/get-active-attended-members';
 import { boxScoreSearchParamsCache } from '@/utils/search-params';
 import type { SearchParams } from 'nuqs/server';
 import { withProtectedPage } from '@/lib/auth/with-page-guards';

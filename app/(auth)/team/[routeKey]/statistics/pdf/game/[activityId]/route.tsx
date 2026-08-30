@@ -4,8 +4,8 @@ import {
   formatPdfDate,
   sanitizePdfFileName,
 } from '@/features/pdf/utils/file-name';
-import { getGamesWithBoxScores } from '@/features/statistics/actions';
-import { getTeamInforamtion } from '@/features/team/actions/get-team-infomation';
+import { getGamesWithBoxScores } from '@/features/statistics/queries';
+import { getTeamInforamtion } from '@/features/team/queries/get-team-infomation';
 import { renderToStream } from '@react-pdf/renderer';
 
 export const runtime = 'nodejs';

@@ -2,6 +2,7 @@
 
 import { useState, type FC } from 'react';
 import { useRouter } from 'next/navigation';
+import { createPractice, updatePractice } from '../../actions/mutations';
 import { getButtonText } from '../../utils/button-text';
 import { practiceSchema, type PracticeData } from '../../zod';
 import { useTeam } from '@/context/team-context';
@@ -9,7 +10,6 @@ import { toastStyling } from '@/features/toast-notification/styling';
 import useStore from '@/store/store';
 import { getTypeBgColor } from '@/utils';
 import { cn } from '@/utils/tw-merge';
-import { useMutation } from '@apollo/client/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format, isBefore, startOfToday } from 'date-fns';
 import { X } from 'lucide-react';
@@ -17,11 +17,9 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import {
   ActivityType,
-  CreatePracticeDocument,
   MemberWithAttendances,
   PracticeType,
   Team,
-  UpdatePracticeDocument,
 } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
 import { Input } from '@/components/foundation/input';
@@ -37,8 +35,6 @@ type PracticeProps = {
 const PracticeForm: FC<PracticeProps> = ({ mode, onClose, member }) => {
   const { routeKey } = useTeam();
   const [formState, setFormState] = useState<Mode>(mode);
-  const [createPractice] = useMutation(CreatePracticeDocument);
-  const [updatePractice] = useMutation(UpdatePracticeDocument);
   const router = useRouter();
 
   const {
@@ -77,42 +73,37 @@ const PracticeForm: FC<PracticeProps> = ({ mode, onClose, member }) => {
   const onSubmit = async (data: PracticeData) => {
     const date = new Date(data.date);
 
-    try {
-      if (formState === 'edit') {
-        await updatePractice({
-          variables: {
-            input: {
-              ...data,
-              id: selectedActivity!.id,
-              date: date.toISOString(),
-              teamId: routeKey,
-              type: ActivityType.Practice,
-              facility: 'Sportschuur',
-            },
-          },
-        });
-        router.refresh();
-        onClose();
-        setFormState('view');
-      } else {
-        await createPractice({
-          variables: {
-            input: {
-              ...data,
-              date: date.toISOString(),
-              teamId: routeKey,
-              type: ActivityType.Practice,
-              facility: 'Sportschuur',
-            },
-          },
-        });
-        toast.success('Practice created successfully!', toastStyling);
-        onClose();
-        router.refresh();
+    if (formState === 'edit') {
+      const res = await updatePractice({
+        ...data,
+        id: selectedActivity!.id,
+        date: date.toISOString(),
+        teamId: routeKey,
+        type: ActivityType.Practice,
+        facility: 'Sportschuur',
+      });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
       }
-    } catch (error) {
-      console.error(error);
-      toast.error('Something went wrong');
+      router.refresh();
+      onClose();
+      setFormState('view');
+    } else {
+      const res = await createPractice({
+        ...data,
+        date: date.toISOString(),
+        teamId: routeKey,
+        type: ActivityType.Practice,
+        facility: 'Sportschuur',
+      });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success('Practice created successfully!', toastStyling);
+      onClose();
+      router.refresh();
     }
   };
 

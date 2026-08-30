@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
-import { getTeam } from './actions/get-team';
 import { ActivityList } from './components/activity/activity-list';
 import { HorizontalCalender } from './components/calender/horizontal-calender';
+import { getTeam } from './queries/get-team';
 
 const ScheduleBlock = async ({ routeKey }: { routeKey: string }) => {
   const { getTeamActivities } = await getTeam(routeKey);

@@ -1,14 +1,14 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { getGameplan } from '@/features/playbook/actions/get-gameplans';
-import { getGames } from '@/features/playbook/actions/get-games';
-import { getPlays } from '@/features/playbook/actions/get-plays';
-import { getPracticePreparations } from '@/features/playbook/actions/get-practice-preparations';
-import { getPractices } from '@/features/playbook/actions/get-practices';
 import PlaybookBookBlock from '@/features/playbook/components/playbook';
 import PlaybookLibrarySkeleton from '@/features/playbook/components/skeleton/playbook-library-skeleton';
 import GamePlanForm from '@/features/playbook/form/gameplan-form';
 import PracticePreparationForm from '@/features/playbook/form/practice-preparation-form';
+import { getGameplan } from '@/features/playbook/queries/get-gameplans';
+import { getGames } from '@/features/playbook/queries/get-games';
+import { getPlays } from '@/features/playbook/queries/get-plays';
+import { getPracticePreparations } from '@/features/playbook/queries/get-practice-preparations';
+import { getPractices } from '@/features/playbook/queries/get-practices';
 import { withProtectedPage } from '@/lib/auth/with-page-guards';
 import { getUser } from '@/api/user/get-user';
 

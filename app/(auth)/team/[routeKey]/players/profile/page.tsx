@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
-import { getUserProfile } from '@/features/team/actions/get-user-profile';
 import PlayerDetailPanel from '@/features/team/components/player-detail-panel';
+import { getUserProfile } from '@/features/team/queries/get-user-profile';
 import { playerProfileSearchParamsCache } from '@/utils/search-params';
 import { withProtectedPage } from '@/lib/auth/with-page-guards';
 
