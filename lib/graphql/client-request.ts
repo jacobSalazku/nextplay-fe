@@ -20,7 +20,7 @@ type HttpErrorBody = {
   error?: string;
 };
 
-/`print` is pure per document — cache it so hot mutations don't re-serialise.
+// `print` is pure per document — cache it so hot mutations don't re-serialise.
 const printCache = new WeakMap<object, string>();
 
 function printDocument(document: object): string {
@@ -55,11 +55,9 @@ function httpErrorMessage(status: number, body: unknown): string {
   return `Request failed (${status})`;
 }
 
-/**
- The single client-side GraphQL transport for TanStack Query
- `mutationFn` / `queryFn`. Always throws `Error(message)` on failure so
- `useMutation`'s `onError` can surface it directly.
- */
+// The single client-side GraphQL transport for TanStack Query mutationFn /
+// queryFn. Always throws Error(message) on failure so useMutation's onError
+// can surface it directly.
 export async function gqlRequest<
   TData,
   TVariables extends Record<string, unknown>,
