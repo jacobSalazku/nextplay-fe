@@ -26,7 +26,11 @@ import { RotateCcw, Save, Trash2 } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { gqlRequest } from '@/lib/graphql/client-request';
-import { Category, CreatePlayDocument } from '@/graphql/graphql';
+import {
+  Category,
+  CreatePlayDocument,
+  type CreatePlayInput,
+} from '@/graphql/graphql';
 import {
   Card,
   CardContent,
@@ -54,13 +58,8 @@ export function PlayForm() {
   const [players, setPlayers] = useState<Player[]>(initialPlayerPosition);
 
   const { mutateAsync: createPlay } = useMutation({
-    mutationFn: (input: {
-      name: string;
-      description: string;
-      category: Category;
-      canvas: string;
-      routeKey: string;
-    }) => gqlRequest(CreatePlayDocument, { input }),
+    mutationFn: (input: CreatePlayInput) =>
+      gqlRequest(CreatePlayDocument, { input }),
     onSuccess: () => {
       toast.success('Your Play has been successfully created', {
         ...toastStyling,
