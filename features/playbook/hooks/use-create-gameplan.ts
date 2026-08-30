@@ -44,9 +44,6 @@ export const useCreateGameplan = (
         position: 'top-right',
       });
     },
-    onError: (error) => {
-      toast.error(error.message, { ...toastStyling, position: 'top-right' });
-    },
   });
 
   return { isPending, mutateAsync };

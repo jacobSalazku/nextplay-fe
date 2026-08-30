@@ -56,15 +56,11 @@ const PlaybookBookBlock: FC<PageProps> = ({
       position: 'top-right',
     });
   };
-  const onDeleteError = (error: Error) => {
-    toast.error(error.message, { ...toastStyling, position: 'top-right' });
-  };
 
   const { mutate: deleteGamePlan } = useMutation({
     mutationFn: (gamePlanId: string) =>
       gqlRequest(DeleteGamePlanDocument, { input: { routeKey, gamePlanId } }),
     onSuccess: onDeleteSuccess,
-    onError: onDeleteError,
   });
   const { mutate: deletePracticePreparation } = useMutation({
     mutationFn: (practicePreparationId: string) =>
@@ -72,7 +68,6 @@ const PlaybookBookBlock: FC<PageProps> = ({
         input: { routeKey, practicePreparationId },
       }),
     onSuccess: onDeleteSuccess,
-    onError: onDeleteError,
   });
 
   const handleCoachTabChange = useCallback(

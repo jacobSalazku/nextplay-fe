@@ -57,9 +57,6 @@ export const PlayCard = ({ play, role }: PlayCardProps) => {
         position: 'top-right',
       });
     },
-    onError: (error) => {
-      toast.error(error.message, { ...toastStyling, position: 'top-right' });
-    },
   });
   const imageSrc = resolvePlayImageSrc(play.canvas);
   const summary = (play.description ?? '')

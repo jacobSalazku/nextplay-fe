@@ -29,9 +29,6 @@ export const useDeletePracticePreparation = (routeKey: string) => {
       router.push(`/team/${routeKey}/playbook`);
       router.refresh();
     },
-    onError: (error) => {
-      toast.error(error.message, { ...toastStyling, position: 'top-right' });
-    },
   });
 
   return { isPending, mutateAsync };

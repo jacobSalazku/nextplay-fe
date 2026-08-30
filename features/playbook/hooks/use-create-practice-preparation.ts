@@ -45,9 +45,6 @@ export const useCreatePracticePreparation = (
         position: 'top-right',
       });
     },
-    onError: (error) => {
-      toast.error(error.message, { ...toastStyling, position: 'top-right' });
-    },
   });
 
   return { isPending, mutateAsync };
