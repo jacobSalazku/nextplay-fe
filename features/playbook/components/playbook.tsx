@@ -77,11 +77,6 @@ const PlaybookBookBlock: FC<PageProps> = ({
     [setActiveCoachTab],
   );
 
-  const handleDeletePlan = (planId: string, type: 'gameplan' | 'practice') => {
-    if (type === 'gameplan') deleteGamePlan(planId);
-    else if (type === 'practice') deletePracticePreparation(planId);
-  };
-
   return (
     <div className="flex w-full flex-col gap-8 px-2 pt-2 pb-8 md:px-6 md:pb-10">
       <div className="hidden px-2 md:px-0 md:block ">
@@ -151,7 +146,7 @@ const PlaybookBookBlock: FC<PageProps> = ({
                 role={role}
                 plan={item}
                 type="gameplan"
-                onDelete={() => handleDeletePlan(item.id, 'gameplan')}
+                onDelete={() => deleteGamePlan(item.id)}
                 onView={{
                   pathname: `/team/${routeKey}/playbook/gameplan`,
                   query: { id: item.id },
@@ -181,7 +176,7 @@ const PlaybookBookBlock: FC<PageProps> = ({
                 role={role}
                 plan={practice}
                 type="practice"
-                onDelete={() => handleDeletePlan(practice.id, 'practice')}
+                onDelete={() => deletePracticePreparation(practice.id)}
                 onView={{
                   pathname: `/team/${routeKey}/playbook/practice-preparation`,
                   query: { id: practice.id },
