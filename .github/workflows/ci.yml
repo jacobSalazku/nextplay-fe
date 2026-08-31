@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # codegen.ts throws if this is unset; the value is only used when codegen
-  # pulls the schema from a live endpoint, which CI never does.
+  # required by codegen.ts and the instrumentation.ts boot guard; CI never
+  # actually reaches the backend (codegen uses the committed schema).
   BACKEND_GRAPHQL_URL: http://localhost:3001/graphql
 
 jobs:
