@@ -7,7 +7,7 @@ const BASE_URL = `http://localhost:${PORT}`;
  * Browser-level tests for things Vitest can't reach — async Server Components,
  * routing, hydration. Specs live in `e2e/`. Vitest ignores that folder.
  *
- * The dev server here talks to a real backend at NEXT_PUBLIC_GRAPHQL_ENDPOINT;
+ * The dev server here talks to a real backend at BACKEND_GRAPHQL_URL;
  * specs that need data should stub it with `page.route(...)`.
  */
 export default defineConfig({
@@ -27,7 +27,7 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
     env: {
-      NEXT_PUBLIC_GRAPHQL_ENDPOINT: 'http://localhost:3001/graphql',
+      BACKEND_GRAPHQL_URL: 'http://localhost:3001/graphql',
       NEXT_PUBLIC_DEV_AUTH_ENABLED: 'true',
       AUTH_SECRET: 'playwright-only',
       NEXTAUTH_SECRET: 'playwright-only',

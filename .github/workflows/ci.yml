@@ -13,7 +13,7 @@ concurrency:
 env:
   # codegen.ts throws if this is unset; the value is only used when codegen
   # pulls the schema from a live endpoint, which CI never does.
-  NEXT_PUBLIC_GRAPHQL_ENDPOINT: http://localhost:3001/graphql
+  BACKEND_GRAPHQL_URL: http://localhost:3001/graphql
 
 jobs:
   check:

@@ -1,7 +1,7 @@
 import { UpdateUserData } from '../zod';
 import type { UpdateUserInput } from '@/graphql/graphql';
 
-type SessionLike = { accessToken?: string; error?: string };
+type SessionLike = { error?: string };
 type SubmitParams = {
   status: 'loading' | 'authenticated' | 'unauthenticated';
   session: SessionLike | null | undefined;
@@ -36,7 +36,7 @@ export async function submitUpdateUser({
     return;
   }
 
-  if (!session?.accessToken || session.error) {
+  if (status === 'unauthenticated' || !session || session.error) {
     router.push('/login?error=SessionExpired');
     return;
   }

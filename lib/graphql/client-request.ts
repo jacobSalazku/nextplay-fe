@@ -2,12 +2,11 @@
 
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { print, type DocumentNode } from 'graphql/language';
-import { resolveGraphqlToken } from './client-token';
+import { getSession } from 'next-auth/react';
 
-const GRAPHQL_ENDPOINT: string = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ?? '';
-if (!GRAPHQL_ENDPOINT) {
-  throw new Error('NEXT_PUBLIC_GRAPHQL_ENDPOINT is not set');
-}
+// Same-origin BFF proxy (app/api/graphql/route.ts) attaches the bearer token
+// server-side from the session cookie — the browser never holds it.
+const PROXY_ENDPOINT = '/api/graphql';
 
 type GraphQLResponse<T> = {
   data?: T | null;
@@ -55,6 +54,18 @@ function httpErrorMessage(status: number, body: unknown): string {
   return `Request failed (${status})`;
 }
 
+async function postToProxy(body: string): Promise<Response> {
+  try {
+    return await fetch(PROXY_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    });
+  } catch {
+    throw new Error('Network error — check your connection and try again.');
+  }
+}
+
 // The single client-side GraphQL transport for TanStack Query mutationFn /
 // queryFn. Always throws Error(message) on failure so useMutation's onError
 // can surface it directly.
@@ -65,23 +76,18 @@ export async function gqlRequest<
   document: TypedDocumentNode<TData, TVariables>,
   variables: TVariables,
 ): Promise<TData> {
-  const token = await resolveGraphqlToken();
+  const payload = JSON.stringify({
+    query: printDocument(document),
+    variables,
+  });
 
-  let res: Response;
-  try {
-    res = await fetch(GRAPHQL_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({
-        query: printDocument(document),
-        variables,
-      }),
-    });
-  } catch {
-    throw new Error('Network error — check your connection and try again.');
+  let res = await postToProxy(payload);
+
+  // The proxy 401s when the cookie's access token is missing/expired. Ask
+  // next-auth to refresh it (that route re-issues the cookie), then retry once.
+  if (res.status === 401) {
+    await getSession();
+    res = await postToProxy(payload);
   }
 
   const body = await readBody(res);

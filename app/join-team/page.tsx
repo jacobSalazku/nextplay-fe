@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { AcceptTeamInviteCard } from '@/features/team-invite/components/accept-team-invite-card';
 import { teamInviteTokenSchema } from '@/features/team-invite/zod';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/options';
+import { authServerOptions } from '@/lib/auth/server-options';
 import { Link } from '@/components/foundation/button/link';
 
 export const metadata: Metadata = {
@@ -43,7 +43,7 @@ export default async function JoinTeamInvitePage({
     );
   }
 
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authServerOptions);
 
   if (!session?.accessToken) {
     const callbackUrl = encodeURIComponent(`/join-team?invite=${token}`);

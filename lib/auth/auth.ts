@@ -13,7 +13,7 @@ export async function authMutation<
   document: TypedDocumentNode<TData, TVariables>,
   variables: TVariables,
 ): Promise<TData> {
-  const res = await fetch(process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!, {
+  const res = await fetch(process.env.BACKEND_GRAPHQL_URL!, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

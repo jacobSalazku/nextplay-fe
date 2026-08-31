@@ -5,8 +5,8 @@ import {
   type StrictResponse,
 } from 'msw';
 
-/** Matches the endpoint gqlRequest / executeGraphQL post to. */
-export const api = graphql.link('http://localhost:3001/graphql');
+/** Matches the same-origin proxy that gqlRequest posts to. */
+export const api = graphql.link('*/api/graphql');
 
 type GqlBody = GraphQLResponseBody<Record<string, unknown>>;
 

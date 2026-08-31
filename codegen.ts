@@ -3,10 +3,10 @@ import { loadEnvConfig } from '@next/env';
 
 loadEnvConfig(process.cwd());
 
-const endpoint = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT;
+const endpoint = process.env.BACKEND_GRAPHQL_URL;
 
 if (!endpoint) {
-  throw new Error('NEXT_PUBLIC_GRAPHQL_ENDPOINT env var is not set');
+  throw new Error('BACKEND_GRAPHQL_URL env var is not set');
 }
 
 const config: CodegenConfig = {

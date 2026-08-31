@@ -194,8 +194,10 @@ export const authOptions: AuthOptions = {
       }
     },
 
+    // The access token is deliberately NOT exposed here — this callback feeds
+    // `/api/auth/session`, which client JS can read. Server code that needs the
+    // token uses `authServerOptions` (lib/auth/server-options.ts).
     async session({ session, token }) {
-      session.accessToken = token.accessToken;
       session.error = token.error;
 
       if (session.user) {
