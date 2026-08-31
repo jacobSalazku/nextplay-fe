@@ -1,4 +1,6 @@
+import { Suspense } from 'react';
 import { ExportBlock } from '@/features/statistics/components/export';
+import { ExportSkeleton } from '@/features/statistics/components/skeleton/export-skeleton';
 import { getGamesWithBoxScores } from '@/features/statistics/queries';
 import { getTeamInforamtion } from '@/features/team/queries/get-team-infomation';
 import { withProtectedPage } from '@/lib/auth/with-page-guards';
@@ -26,8 +28,7 @@ async function getExportPageData(routeKey: string) {
   };
 }
 
-async function StatisticsExportPage({ params }: ExportPageProps) {
-  const { routeKey } = await params;
+async function ExportContent({ routeKey }: { routeKey: string }) {
   const { completedGames, latestGame, team, totalReports } =
     await getExportPageData(routeKey);
 
@@ -39,6 +40,16 @@ async function StatisticsExportPage({ params }: ExportPageProps) {
       team={team}
       totalReports={totalReports}
     />
+  );
+}
+
+async function StatisticsExportPage({ params }: ExportPageProps) {
+  const { routeKey } = await params;
+
+  return (
+    <Suspense fallback={<ExportSkeleton />}>
+      <ExportContent routeKey={routeKey} />
+    </Suspense>
   );
 }
 
