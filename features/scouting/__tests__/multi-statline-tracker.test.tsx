@@ -1,10 +1,10 @@
-import { api, gqlData } from '../../../test/msw/handlers';
-import { server } from '../../../test/msw/server';
-import { renderWithClient } from '../../../test/utils';
+import { MultiStatlineTracker } from '@/features/scouting/components/multi-statline-tracker';
+import { api, gqlData } from '@/test/msw/handlers';
+import { server } from '@/test/msw/server';
+import { renderWithClient } from '@/test/utils';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { MultiStatlineTracker } from './multi-statline-tracker';
 
 vi.mock('@/context/team-context', () => ({
   useTeam: () => ({ routeKey: 'team-1' }),

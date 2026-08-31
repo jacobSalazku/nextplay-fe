@@ -1,9 +1,9 @@
-import { api, gqlData, gqlError } from '../../../test/msw/handlers';
-import { server } from '../../../test/msw/server';
-import { renderHookWithClient } from '../../../test/utils';
+import { useStatsPerGame } from '@/features/statistics/hooks/use-stats-per-game';
+import { api, gqlData, gqlError } from '@/test/msw/handlers';
+import { server } from '@/test/msw/server';
+import { renderHookWithClient } from '@/test/utils';
 import { waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { useStatsPerGame } from './use-stats-per-game';
 
 const COMPLETE = { routeKey: 'team-1', memberId: 'm1', month: 1, year: 2026 };
 
