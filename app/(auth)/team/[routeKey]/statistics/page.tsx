@@ -12,11 +12,12 @@ type PageProps = {
   params: Promise<{ routeKey: string }>;
 };
 
-async function StatisticsPage({ params }: PageProps) {
-  const { routeKey } = await params;
-  const team = await getTeamInforamtion(routeKey);
-  const statsList = await getStatlineAverage({ routeKey });
-  const stats = await getTeamStats({ routeKey });
+async function StatisticsContent({ routeKey }: { routeKey: string }) {
+  const [team, statsList, stats] = await Promise.all([
+    getTeamInforamtion(routeKey),
+    getStatlineAverage({ routeKey }),
+    getTeamStats({ routeKey }),
+  ]);
 
   if (!team) {
     return (
@@ -25,14 +26,19 @@ async function StatisticsPage({ params }: PageProps) {
       </div>
     );
   }
+
+  return (
+    <StatisticsBlock teamStatlist={stats} statsList={statsList} team={team} />
+  );
+}
+
+async function StatisticsPage({ params }: PageProps) {
+  const { routeKey } = await params;
+
   return (
     <div className="scrollbar-none overflow-y-auto">
       <Suspense fallback={<StatisticsSkeleton />}>
-        <StatisticsBlock
-          teamStatlist={stats}
-          statsList={statsList}
-          team={team}
-        />
+        <StatisticsContent routeKey={routeKey} />
       </Suspense>
     </div>
   );

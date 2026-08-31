@@ -27,8 +27,7 @@ export const metadata: Metadata = {
   },
 };
 
-async function PlaybookPage({ params }: PageProps) {
-  const { routeKey } = await params;
+async function PlaybookContent({ routeKey }: { routeKey: string }) {
   const [
     playbook,
     games,
@@ -48,35 +47,41 @@ async function PlaybookPage({ params }: PageProps) {
   const role = currentUser.member?.role ?? 'PLAYER';
 
   return (
-    <Suspense fallback={<PlaybookLibrarySkeleton />}>
-      <div className="scrollbar-none h-full w-full overflow-y-auto overflow-x-hidden text-white">
-        <div className="mx-auto w-full max-w-screen-4xl">
-          <PlaybookBookBlock
-            practicePreparation={practicePreparation}
-            role={role}
-            playbook={playbook}
-            gamePlan={gameplan}
-          />
-          <GamePlanForm
-            mode="create"
-            role={role}
-            data={games}
-            playbook={playbook}
-            existingGameplanActivityIds={gameplan.map(
-              (plan) => plan.activityId,
-            )}
-          />
-          <PracticePreparationForm
-            mode="create"
-            role={role}
-            practices={practices}
-            playbook={playbook}
-            existingPreparationActivityIds={practicePreparation
-              .map((preparation) => preparation.activityId)
-              .filter((id): id is string => Boolean(id))}
-          />
-        </div>
+    <div className="scrollbar-none h-full w-full overflow-y-auto overflow-x-hidden text-white">
+      <div className="mx-auto w-full max-w-screen-4xl">
+        <PlaybookBookBlock
+          practicePreparation={practicePreparation}
+          role={role}
+          playbook={playbook}
+          gamePlan={gameplan}
+        />
+        <GamePlanForm
+          mode="create"
+          role={role}
+          data={games}
+          playbook={playbook}
+          existingGameplanActivityIds={gameplan.map((plan) => plan.activityId)}
+        />
+        <PracticePreparationForm
+          mode="create"
+          role={role}
+          practices={practices}
+          playbook={playbook}
+          existingPreparationActivityIds={practicePreparation
+            .map((preparation) => preparation.activityId)
+            .filter((id): id is string => Boolean(id))}
+        />
       </div>
+    </div>
+  );
+}
+
+async function PlaybookPage({ params }: PageProps) {
+  const { routeKey } = await params;
+
+  return (
+    <Suspense fallback={<PlaybookLibrarySkeleton />}>
+      <PlaybookContent routeKey={routeKey} />
     </Suspense>
   );
 }

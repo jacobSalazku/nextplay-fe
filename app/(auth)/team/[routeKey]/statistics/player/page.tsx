@@ -1,4 +1,6 @@
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
+import PlayerDetailSkeleton from '@/features/statistics/components/player-detail/player-detail-skeleton';
 import { PlayerDetailStatistics } from '@/features/statistics/components/player-detail/player-detail-statistics';
 import { getStatlineAverage } from '@/features/statistics/queries';
 import { PlayerStatRow } from '@/features/statistics/utils/types';
@@ -11,11 +13,14 @@ type PageProps = {
   params: Promise<{ routeKey: string }>;
 };
 
-async function PlayerStatisticsDetailPage({ params, searchParams }: PageProps) {
-  const { routeKey } = await params;
-  const { id } = await boxScoreSearchParamsCache.parse(searchParams);
-
-  const statsList = await getStatlineAverage({ routeKey: routeKey });
+async function PlayerStatisticsDetailContent({
+  routeKey,
+  id,
+}: {
+  routeKey: string;
+  id: string;
+}) {
+  const statsList = await getStatlineAverage({ routeKey });
   const player = statsList?.find((stat) => stat.memberId === id);
 
   if (!player) {
@@ -39,6 +44,17 @@ async function PlayerStatisticsDetailPage({ params, searchParams }: PageProps) {
   };
 
   return <PlayerDetailStatistics player={mappedPlayer} />;
+}
+
+async function PlayerStatisticsDetailPage({ params, searchParams }: PageProps) {
+  const { routeKey } = await params;
+  const { id } = await boxScoreSearchParamsCache.parse(searchParams);
+
+  return (
+    <Suspense fallback={<PlayerDetailSkeleton />}>
+      <PlayerStatisticsDetailContent routeKey={routeKey} id={id} />
+    </Suspense>
+  );
 }
 
 export default withProtectedPage(PlayerStatisticsDetailPage);
