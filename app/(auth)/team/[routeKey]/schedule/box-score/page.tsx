@@ -24,14 +24,13 @@ type PageProps = {
   params: Promise<{ routeKey: string }>;
 };
 
-async function TeamBoxScores({ params, searchParams }: PageProps) {
-  const { routeKey } = await params;
-  const { activityId } = await boxScoreSearchParamsCache.parse(searchParams);
-
-  if (!activityId) {
-    redirect(`/team/${routeKey}/schedule`);
-  }
-
+async function BoxScoreContent({
+  routeKey,
+  activityId,
+}: {
+  routeKey: string;
+  activityId: string;
+}) {
   const currentUser = await getUser(routeKey);
   if (currentUser.member.role !== 'COACH') {
     redirect(`/team/${routeKey}/schedule`);
@@ -73,11 +72,24 @@ async function TeamBoxScores({ params, searchParams }: PageProps) {
   return (
     <div className="flex min-h-screen w-full flex-col items-center justify-start overflow-y-auto text-white">
       <div className="flex h-screen max-h-256 w-full flex-row justify-center py-4">
-        <Suspense fallback={<Skeleton />}>
-          <MultiStatlineTracker activity={activity} players={members} />
-        </Suspense>
+        <MultiStatlineTracker activity={activity} players={members} />
       </div>
     </div>
+  );
+}
+
+async function TeamBoxScores({ params, searchParams }: PageProps) {
+  const { routeKey } = await params;
+  const { activityId } = await boxScoreSearchParamsCache.parse(searchParams);
+
+  if (!activityId) {
+    redirect(`/team/${routeKey}/schedule`);
+  }
+
+  return (
+    <Suspense fallback={<Skeleton />}>
+      <BoxScoreContent routeKey={routeKey} activityId={activityId} />
+    </Suspense>
   );
 }
 
