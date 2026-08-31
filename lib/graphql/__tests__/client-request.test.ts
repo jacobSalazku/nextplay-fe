@@ -1,3 +1,4 @@
+import { getSession } from 'next-auth/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { gqlRequest } from '@/lib/graphql/client-request';
 import { CreatePlayDocument } from '@/graphql/graphql';
@@ -26,6 +27,7 @@ const INPUT = {
 describe('gqlRequest', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.mocked(getSession).mockClear();
   });
 
   it('returns data on a successful response', async () => {
@@ -36,15 +38,43 @@ describe('gqlRequest', () => {
     });
   });
 
-  it('sends the bearer token', async () => {
+  it('posts to the same-origin proxy with no auth header', async () => {
     const fetchMock = stubFetch(() =>
       jsonResponse({ data: { createPlay: {} } }),
     );
 
     await gqlRequest(CreatePlayDocument, INPUT);
 
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/graphql');
     const headers = new Headers(fetchMock.mock.calls[0][1]?.headers);
-    expect(headers.get('authorization')).toBe('Bearer test-token');
+    expect(headers.get('authorization')).toBeNull();
+  });
+
+  it('refreshes the session and retries once on a 401', async () => {
+    let call = 0;
+    const fetchMock = stubFetch(() => {
+      call += 1;
+      return call === 1
+        ? jsonResponse({ errors: [{ message: 'Not authenticated' }] }, 401)
+        : jsonResponse({ data: { createPlay: { id: 'p1' } } });
+    });
+
+    await expect(gqlRequest(CreatePlayDocument, INPUT)).resolves.toEqual({
+      createPlay: { id: 'p1' },
+    });
+
+    expect(getSession).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('gives up after one failed retry on a 401', async () => {
+    stubFetch(() =>
+      jsonResponse({ errors: [{ message: 'Not authenticated' }] }, 401),
+    );
+
+    await expect(gqlRequest(CreatePlayDocument, INPUT)).rejects.toThrow(
+      /not authenticated/i,
+    );
   });
 
   it('throws the GraphQL error message (joined)', async () => {
