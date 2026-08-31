@@ -1,12 +1,12 @@
 import 'server-only';
 
-import { authOptions } from '@/lib/auth/options';
+import { authServerOptions } from '@/lib/auth/server-options';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
 
 export const requireSession = cache(async () => {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authServerOptions);
 
   const hasSessionError =
     !!session &&

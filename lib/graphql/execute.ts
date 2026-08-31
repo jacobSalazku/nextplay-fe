@@ -2,7 +2,7 @@ import 'server-only';
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { print, type DocumentNode } from 'graphql/language';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/options';
+import { authServerOptions } from '@/lib/auth/server-options';
 
 type GraphQLResponse<T> = {
   data?: T;
@@ -39,7 +39,7 @@ export async function executeGraphQL<
   let accessToken = options?.accessToken;
 
   if (!accessToken && !options?.skipAuth) {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authServerOptions);
     accessToken = session?.accessToken as string | undefined;
   }
 
