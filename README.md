@@ -20,6 +20,20 @@ NextPlay enables players to monitor their personal progress, while giving coache
 - **NextAuth.js** – Authentication
 - **TypeScript** – End-to-end type safety
 
+## GraphQL access
+
+Server Components read through `executeGraphQL` (`lib/graphql/execute.ts`),
+bearer attached from `getServerSession`. Client components go through
+`gqlRequest`, which POSTs to the same-origin BFF proxy
+`app/api/graphql/route.ts` — the proxy reads the access token from the session
+cookie server-side and forwards it, so the **access token never reaches client
+JS**.
+
+Set `BACKEND_GRAPHQL_URL` (server-only) to the backend's `/graphql` endpoint.
+Behind a load balancer the backend must run with Fastify `trustProxy` so its
+per-IP rate limiting sees the real client IP (the proxy forwards
+`X-Forwarded-For`), not the Next.js server's.
+
 ## Testing
 
 **Unit / component:** Vitest + `@testing-library/react` + `user-event` +
