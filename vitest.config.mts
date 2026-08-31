@@ -15,7 +15,7 @@ export default defineConfig({
     exclude: ['node_modules', '.next', 'e2e'],
     // client-request.ts throws at import if this is unset
     env: {
-      NEXT_PUBLIC_GRAPHQL_ENDPOINT: 'http://localhost:3001/graphql',
+      BACKEND_GRAPHQL_URL: 'http://localhost:3001/graphql',
     },
   },
 });

@@ -22,6 +22,18 @@ export async function proxy(request: NextRequest) {
       ? token.hasOnBoarded
       : false;
 
+  // The GraphQL proxy is an API endpoint — answer with a status code, never a
+  // redirect, and don't apply the onboarding gate.
+  if (pathname.startsWith('/api/graphql')) {
+    if (!hasValidSession) {
+      return NextResponse.json(
+        { errors: [{ message: 'Not authenticated' }] },
+        { status: 401 },
+      );
+    }
+    return NextResponse.next();
+  }
+
   const isAuthPage = pathname.startsWith('/login');
   const isCreatePage = pathname === '/create';
   const isOnboardingPage = pathname.startsWith('/create/onboarding');
@@ -36,8 +48,7 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith('/team') ||
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/teams') ||
-    pathname.startsWith('/create') ||
-    pathname.startsWith('/api/graphql');
+    pathname.startsWith('/create');
 
   // Not logged in block protected
   if (isProtectedPage && !hasValidSession) {

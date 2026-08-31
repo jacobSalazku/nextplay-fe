@@ -13,8 +13,7 @@ import { getToken } from 'next-auth/jwt';
  * retries once. See `lib/graphql/client-request.ts`.
  */
 
-const BACKEND_GRAPHQL_URL =
-  process.env.BACKEND_GRAPHQL_URL ?? process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT;
+const BACKEND_GRAPHQL_URL = process.env.BACKEND_GRAPHQL_URL;
 const AUTH_SECRET = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET;
 
 function unauthenticated() {
