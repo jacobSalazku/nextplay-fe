@@ -11,7 +11,6 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // TODO: forward to a telemetry service (Sentry, etc.)
     console.error(error);
   }, [error]);
 
