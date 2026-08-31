@@ -440,7 +440,6 @@ export type Mutation = {
   deletePlay: Scalars['Boolean']['output'];
   deletePracticePreparation: PracticePreparation;
   devLogin: AuthPayload;
-  getAttendanceByActivities?: Maybe<PlayerActivityAttendance>;
   loginWithGoogle: AuthPayload;
   logout: Scalars['Boolean']['output'];
   refresh: AuthPayload;
@@ -537,11 +536,6 @@ export type MutationDeletePracticePreparationArgs = {
 
 export type MutationDevLoginArgs = {
   email: Scalars['String']['input'];
-};
-
-
-export type MutationGetAttendanceByActivitiesArgs = {
-  input: GetAttendanceByActivitiesInput;
 };
 
 
@@ -749,6 +743,7 @@ export type Query = {
   getActiveAttendedMembers: Array<MemberWithStatlines>;
   getActivities: Array<Activity>;
   getActivity: Activity;
+  getAttendanceByActivities?: Maybe<PlayerActivityAttendance>;
   getCurrentUser: GetUserResponse;
   getDashboardTeams: Array<TeamDashboard>;
   getGameplan: Array<GamePlan>;
@@ -784,6 +779,11 @@ export type QueryGetActivitiesArgs = {
 
 export type QueryGetActivityArgs = {
   input: GetActivityInput;
+};
+
+
+export type QueryGetAttendanceByActivitiesArgs = {
+  input: GetAttendanceByActivitiesInput;
 };
 
 
