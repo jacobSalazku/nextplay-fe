@@ -24,7 +24,8 @@ NextPlay enables players to monitor their personal progress, while giving coache
 
 **Unit / component:** Vitest + `@testing-library/react` + `user-event` +
 `jest-dom` (`jsdom` env), with **MSW** faking the GraphQL backend at the
-`fetch` layer. Specs are `*.test.ts(x)` next to the source.
+`fetch` layer. Specs are `*.test.ts(x)` in a `__tests__/` folder per feature
+(and beside the code for shared `lib/` modules).
 
 **Browser (`e2e/`):** Playwright, for what Vitest can't reach — async Server
 Components, routing, hydration. Its `webServer` builds + starts the app; specs

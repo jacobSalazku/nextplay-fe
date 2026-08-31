@@ -1,11 +1,11 @@
-import { api, gqlData } from '../../../test/msw/handlers';
-import { server } from '../../../test/msw/server';
-import { renderWithClient } from '../../../test/utils';
+import AttendanceModal from '@/features/attendance/components/attendance-modal';
 import useStore from '@/store/store';
+import { api, gqlData } from '@/test/msw/handlers';
+import { server } from '@/test/msw/server';
+import { renderWithClient } from '@/test/utils';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import AttendanceModal from './attendance-modal';
 
 vi.mock('@/context/team-context', () => ({
   useTeam: () => ({ routeKey: 'team-1' }),

@@ -1,9 +1,9 @@
-import { api, gqlData, gqlError } from '../../../test/msw/handlers';
-import { server } from '../../../test/msw/server';
-import { renderWithClient } from '../../../test/utils';
+import { AcceptTeamInviteCard } from '@/features/team-invite/components/accept-team-invite-card';
+import { api, gqlData, gqlError } from '@/test/msw/handlers';
+import { server } from '@/test/msw/server';
+import { renderWithClient } from '@/test/utils';
 import { screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { AcceptTeamInviteCard } from './accept-team-invite-card';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }),

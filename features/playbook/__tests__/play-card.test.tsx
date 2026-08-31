@@ -1,12 +1,12 @@
-import { makePlay } from '../../../../test/factories';
-import { api, gqlData, gqlError } from '../../../../test/msw/handlers';
-import { server } from '../../../../test/msw/server';
-import { renderWithClient } from '../../../../test/utils';
+import { PlayCard } from '@/features/playbook/components/play/play-card';
+import { makePlay } from '@/test/factories';
+import { api, gqlData, gqlError } from '@/test/msw/handlers';
+import { server } from '@/test/msw/server';
+import { renderWithClient } from '@/test/utils';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { toast } from 'sonner';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { PlayCard } from './play-card';
 
 const { refresh } = vi.hoisted(() => ({ refresh: vi.fn() }));
 vi.mock('next/navigation', () => ({

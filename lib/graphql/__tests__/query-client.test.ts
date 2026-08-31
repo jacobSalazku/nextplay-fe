@@ -1,7 +1,7 @@
 import { MutationObserver } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createQueryClient } from './query-client';
+import { createQueryClient } from '@/lib/graphql/query-client';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 

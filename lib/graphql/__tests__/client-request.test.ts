@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { gqlRequest } from '@/lib/graphql/client-request';
 import { CreatePlayDocument } from '@/graphql/graphql';
-import { gqlRequest } from './client-request';
 
 // A minimal fetch stub we can point at any Response per test.
 function stubFetch(impl: () => Promise<Response> | Response) {
