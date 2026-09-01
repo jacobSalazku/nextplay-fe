@@ -34,6 +34,15 @@ vi.mock('next/image', () => ({
     createElement('img', { ...props, alt: props.alt ?? '' }),
 }));
 
+// @sentry/nextjs pulls its build-time bundler plugins in through the package
+// entry, which throw under vitest's resolver. Tests only need the call surface.
+vi.mock('@sentry/nextjs', () => ({
+  init: vi.fn(),
+  captureException: vi.fn(),
+  captureRouterTransitionStart: vi.fn(),
+  captureRequestError: vi.fn(),
+}));
+
 // A logged-in session, so getSession() / useSession() don't try to hit
 // /api/auth/session (which MSW would then reject as unhandled).
 vi.mock('next-auth/react', async (importOriginal) => {
