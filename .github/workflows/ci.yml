@@ -14,6 +14,12 @@ env:
   # required by codegen.ts and the instrumentation.ts boot guard; CI never
   # actually reaches the backend (codegen uses the committed schema).
   BACKEND_GRAPHQL_URL: http://localhost:3001/graphql
+  # placeholder auth config so `next build` can collect page data for the
+  # nextauth route (its options module throws when no provider is configured).
+  AUTH_SECRET: ci-build-only
+  NEXTAUTH_SECRET: ci-build-only
+  AUTH_GOOGLE_ID: ci-build-only
+  AUTH_GOOGLE_SECRET: ci-build-only
 
 jobs:
   check:
@@ -39,9 +45,6 @@ jobs:
 
       - name: Build
         run: pnpm build
-        env:
-          AUTH_SECRET: ci-build-only
-          NEXTAUTH_SECRET: ci-build-only
 
       # Cross-repo schema drift: regenerate the typed client from the
       # backend's committed schema and fail if graphql/ changed. Needs a PAT
