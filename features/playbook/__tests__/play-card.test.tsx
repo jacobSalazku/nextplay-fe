@@ -3,7 +3,7 @@ import { makePlay } from '@/test/factories';
 import { api, gqlData, gqlError } from '@/test/msw/handlers';
 import { server } from '@/test/msw/server';
 import { renderWithClient } from '@/test/utils';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { toast } from 'sonner';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -16,6 +16,12 @@ vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('@/context/team-context', () => ({
   useTeam: () => ({ routeKey: 'team-1' }),
 }));
+
+async function clickDeleteAndConfirm() {
+  await userEvent.click(screen.getByRole('button', { name: /delete play/i }));
+  const dialog = await screen.findByRole('alertdialog');
+  await userEvent.click(within(dialog).getByRole('button', { name: 'Delete' }));
+}
 
 describe('PlayCard', () => {
   afterEach(() => vi.clearAllMocks());
@@ -58,7 +64,7 @@ describe('PlayCard', () => {
     const play = makePlay({ id: 'p1' });
 
     renderWithClient(<PlayCard play={play} role="COACH" />);
-    await userEvent.click(screen.getByRole('button', { name: /delete play/i }));
+    await clickDeleteAndConfirm();
 
     await waitFor(() => expect(refresh).toHaveBeenCalledOnce());
     expect(seen).toHaveBeenCalledWith({
@@ -74,7 +80,7 @@ describe('PlayCard', () => {
     server.use(api.mutation('DeletePlay', () => gqlError('Not a coach')));
 
     renderWithClient(<PlayCard play={makePlay()} role="COACH" />);
-    await userEvent.click(screen.getByRole('button', { name: /delete play/i }));
+    await clickDeleteAndConfirm();
 
     await waitFor(() => expect(toast.error).not.toHaveBeenCalled()); // handled globally, not here
     expect(refresh).not.toHaveBeenCalled();

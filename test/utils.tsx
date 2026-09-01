@@ -6,6 +6,7 @@ import {
   type RenderHookOptions,
   type RenderOptions,
 } from '@testing-library/react';
+import { ConfirmProvider } from '@/components/feedback/confirm-provider';
 
 /** A fresh QueryClient per test, retries off so failures surface immediately. */
 function makeQueryClient() {
@@ -20,7 +21,7 @@ function makeQueryClient() {
 function wrapper({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={makeQueryClient()}>
-      {children}
+      <ConfirmProvider>{children}</ConfirmProvider>
     </QueryClientProvider>
   );
 }

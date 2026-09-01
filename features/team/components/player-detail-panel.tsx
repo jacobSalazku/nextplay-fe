@@ -20,6 +20,7 @@ import {
   GetUserProfileQuery,
   Role,
 } from '@/graphql/graphql';
+import { useConfirm } from '@/components/feedback/confirm-provider';
 import { Button } from '@/components/foundation/button/button';
 import { CategoryBadge } from '@/components/foundation/category-badge';
 import { Tabs, TabsList } from '@/components/foundation/tabs/tab-list';
@@ -47,6 +48,7 @@ const PlayerDetailPanel = ({
 }) => {
   const { routeKey } = useTeam();
   const router = useRouter();
+  const confirm = useConfirm();
   const { mutate: deletePlayer } = useMutation({
     mutationFn: (id: string) =>
       gqlRequest(DeleteMemberDocument, { input: { id, routeKey } }),
@@ -76,7 +78,15 @@ const PlayerDetailPanel = ({
       : 'Unknown position';
   const roleLabel = selectedPlayer.role === Role.Coach ? 'Coach' : 'Player';
 
-  const handleDeletePlayer = (id: string) => deletePlayer(id);
+  const handleDeletePlayer = async (id: string) => {
+    const ok = await confirm({
+      title: 'Remove this player?',
+      description:
+        'They drop off the roster but their stats and attendance stay on record. Re-inviting restores their access.',
+      confirmLabel: 'Remove',
+    });
+    if (ok) deletePlayer(id);
+  };
 
   return (
     <div className="relative mx-auto w-full max-w-5xl px-4 py-8 text-white sm:px-6 lg:px-8">
