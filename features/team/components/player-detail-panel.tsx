@@ -51,6 +51,9 @@ const PlayerDetailPanel = ({
     mutationFn: (id: string) =>
       gqlRequest(DeleteMemberDocument, { input: { id, routeKey } }),
     onSuccess: () => {
+      // Soft-deleted, so this profile URL still resolves — leave it for the
+      // now-stale roster link instead of re-rendering a removed member.
+      router.push(`/team/${routeKey}/players`);
       router.refresh();
       toast.success('Player removed from team', {
         ...deleteToastStyling,
