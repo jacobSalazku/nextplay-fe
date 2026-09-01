@@ -26,11 +26,9 @@ const CONFIG = {
   ALLOWED_ATTR: ['style'],
 };
 
-/**
- * Render-time defense for the rich-text fields. The backend sanitizes on write;
- * this also covers rows stored before that and blocks anything a compromised
- * response could carry.
- */
+// Render-time defense for the rich-text fields. The backend sanitizes on write;
+// this also covers rows stored before that and anything a compromised response
+// could carry.
 export function sanitizeRichText(html: string | null | undefined): string {
   if (!html) return '';
   return DOMPurify.sanitize(html, CONFIG);
