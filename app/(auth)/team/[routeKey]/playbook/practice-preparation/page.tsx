@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { getPracticePreparationById } from '@/features/playbook/queries/get-practice-preparation-by-id';
 import { practiceSearchParamsCache } from '@/utils/search-params';
+import { sanitizeRichText } from '@/lib/sanitize-rich-text';
 
 type PageProps = {
   searchParams: Promise<{ id: string }>;
@@ -50,7 +51,7 @@ async function PracticePreparationView({ searchParams, params }: PageProps) {
           <div
             className="prose prose-invert prose-h1:text-2xl prose-ul:py-0 prose-li:py-0 prose-strong:font-extrabold prose-h2:text-lg max-w-none rounded p-4 text-white"
             dangerouslySetInnerHTML={{
-              __html: practicePreparation.notes ?? '',
+              __html: sanitizeRichText(practicePreparation.notes),
             }}
           />
         </div>
