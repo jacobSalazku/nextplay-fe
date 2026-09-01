@@ -19,7 +19,7 @@ import {
   type PracticePreparation,
 } from '@/graphql/graphql';
 import { Card } from '@/components/card';
-import { useConfirm } from '@/components/feedback/confirm-provider';
+import { useConfirmedAction } from '@/components/feedback/confirm-provider';
 import { Button } from '@/components/foundation/button/button';
 import { Link } from '@/components/foundation/button/link';
 import { Tabs, TabsList } from '@/components/foundation/tabs/tab-list';
@@ -43,7 +43,6 @@ const PlaybookBookBlock: FC<PageProps> = ({
 }) => {
   const { routeKey } = useTeam();
   const router = useRouter();
-  const confirm = useConfirm();
   const {
     activeCoachTab,
     setOpenGamePlan,
@@ -72,23 +71,20 @@ const PlaybookBookBlock: FC<PageProps> = ({
     onSuccess: onDeleteSuccess,
   });
 
-  const confirmDeleteGamePlan = async (id: string) => {
-    const ok = await confirm({
-      title: 'Delete this game plan?',
-      description: 'This permanently removes the game plan.',
-      confirmLabel: 'Delete',
-    });
-    if (ok) deleteGamePlan(id);
-  };
+  const confirmDeleteGamePlan = useConfirmedAction(deleteGamePlan, {
+    title: 'Delete this game plan?',
+    description: 'This permanently removes the game plan.',
+    confirmLabel: 'Delete',
+  });
 
-  const confirmDeletePracticePreparation = async (id: string) => {
-    const ok = await confirm({
+  const confirmDeletePracticePreparation = useConfirmedAction(
+    deletePracticePreparation,
+    {
       title: 'Delete this preparation?',
       description: 'This permanently removes the practice preparation.',
       confirmLabel: 'Delete',
-    });
-    if (ok) deletePracticePreparation(id);
-  };
+    },
+  );
 
   const handleCoachTabChange = useCallback(
     (value: string) => {

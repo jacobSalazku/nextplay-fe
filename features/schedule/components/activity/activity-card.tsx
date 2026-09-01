@@ -18,7 +18,7 @@ import {
   DeleteActivityDocument,
   MemberWithAttendances,
 } from '@/graphql/graphql';
-import { useConfirm } from '@/components/feedback/confirm-provider';
+import { useConfirmedAction } from '@/components/feedback/confirm-provider';
 import { Button } from '@/components/foundation/button/button';
 import { Link } from '@/components/foundation/button/link';
 
@@ -30,7 +30,6 @@ type ActivityCardProps = {
 export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
   const { routeKey } = useTeam();
   const router = useRouter();
-  const confirm = useConfirm();
   const {
     setOpenPracticeDetails,
     setOpenGameDetails,
@@ -72,15 +71,12 @@ export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
     },
   });
 
-  const handleDeleteActivity = async (id: string) => {
-    const ok = await confirm({
-      title: 'Delete this activity?',
-      description:
-        "This permanently deletes the activity and its box score. This can't be undone.",
-      confirmLabel: 'Delete',
-    });
-    if (ok) deleteActivity(id);
-  };
+  const handleDeleteActivity = useConfirmedAction(deleteActivity, {
+    title: 'Delete this activity?',
+    description:
+      "This permanently deletes the activity and its box score. This can't be undone.",
+    confirmLabel: 'Delete',
+  });
 
   const date = isToday(new Date(activity.date));
 
@@ -156,7 +152,7 @@ export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
         </Button>
         {role && (
           <Button
-            onClick={async () => handleDeleteActivity(activity.id)}
+            onClick={() => handleDeleteActivity(activity.id)}
             aria-label="Delete Activity"
             size="sm"
             variant="danger"

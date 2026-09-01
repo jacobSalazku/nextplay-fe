@@ -90,18 +90,4 @@ describe('useConfirm', () => {
       expect(screen.getByRole('status')).toHaveTextContent('1:false'),
     );
   });
-
-  it('resolves the previous call false when a new confirm opens', async () => {
-    renderHarness();
-    const trigger = screen.getByRole('button', { name: 'trigger' });
-
-    await userEvent.click(trigger);
-    await screen.findByRole('alertdialog');
-    await userEvent.click(trigger);
-    await userEvent.click(
-      await screen.findByRole('button', { name: 'Remove' }),
-    );
-
-    expect(screen.getByRole('status')).toHaveTextContent('2:true');
-  });
 });

@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { gqlRequest } from '@/lib/graphql/client-request';
 import { DeletePlayDocument, Play } from '@/graphql/graphql';
 import { Card, CardContent } from '@/components/card';
-import { useConfirm } from '@/components/feedback/confirm-provider';
+import { useConfirmedAction } from '@/components/feedback/confirm-provider';
 import { Button } from '@/components/foundation/button/button';
 import { Link } from '@/components/foundation/button/link';
 
@@ -48,7 +48,6 @@ function resolvePlayImageSrc(canvas?: string | null): string {
 export const PlayCard = ({ play, role }: PlayCardProps) => {
   const { routeKey } = useTeam();
   const router = useRouter();
-  const confirm = useConfirm();
   const { mutate: deletePlay } = useMutation({
     mutationFn: () =>
       gqlRequest(DeletePlayDocument, { input: { routeKey, id: play.id } }),
@@ -59,6 +58,11 @@ export const PlayCard = ({ play, role }: PlayCardProps) => {
         position: 'top-right',
       });
     },
+  });
+  const handleDelete = useConfirmedAction(deletePlay, {
+    title: 'Delete this play?',
+    description: 'This permanently removes the play from your playbook.',
+    confirmLabel: 'Delete',
   });
   const imageSrc = resolvePlayImageSrc(play.canvas);
   const summary = (play.description ?? '')
@@ -97,15 +101,7 @@ export const PlayCard = ({ play, role }: PlayCardProps) => {
                 variant="danger"
                 size="icon"
                 className="h-9 w-9 rounded-full border border-white/35 bg-slate-900/45 text-white backdrop-blur-md hover:bg-red-600"
-                onClick={async () => {
-                  const ok = await confirm({
-                    title: 'Delete this play?',
-                    description:
-                      'This permanently removes the play from your playbook.',
-                    confirmLabel: 'Delete',
-                  });
-                  if (ok) deletePlay();
-                }}
+                onClick={() => handleDelete()}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>

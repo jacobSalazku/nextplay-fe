@@ -26,8 +26,8 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
   const [options, setOptions] = useState<ConfirmOptions | null>(null);
   const resolverRef = useRef<((value: boolean) => void) | null>(null);
 
-  const settle = useCallback((value: boolean) => {
-    resolverRef.current?.(value);
+  const close = useCallback((confirmed: boolean) => {
+    resolverRef.current?.(confirmed);
     resolverRef.current = null;
     setOptions(null);
   }, []);
@@ -47,16 +47,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
   return (
     <ConfirmContext.Provider value={confirm}>
       {children}
-      <ConfirmDialog
-        open={options !== null}
-        title={options?.title ?? ''}
-        description={options?.description}
-        confirmLabel={options?.confirmLabel}
-        cancelLabel={options?.cancelLabel}
-        confirmVariant={options?.confirmVariant}
-        onConfirm={() => settle(true)}
-        onCancel={() => settle(false)}
-      />
+      {options && <ConfirmDialog open {...options} onClose={close} />}
     </ConfirmContext.Provider>
   );
 }
@@ -67,4 +58,18 @@ export function useConfirm(): Confirm {
     throw new Error('useConfirm must be used within a ConfirmProvider');
   }
   return confirm;
+}
+
+/**
+ * Wrap an action so it only runs after the user confirms.
+ * `const remove = useConfirmedAction(deletePlayer, { title: '…' });`
+ */
+export function useConfirmedAction<Args extends unknown[]>(
+  action: (...args: Args) => void,
+  options: ConfirmOptions,
+): (...args: Args) => Promise<void> {
+  const confirm = useConfirm();
+  return async (...args: Args) => {
+    if (await confirm(options)) action(...args);
+  };
 }
