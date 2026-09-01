@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import * as Sentry from '@sentry/nextjs';
 import { ErrorState } from '@/components/feedback/error-state';
 
 export default function TeamError({
@@ -15,6 +16,7 @@ export default function TeamError({
 
   useEffect(() => {
     console.error(error);
+    Sentry.captureException(error);
   }, [error]);
 
   return (

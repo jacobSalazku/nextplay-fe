@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import { getToken } from 'next-auth/jwt';
 
 /**
@@ -65,7 +66,8 @@ export async function POST(req: NextRequest) {
       body: await req.text(),
       cache: 'no-store',
     });
-  } catch {
+  } catch (err) {
+    Sentry.captureException(err);
     return NextResponse.json(
       { errors: [{ message: 'Upstream GraphQL request failed' }] },
       { status: 502 },
