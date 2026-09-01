@@ -3,6 +3,7 @@ import Image from 'next/image';
 import PlanViewSkeleton from '@/features/playbook/components/skeleton/plan-view-skeleton';
 import { getPlay } from '@/features/playbook/queries/get-play';
 import { playbookSearchParamsCache } from '@/utils/search-params';
+import { sanitizeRichText } from '@/lib/sanitize-rich-text';
 
 type PageProps = {
   params: Promise<{ routeKey: string }>;
@@ -50,7 +51,9 @@ async function PlayContent({ id, routeKey }: { id: string; routeKey: string }) {
         <div className="flex flex-col p-0 sm:flex-row sm:items-start md:gap-8">
           <div
             className="prose prose-invert prose-h1:text-2xl prose-ul:py-0 prose-li:py-0 prose-strong:font-extrabold prose-h2:text-lg max-w-none text-white"
-            dangerouslySetInnerHTML={{ __html: play.description ?? '' }}
+            dangerouslySetInnerHTML={{
+              __html: sanitizeRichText(play.description),
+            }}
           />
           <div className="mb-4 shrink-0 sm:mr-6 sm:mb-0 sm:w-2/5">
             <Image
