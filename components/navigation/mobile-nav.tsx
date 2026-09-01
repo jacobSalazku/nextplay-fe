@@ -1,5 +1,6 @@
 import type { NavItemType } from '.';
 import { Button } from '../foundation/button/button';
+import { useLogout } from '@/features/auth/use-logout';
 import { useNavigationStore } from '@/store/use-navigation-store';
 import { cn } from '@/utils/tw-merge';
 import { LogOut, X } from 'lucide-react';
@@ -11,7 +12,8 @@ type MobileNavProps = {
   routeKey?: string;
 };
 export function MobileNav({ items, onClose, routeKey }: MobileNavProps) {
-  const { mobileNavOpen, setOpenLogOutModal } = useNavigationStore();
+  const { mobileNavOpen } = useNavigationStore();
+  const logout = useLogout();
   return (
     <div
       className={cn(
@@ -50,7 +52,7 @@ export function MobileNav({ items, onClose, routeKey }: MobileNavProps) {
             <Button
               aria-label="Logout"
               className="flex w-full items-center justify-start px-4 py-3 text-sm transition-colors dark:hover:bg-gray-800"
-              onClick={() => setOpenLogOutModal(true)}
+              onClick={() => logout()}
             >
               <LogOut className="mr-2 h-5 w-5 rotate-180" />
               <span>Logout</span>
