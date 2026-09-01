@@ -1,14 +1,15 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useLogout } from '@/features/auth/use-logout';
 import { User } from 'lucide-react';
-import { signOut } from 'next-auth/react';
 import { Button } from '@/components/foundation/button/button';
 import { Link } from '@/components/foundation/button/link';
 
 const ProfileDropDown = () => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const logout = useLogout();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -51,7 +52,7 @@ const ProfileDropDown = () => {
           </Link>
           <Button
             size="full"
-            onClick={() => signOut({ callbackUrl: '/login' })}
+            onClick={() => logout()}
             className="justify-start px-4 py-2 hover:bg-gray-700 hover:text-white"
           >
             Logout

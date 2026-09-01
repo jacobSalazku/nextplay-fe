@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTeam } from '@/context/team-context';
-import { useNavigationStore } from '@/store/use-navigation-store';
+import { useLogout } from '@/features/auth/use-logout';
 import { useUserStore } from '@/store/user-store';
 import { cn } from '@/utils/tw-merge';
 import { ChevronRight, User } from 'lucide-react';
@@ -18,7 +18,7 @@ export const Breadcrumb = () => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  const { setOpenLogOutModal } = useNavigationStore();
+  const logout = useLogout();
   const { data: session } = useSession();
   const { teamSlug, routeKey } = useTeam();
   const { user } = useUserStore();
@@ -115,7 +115,7 @@ export const Breadcrumb = () => {
               className="block w-full rounded px-4 py-2 text-left text-white hover:bg-gray-700 hover:text-white"
               onClick={() => {
                 setOpen(false);
-                setOpenLogOutModal(true);
+                logout();
               }}
             >
               Logout

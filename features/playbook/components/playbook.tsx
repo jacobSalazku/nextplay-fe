@@ -19,6 +19,7 @@ import {
   type PracticePreparation,
 } from '@/graphql/graphql';
 import { Card } from '@/components/card';
+import { useConfirmedAction } from '@/components/feedback/confirm-provider';
 import { Button } from '@/components/foundation/button/button';
 import { Link } from '@/components/foundation/button/link';
 import { Tabs, TabsList } from '@/components/foundation/tabs/tab-list';
@@ -69,6 +70,21 @@ const PlaybookBookBlock: FC<PageProps> = ({
       }),
     onSuccess: onDeleteSuccess,
   });
+
+  const confirmDeleteGamePlan = useConfirmedAction(deleteGamePlan, {
+    title: 'Delete this game plan?',
+    description: 'This permanently removes the game plan.',
+    confirmLabel: 'Delete',
+  });
+
+  const confirmDeletePracticePreparation = useConfirmedAction(
+    deletePracticePreparation,
+    {
+      title: 'Delete this preparation?',
+      description: 'This permanently removes the practice preparation.',
+      confirmLabel: 'Delete',
+    },
+  );
 
   const handleCoachTabChange = useCallback(
     (value: string) => {
@@ -145,7 +161,7 @@ const PlaybookBookBlock: FC<PageProps> = ({
                 key={idx}
                 role={role}
                 plan={item}
-                onDelete={() => deleteGamePlan(item.id)}
+                onDelete={() => confirmDeleteGamePlan(item.id)}
                 onView={{
                   pathname: `/team/${routeKey}/playbook/gameplan`,
                   query: { id: item.id },
@@ -174,7 +190,7 @@ const PlaybookBookBlock: FC<PageProps> = ({
                 key={idx}
                 role={role}
                 plan={practice}
-                onDelete={() => deletePracticePreparation(practice.id)}
+                onDelete={() => confirmDeletePracticePreparation(practice.id)}
                 onView={{
                   pathname: `/team/${routeKey}/playbook/practice-preparation`,
                   query: { id: practice.id },

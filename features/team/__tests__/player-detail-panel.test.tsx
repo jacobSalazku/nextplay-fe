@@ -1,12 +1,12 @@
 import PlayerDetailPanel from '@/features/team/components/player-detail-panel';
-import { GetUserProfileQuery, Role, Status } from '@/graphql/graphql';
 import { api, gqlData, gqlError } from '@/test/msw/handlers';
 import { server } from '@/test/msw/server';
 import { renderWithClient } from '@/test/utils';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { toast } from 'sonner';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { GetUserProfileQuery, Role, Status } from '@/graphql/graphql';
 
 const { push, refresh } = vi.hoisted(() => ({
   push: vi.fn(),
@@ -49,6 +49,14 @@ const makeMember = (
   ...overrides,
 });
 
+async function clickRemoveAndConfirm() {
+  await userEvent.click(
+    screen.getByRole('button', { name: /remove from team/i }),
+  );
+  const dialog = await screen.findByRole('alertdialog');
+  await userEvent.click(within(dialog).getByRole('button', { name: 'Remove' }));
+}
+
 describe('PlayerDetailPanel', () => {
   afterEach(() => vi.clearAllMocks());
 
@@ -82,9 +90,7 @@ describe('PlayerDetailPanel', () => {
         userProfile={makeMember({ id: 'm1', role: Role.Coach })}
       />,
     );
-    await userEvent.click(
-      screen.getByRole('button', { name: /remove from team/i }),
-    );
+    await clickRemoveAndConfirm();
 
     await waitFor(() => expect(push).toHaveBeenCalledOnce());
     expect(push).toHaveBeenCalledWith('/team/team-1/players');
@@ -103,9 +109,7 @@ describe('PlayerDetailPanel', () => {
     renderWithClient(
       <PlayerDetailPanel userProfile={makeMember({ role: Role.Coach })} />,
     );
-    await userEvent.click(
-      screen.getByRole('button', { name: /remove from team/i }),
-    );
+    await clickRemoveAndConfirm();
 
     await waitFor(() => expect(toast.error).not.toHaveBeenCalled()); // handled globally, not here
     expect(push).not.toHaveBeenCalled();

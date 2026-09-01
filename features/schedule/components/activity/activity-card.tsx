@@ -18,6 +18,7 @@ import {
   DeleteActivityDocument,
   MemberWithAttendances,
 } from '@/graphql/graphql';
+import { useConfirmedAction } from '@/components/feedback/confirm-provider';
 import { Button } from '@/components/foundation/button/button';
 import { Link } from '@/components/foundation/button/link';
 
@@ -70,7 +71,12 @@ export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
     },
   });
 
-  const handleDeleteActivity = (id: string) => deleteActivity(id);
+  const handleDeleteActivity = useConfirmedAction(deleteActivity, {
+    title: 'Delete this activity?',
+    description:
+      "This permanently deletes the activity and its box score. This can't be undone.",
+    confirmLabel: 'Delete',
+  });
 
   const date = isToday(new Date(activity.date));
 
@@ -146,7 +152,7 @@ export const ActivityCard: FC<ActivityCardProps> = ({ activity, member }) => {
         </Button>
         {role && (
           <Button
-            onClick={async () => handleDeleteActivity(activity.id)}
+            onClick={() => handleDeleteActivity(activity.id)}
             aria-label="Delete Activity"
             size="sm"
             variant="danger"

@@ -5,9 +5,6 @@ type NavigationState = {
   setMobileNavOpen: (open: boolean) => void;
   navOpen: boolean;
   setNavOpen: (open: boolean) => void;
-
-  openLogOutModal: boolean;
-  setOpenLogOutModal: (open: boolean) => void;
 };
 
 export const useNavigationStore = create<NavigationState>((set) => ({
@@ -16,7 +13,4 @@ export const useNavigationStore = create<NavigationState>((set) => ({
 
   mobileNavOpen: false,
   setMobileNavOpen: (open) => set({ mobileNavOpen: open }),
-
-  openLogOutModal: false,
-  setOpenLogOutModal: (open) => set({ openLogOutModal: open }),
 }));
