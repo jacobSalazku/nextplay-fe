@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import PlanViewSkeleton from '@/features/playbook/components/skeleton/plan-view-skeleton';
 import { getGameplanById } from '@/features/playbook/queries/get-gameplan-by-id';
 import { gameplanSearchParamsCache } from '@/utils/search-params';
+import { sanitizeRichText } from '@/lib/sanitize-rich-text';
 
 type PageProps = {
   searchParams: Promise<{ id: string }>;
@@ -46,7 +47,9 @@ async function GamePlanContent({
 
           <div
             className="prose prose-invert prose-h1:text-2xl prose-ul:py-0 prose-li:py-0 prose-strong:font-extrabold prose-h2:text-lg max-w-none rounded p-4 text-white"
-            dangerouslySetInnerHTML={{ __html: gameplan.notes ?? '' }}
+            dangerouslySetInnerHTML={{
+              __html: sanitizeRichText(gameplan.notes),
+            }}
           />
         </div>
       </div>
