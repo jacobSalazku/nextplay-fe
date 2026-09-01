@@ -47,10 +47,12 @@ jobs:
       # backend's committed schema and fail if graphql/ changed. Needs a PAT
       # with read access to nextplay-be while that repo is private.
       - name: GraphQL types match the backend schema
-        if: ${{ secrets.NEXTPLAY_BE_TOKEN != '' }}
+        if: ${{ env.NEXTPLAY_BE_TOKEN != '' }}
+        env:
+          NEXTPLAY_BE_TOKEN: ${{ secrets.NEXTPLAY_BE_TOKEN }}
         run: |
           curl -sfL \
-            -H "Authorization: token ${{ secrets.NEXTPLAY_BE_TOKEN }}" \
+            -H "Authorization: token ${NEXTPLAY_BE_TOKEN}" \
             -H "Accept: application/vnd.github.raw" \
             "https://api.github.com/repos/jacobSalazku/nextplay-be/contents/graphql/schema.graphql?ref=main" \
             -o schema.be.graphql
