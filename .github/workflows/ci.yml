@@ -20,6 +20,8 @@ env:
   NEXTAUTH_SECRET: ci-build-only
   AUTH_GOOGLE_ID: ci-build-only
   AUTH_GOOGLE_SECRET: ci-build-only
+  # metadataBase in the team routes does `new URL(process.env.NEXT_BASE_URL ?? '')`
+  NEXT_BASE_URL: http://localhost:3000
 
 jobs:
   check:
