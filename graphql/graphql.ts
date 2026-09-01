@@ -925,7 +925,8 @@ export type StatsPerGameInput = {
 export enum Status {
   Active = 'ACTIVE',
   Inactive = 'INACTIVE',
-  Pending = 'PENDING'
+  Pending = 'PENDING',
+  Removed = 'REMOVED'
 }
 
 export type SubmitStatlinesInput = {
