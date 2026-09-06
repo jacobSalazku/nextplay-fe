@@ -10,7 +10,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { Category } from '@/graphql/graphql';
 import { Button } from '@/components/foundation/button/button';
-import { Input } from '@/components/foundation/input';
 
 // Loose on purpose: `court` widens from the codegen enum to our string union,
 // `objects` is the JSON scalar. Coerced through toFormationObjects on use.
@@ -42,14 +41,13 @@ export function NewPlaySetup({
   const { createPlay, isCreating } = useCreatePlay(routeKey);
 
   const {
-    register,
     handleSubmit,
     control,
     setValue,
     formState: { errors },
   } = useForm<NewPlayData>({
     resolver: zodResolver(newPlaySchema),
-    defaultValues: { name: '', court: 'half', formationId: '' },
+    defaultValues: { court: 'half', formationId: '' },
   });
 
   const court = useWatch({ control, name: 'court' });
@@ -61,7 +59,7 @@ export function NewPlaySetup({
 
     // global MutationCache toasts failures; catch to keep the form usable
     await createPlay({
-      name: data.name,
+      name: 'New play',
       description: '',
       category: data.category,
       diagram: seedDiagram(data.court, objects),
@@ -76,20 +74,10 @@ export function NewPlaySetup({
       <header>
         <h1 className="text-2xl font-bold text-white">New play</h1>
         <p className="text-sm text-gray-400">
-          Pick a court and a starting formation. You can move players once the
-          editor opens.
+          Pick a court and a starting formation. You can move players and name
+          the play once the editor opens.
         </p>
       </header>
-
-      <Input
-        id="name"
-        label="Name"
-        labelColor="light"
-        placeholder="e.g. Horns flare"
-        {...register('name')}
-        error={errors.name}
-        errorMessage={errors.name?.message}
-      />
 
       <Fieldset label="Category" error={errors.category?.message}>
         <Controller

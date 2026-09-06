@@ -240,3 +240,51 @@ describe('PlayEditor — selection panel', () => {
     ).toBeInTheDocument();
   });
 });
+
+describe('PlayEditor — rename', () => {
+  it('renames the play from the header title', async () => {
+    // Arrange
+    const user = userEvent.setup();
+    const seen = vi.fn();
+    server.use(
+      api.mutation('UpdatePlay', ({ variables }) => {
+        seen(variables.input);
+        return gqlData({ updatePlay: { id: 'play-1' } });
+      }),
+    );
+    renderEditor();
+
+    // Act — click the title, type a new name, commit with Enter
+    await user.click(screen.getByRole('button', { name: 'Horns' }));
+    const field = screen.getByLabelText('Play name');
+    await user.clear(field);
+    await user.type(field, 'Horns flare{Enter}');
+
+    // Assert
+    await waitFor(() =>
+      expect(seen).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'play-1', name: 'Horns flare' }),
+      ),
+    );
+  });
+
+  it('does not call the backend when the name is unchanged', async () => {
+    // Arrange
+    const user = userEvent.setup();
+    const seen = vi.fn();
+    server.use(
+      api.mutation('UpdatePlay', ({ variables }) => {
+        seen(variables.input);
+        return gqlData({ updatePlay: { id: 'play-1' } });
+      }),
+    );
+    renderEditor();
+
+    // Act — open and close the field without editing
+    await user.click(screen.getByRole('button', { name: 'Horns' }));
+    await user.keyboard('{Escape}');
+
+    // Assert
+    expect(seen).not.toHaveBeenCalled();
+  });
+});

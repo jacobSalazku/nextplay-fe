@@ -9,17 +9,24 @@ import { UpdatePlayDocument } from '@/graphql/graphql';
 export const useUpdatePlay = (routeKey: string, id: string) => {
   const router = useRouter();
 
-  const { mutateAsync, isPending } = useMutation({
+  const save = useMutation({
     mutationFn: (diagram: PlayDiagram) =>
       gqlRequest(UpdatePlayDocument, { input: { id, routeKey, diagram } }),
     onSuccess: () => {
       router.refresh();
-      toast.success('Play saved', {
-        ...toastStyling,
-        position: 'top-right',
-      });
+      toast.success('Play saved', { ...toastStyling, position: 'top-right' });
     },
   });
 
-  return { savePlay: mutateAsync, isSaving: isPending };
+  const rename = useMutation({
+    mutationFn: (name: string) =>
+      gqlRequest(UpdatePlayDocument, { input: { id, routeKey, name } }),
+    onSuccess: () => router.refresh(),
+  });
+
+  return {
+    savePlay: save.mutateAsync,
+    isSaving: save.isPending,
+    renamePlay: rename.mutateAsync,
+  };
 };

@@ -24,7 +24,7 @@ type Props = {
 export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
   const router = useRouter();
   const confirm = useConfirm();
-  const { savePlay, isSaving } = useUpdatePlay(routeKey, playId);
+  const { savePlay, isSaving, renamePlay } = useUpdatePlay(routeKey, playId);
 
   // Load this play into the singleton store. The initializer hydrates before
   // the first paint (no empty flash); the effect re-hydrates only if the store
@@ -117,6 +117,20 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
     router.push(toPlaybook);
   };
 
+  const [nameDraft, setNameDraft] = useState(name);
+  const [renaming, setRenaming] = useState(false);
+
+  const startRenaming = () => {
+    setNameDraft(name);
+    setRenaming(true);
+  };
+
+  const commitName = () => {
+    setRenaming(false);
+    const next = nameDraft.trim();
+    if (next && next !== name) renamePlay(next).catch(() => {});
+  };
+
   const selectedObject =
     selection?.kind === 'object'
       ? (phase.objects.find((o) => o.id === selection.id) ?? null)
@@ -139,7 +153,30 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
           <Button variant="close" onClick={leave} aria-label="Back to playbook">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="truncate text-lg font-semibold">{name}</h1>
+          <h1 className="min-w-0 truncate text-lg font-semibold">
+            {renaming ? (
+              <input
+                autoFocus
+                aria-label="Play name"
+                value={nameDraft}
+                onChange={(event) => setNameDraft(event.target.value)}
+                onBlur={commitName}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') commitName();
+                  if (event.key === 'Escape') setRenaming(false);
+                }}
+                className="w-56 max-w-full rounded bg-slate-800 px-2 py-0.5 outline-none focus:ring-2 focus:ring-orange-400"
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={startRenaming}
+                className="max-w-full truncate rounded px-1 hover:bg-white/5"
+              >
+                {name}
+              </button>
+            )}
+          </h1>
         </div>
         <Button
           variant="primary"
