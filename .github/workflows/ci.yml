@@ -67,8 +67,7 @@ jobs:
 
   e2e:
     runs-on: ubuntu-latest
-    # Postgres for the backend the `play editor flow` spec drives. Skipped when
-    # NEXTPLAY_BE_TOKEN is absent (forks) — the flow spec skips itself.
+    # Postgres for the backend the `play editor flow` spec drives.
     services:
       postgres:
         image: postgres:17-alpine
@@ -82,17 +81,15 @@ jobs:
           --health-cmd "pg_isready -U nextplay"
           --health-interval 1s --health-timeout 3s --health-retries 30
     env:
-      NEXTPLAY_BE_TOKEN: ${{ secrets.NEXTPLAY_BE_TOKEN }}
       DATABASE_URL: postgresql://nextplay:nextplay@localhost:5432/nextplay_e2e
+      E2E_BACKEND_DIR: ${{ github.workspace }}/nextplay-be
     steps:
       - uses: actions/checkout@v4
       - name: Check out nextplay-be
-        if: ${{ env.NEXTPLAY_BE_TOKEN != '' }}
         uses: actions/checkout@v4
         with:
           repository: jacobSalazku/nextplay-be
           ref: main
-          token: ${{ secrets.NEXTPLAY_BE_TOKEN }}
           path: nextplay-be
 
       - uses: pnpm/action-setup@v4
@@ -103,18 +100,15 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - name: Install backend deps
-        if: ${{ env.NEXTPLAY_BE_TOKEN != '' }}
         working-directory: nextplay-be
         run: pnpm install --frozen-lockfile
 
       - run: pnpm exec playwright install --with-deps chromium
 
       - name: Playwright
-        # playwright.config.ts boots nextplay-be via e2e/start-backend.sh when
-        # E2E_BACKEND_DIR exists; otherwise the flow spec skips.
+        # playwright.config.ts boots nextplay-be via e2e/start-backend.sh
+        # because E2E_BACKEND_DIR is set.
         run: pnpm exec playwright test
-        env:
-          E2E_BACKEND_DIR: ${{ env.NEXTPLAY_BE_TOKEN != '' && format('{0}/nextplay-be', github.workspace) || '' }}
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}

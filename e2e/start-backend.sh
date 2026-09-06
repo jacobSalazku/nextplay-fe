@@ -26,6 +26,7 @@ if [ -z "${JWT_PRIVATE_KEY_BASE64:-}" ]; then
 fi
 
 [ -d node_modules ] || pnpm install --frozen-lockfile
+pnpm exec prisma generate
 pnpm exec prisma migrate deploy
 node prisma/seed.js
 exec pnpm start
