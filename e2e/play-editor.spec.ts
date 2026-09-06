@@ -153,6 +153,38 @@ test.describe('play editor flow', () => {
     ).toBeVisible();
   });
 
+  test('add a phase, move a player in it, and both phases persist', async ({
+    page,
+  }) => {
+    // Arrange
+    await newPlay(page);
+    const strip = page.getByRole('tablist', { name: 'Phases' });
+    const token = () => page.getByRole('button', { name: 'Move player 1' });
+    const p1Pos = await pos(token());
+
+    // Act — add a second phase and move player 1 in it
+    await page.getByRole('button', { name: 'Add phase' }).click();
+    await expect(strip.getByRole('tab')).toHaveCount(2);
+    await drag(page, token(), { x: 500, y: 250 });
+    const p2Pos = await pos(token());
+    expect(p2Pos).not.toEqual(p1Pos);
+
+    // Assert — phase 1 still has the player where it started
+    await strip.getByRole('tab', { name: 'Phase 1' }).click();
+    expect(await pos(token())).toEqual(p1Pos);
+
+    // Act — save and reload
+    await page.getByRole('button', { name: /save/i }).click();
+    await expect(page.getByRole('button', { name: /save/i })).toBeDisabled();
+    await page.reload();
+
+    // Assert — two phases, each with its own position
+    await expect(strip.getByRole('tab')).toHaveCount(2);
+    expect(await pos(token())).toEqual(p1Pos);
+    await strip.getByRole('tab', { name: 'Phase 2' }).click();
+    expect(await pos(token())).toEqual(p2Pos);
+  });
+
   test('warns before leaving with unsaved changes', async ({ page }) => {
     // Arrange — a fresh play with one dragged (unsaved) player
     await newPlay(page);
