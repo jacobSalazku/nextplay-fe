@@ -44,10 +44,13 @@ function renderStage(
 ) {
   const spies = {
     onSelect: vi.fn(),
+    onBeginEdit: vi.fn(),
+    onEndEdit: vi.fn(),
     onMove: vi.fn(),
     onDraw: vi.fn(),
     onBend: vi.fn(),
     onRotate: vi.fn(),
+    onSetBall: vi.fn(),
     onDelete: vi.fn(),
   };
   render(
@@ -67,8 +70,12 @@ describe('EditorStage — select tool', () => {
   it('labels a grab target for every token', () => {
     renderStage();
 
-    expect(screen.getByRole('button', { name: 'Move 1' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Move 2' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Move player 1' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Move player 2' }),
+    ).toBeInTheDocument();
   });
 
   it('selects a token when it is pressed', () => {
@@ -76,9 +83,12 @@ describe('EditorStage — select tool', () => {
     const { onSelect } = renderStage();
 
     // Act
-    fireEvent.pointerDown(screen.getByRole('button', { name: 'Move 1' }), {
-      pointerId: 1,
-    });
+    fireEvent.pointerDown(
+      screen.getByRole('button', { name: 'Move player 1' }),
+      {
+        pointerId: 1,
+      },
+    );
 
     // Assert
     expect(onSelect).toHaveBeenCalledWith({ kind: 'object', id: 'o1' });
@@ -88,7 +98,7 @@ describe('EditorStage — select tool', () => {
     // Arrange
     pinBox();
     const { onMove } = renderStage();
-    const token = screen.getByRole('button', { name: 'Move 2' }); // o2 at (75,75)
+    const token = screen.getByRole('button', { name: 'Move player 2' }); // o2 at (75,75)
 
     // Act — grab o2 at its centre, drag past the top-right corner
     fireEvent.pointerDown(token, { pointerId: 1, ...at(75, 75) });
@@ -96,6 +106,35 @@ describe('EditorStage — select tool', () => {
 
     // Assert
     expect(onMove).toHaveBeenLastCalledWith('o2', 100, 0);
+  });
+
+  it('gives the ball from a token dot', () => {
+    // Arrange
+    const { onSetBall } = renderStage();
+
+    // Act
+    fireEvent.pointerDown(
+      screen.getByRole('button', { name: 'Give the ball to 1' }),
+    );
+
+    // Assert
+    expect(onSetBall).toHaveBeenCalledWith('o1');
+  });
+
+  it('has no ball dot on a defender', () => {
+    // Arrange
+    renderStage({
+      phase: {
+        id: 'p1',
+        objects: [{ id: 'x1', kind: 'defense', label: '1', x: 50, y: 50 }],
+        actions: [],
+      },
+    });
+
+    // Assert
+    expect(
+      screen.queryByRole('button', { name: /give the ball/i }),
+    ).not.toBeInTheDocument();
   });
 
   it('clears the selection when the empty court is pressed', () => {
@@ -136,7 +175,7 @@ describe('EditorStage — drawing an action', () => {
     // Arrange
     pinBox();
     const { onDraw } = renderStage({ tool: 'pass' });
-    const from = screen.getByRole('button', { name: 'Draw from 1' });
+    const from = screen.getByRole('button', { name: 'Draw from player 1' });
 
     // Act — press on o1 (25,25), release on o2 (75,75)
     fireEvent.pointerDown(from, { pointerId: 1, ...at(25, 25) });
@@ -151,7 +190,7 @@ describe('EditorStage — drawing an action', () => {
     // Arrange
     pinBox();
     const { onDraw } = renderStage({ tool: 'cut' });
-    const from = screen.getByRole('button', { name: 'Draw from 1' });
+    const from = screen.getByRole('button', { name: 'Draw from player 1' });
 
     // Act — release on empty court at (45,45), nothing nearby
     fireEvent.pointerDown(from, { pointerId: 1, ...at(25, 25) });
@@ -165,7 +204,7 @@ describe('EditorStage — drawing an action', () => {
     // Arrange
     pinBox();
     const { onDraw } = renderStage({ tool: 'cut' });
-    const from = screen.getByRole('button', { name: 'Draw from 1' });
+    const from = screen.getByRole('button', { name: 'Draw from player 1' });
 
     // Act — barely moved
     fireEvent.pointerDown(from, { pointerId: 1, ...at(25, 25) });

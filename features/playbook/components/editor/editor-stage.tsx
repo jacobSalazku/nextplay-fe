@@ -40,10 +40,13 @@ type Props = {
   tool: EditorTool;
   selection: Selection;
   onSelect: (selection: Selection) => void;
+  onBeginEdit: () => void;
+  onEndEdit: () => void;
   onMove: (id: string, x: number, y: number) => void;
   onDraw: (fromId: string, end: DrawEnd) => void;
   onBend: (actionId: string, bend: Point | undefined) => void;
   onRotate: (id: string, facing: number) => void;
+  onSetBall: (id: string) => void;
   onDelete: () => void;
 };
 
@@ -52,6 +55,7 @@ const MIN_DRAW_LEN = 4; // court units — discard shorter drags
 const TOKEN_HIT_R = 5; // court units — the invisible grab circle
 const ROTATE_ARM = 9; // court units — rotation handle distance from the token
 const ACCENT = 'rgb(251 146 60)';
+const BALL = '#F97316';
 
 type Interaction =
   | { kind: 'move'; id: string; grab: Point; frame: number; last: Point }
@@ -70,10 +74,13 @@ export function EditorStage({
   tool,
   selection,
   onSelect,
+  onBeginEdit,
+  onEndEdit,
   onMove,
   onDraw,
   onBend,
   onRotate,
+  onSetBall,
   onDelete,
 }: Props) {
   const boxRef = useRef<HTMLDivElement>(null);
@@ -120,6 +127,7 @@ export function EditorStage({
   ) => {
     event.stopPropagation();
     event.currentTarget.setPointerCapture?.(event.pointerId);
+    onBeginEdit();
     interaction.current = next;
   };
 
@@ -133,6 +141,7 @@ export function EditorStage({
       setPreview({ from, to: point ?? from });
     } else {
       onSelect({ kind: 'object', id: object.id });
+      onBeginEdit();
       // keep the point you grabbed under the cursor instead of snapping the
       // token's centre to it
       const grab = point
@@ -168,6 +177,7 @@ export function EditorStage({
     const current = interaction.current;
     interaction.current = null;
     setPreview(null);
+    onEndEdit();
     event.currentTarget.releasePointerCapture?.(event.pointerId);
 
     const point = toCourt(event);
@@ -248,7 +258,7 @@ export function EditorStage({
                 fill="none"
                 stroke={active ? ACCENT : 'transparent'}
                 strokeOpacity={active ? 0.6 : 1}
-                strokeWidth={active ? 1.4 : 6}
+                strokeWidth={active ? 1 : 6}
                 strokeLinecap="round"
                 style={{ pointerEvents: 'all', cursor: 'pointer' }}
                 onPointerDown={(event) => {
@@ -269,8 +279,8 @@ export function EditorStage({
             )}
             fill="none"
             stroke={ACCENT}
-            strokeWidth={0.7}
-            strokeDasharray="1.6 1.6"
+            strokeWidth={0.55}
+            strokeDasharray="1.2 1.2"
             strokeLinecap="round"
             markerEnd={
               ARROW_ACTIONS.has(tool) ? 'url(#route-arrow)' : undefined
@@ -284,7 +294,7 @@ export function EditorStage({
               <circle
                 cx={object.x}
                 cy={object.y * sy}
-                r={4.2}
+                r={3.4}
                 fill="none"
                 stroke={ACCENT}
                 strokeWidth={0.5}
@@ -293,7 +303,7 @@ export function EditorStage({
             )}
             <circle
               role="button"
-              aria-label={`${drawing ? 'Draw from' : 'Move'} ${object.label}`}
+              aria-label={`${drawing ? 'Draw from' : 'Move'} ${object.kind === 'defense' ? 'defender' : 'player'} ${object.label}`}
               cx={object.x}
               cy={object.y * sy}
               r={TOKEN_HIT_R}
@@ -304,6 +314,27 @@ export function EditorStage({
               }}
               onPointerDown={startToken(object)}
             />
+            {object.kind === 'offense' && !drawing && (
+              <circle
+                role="button"
+                aria-label={
+                  ballHolderId === object.id
+                    ? `Take the ball from ${object.label}`
+                    : `Give the ball to ${object.label}`
+                }
+                cx={object.x + 1.9}
+                cy={object.y * sy + 1.9}
+                r={1.1}
+                fill={ballHolderId === object.id ? BALL : 'white'}
+                stroke={ballHolderId === object.id ? 'white' : '#CFA068'}
+                strokeWidth={0.4}
+                style={{ pointerEvents: 'all', cursor: 'pointer' }}
+                onPointerDown={(event) => {
+                  event.stopPropagation();
+                  onSetBall(object.id);
+                }}
+              />
+            )}
           </g>
         ))}
 
@@ -370,20 +401,20 @@ function ActionHandles({
         style={{ pointerEvents: 'all', cursor: 'grab' }}
         onPointerDown={(event) => onBendPointerDown(event, chord)}
       >
-        <circle cx={handle.x} cy={handle.y * sy} r={3.2} fill="transparent" />
+        <circle cx={handle.x} cy={handle.y * sy} r={3} fill="transparent" />
         <circle
           cx={handle.x}
           cy={handle.y * sy}
-          r={1.7}
+          r={1}
           fill={ACCENT}
           stroke="white"
-          strokeWidth={0.35}
+          strokeWidth={0.3}
           style={{ pointerEvents: 'none' }}
         />
       </g>
       <DeleteControl
-        x={handle.x + 4}
-        y={handle.y * sy - 4}
+        x={handle.x + 3}
+        y={handle.y * sy - 3}
         onDelete={onDelete}
       />
     </>
@@ -411,20 +442,25 @@ function RotationHandle({
         x2={hx}
         y2={hy * sy}
         stroke={ACCENT}
-        strokeWidth={0.5}
+        strokeWidth={0.4}
       />
-      <circle
+      <g
         role="button"
         aria-label="Rotate defender"
-        cx={hx}
-        cy={hy * sy}
-        r={2.2}
-        fill={ACCENT}
-        stroke="white"
-        strokeWidth={0.4}
         style={{ pointerEvents: 'all', cursor: 'grab' }}
         onPointerDown={onPointerDown}
-      />
+      >
+        <circle cx={hx} cy={hy * sy} r={2.6} fill="transparent" />
+        <circle
+          cx={hx}
+          cy={hy * sy}
+          r={1.2}
+          fill={ACCENT}
+          stroke="white"
+          strokeWidth={0.3}
+          style={{ pointerEvents: 'none' }}
+        />
+      </g>
     </>
   );
 }
@@ -449,12 +485,12 @@ function DeleteControl({
         onDelete();
       }}
     >
-      <circle r={3.4} fill="transparent" />
-      <circle r={1.9} fill="rgb(220 38 38)" />
+      <circle r={3} fill="transparent" />
+      <circle r={1.1} fill="rgb(220 38 38)" />
       <path
-        d="M-0.75 -0.75 L0.75 0.75 M-0.75 0.75 L0.75 -0.75"
+        d="M-0.5 -0.5 L0.5 0.5 M-0.5 0.5 L0.5 -0.5"
         stroke="white"
-        strokeWidth={0.5}
+        strokeWidth={0.4}
         strokeLinecap="round"
       />
     </g>

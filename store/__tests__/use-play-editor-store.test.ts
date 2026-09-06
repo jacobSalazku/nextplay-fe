@@ -174,6 +174,146 @@ describe('usePlayEditorStore', () => {
     expect(diagram.phases[0].actions).toHaveLength(1);
   });
 
+  it('benches a player, dropping its routes and the ball', () => {
+    // Arrange
+    hydrate();
+    store().setBallHolder('o1');
+    store().addAction({ type: 'pass', fromId: 'o1', toId: 'o2' });
+
+    // Act
+    store().benchObject('o1');
+
+    // Assert
+    expect(store().phase.objects.some((o) => o.id === 'o1')).toBe(false);
+    expect(store().phase.actions).toHaveLength(0);
+    expect(store().phase.ballHolderId).toBeUndefined();
+  });
+
+  it('un-benches a player back at its formation spot', () => {
+    // Arrange — o2 was seeded at (20, 55)
+    hydrate();
+    store().benchObject('o2');
+
+    // Act
+    store().unbenchObject('o2');
+
+    // Assert
+    expect(store().phase.objects.find((o) => o.id === 'o2')).toMatchObject({
+      x: 20,
+      y: 55,
+    });
+  });
+
+  it('un-benches a fresh slot at its role home', () => {
+    // Arrange — o3 was never on court
+    hydrate();
+
+    // Act
+    store().unbenchObject('o3');
+
+    // Assert — a real spot, not (0,0)
+    const o3 = store().phase.objects.find((o) => o.id === 'o3');
+    expect(o3!.x).toBeGreaterThan(0);
+    expect(o3!.y).toBeGreaterThan(0);
+  });
+
+  it('adds a sixth player with the + slot and caps there', () => {
+    // Arrange
+    hydrate();
+
+    // Act
+    store().addSlot('offense');
+
+    // Assert
+    expect(store().phase.objects.some((o) => o.id === 'o6')).toBe(true);
+    expect(store().rosterCount.offense).toBe(6);
+
+    // Act — push past the cap
+    store().addSlot('offense'); // refused
+
+    // Assert
+    expect(store().rosterCount.offense).toBe(6);
+  });
+
+  it('matches every attacker man-to-man', () => {
+    // Arrange — hydrate has o1, o2 (and x1)
+    hydrate();
+
+    // Act
+    store().matchManToMan();
+
+    // Assert — a defender for o2, x1 already there
+    const defenders = store()
+      .phase.objects.filter((o) => o.kind === 'defense')
+      .map((o) => o.id);
+    expect(defenders).toContain('x1');
+    expect(defenders).toContain('x2');
+  });
+
+  it('toggles ball possession', () => {
+    // Arrange
+    hydrate();
+
+    // Act / Assert
+    store().setBallHolder('o1');
+    expect(store().phase.ballHolderId).toBe('o1');
+
+    store().setBallHolder('o1');
+    expect(store().phase.ballHolderId).toBeUndefined();
+  });
+
+  it('undoes and redoes a discrete edit', () => {
+    // Arrange
+    hydrate();
+    store().benchObject('o1');
+
+    // Act — undo
+    store().undo();
+
+    // Assert — o1 is back
+    expect(store().phase.objects.some((o) => o.id === 'o1')).toBe(true);
+
+    // Act — redo
+    store().redo();
+
+    // Assert — gone again
+    expect(store().phase.objects.some((o) => o.id === 'o1')).toBe(false);
+  });
+
+  it('collapses a drag into a single undo step', () => {
+    // Arrange
+    hydrate();
+    const start = store().phase.objects.find((o) => o.id === 'o1');
+
+    // Act — one drag: arm once, move several times
+    store().beginEdit();
+    store().moveObject('o1', 10, 10);
+    store().moveObject('o1', 20, 20);
+    store().moveObject('o1', 30, 30);
+    store().endEdit();
+
+    store().undo();
+
+    // Assert — back to where the drag started, in one step
+    expect(store().phase.objects.find((o) => o.id === 'o1')).toMatchObject({
+      x: start!.x,
+      y: start!.y,
+    });
+  });
+
+  it('drops undo history when the play is saved', () => {
+    // Arrange
+    hydrate();
+    store().benchObject('o1');
+
+    // Act
+    store().markSaved();
+    store().undo();
+
+    // Assert — the save is a floor; o1 stays benched
+    expect(store().phase.objects.some((o) => o.id === 'o1')).toBe(false);
+  });
+
   it('reset returns to the initial state', () => {
     // Arrange
     hydrate();

@@ -7,11 +7,12 @@ import { useUpdatePlay } from '@/features/playbook/hooks/play/use-update-play';
 import type { PlayDiagram } from '@/features/playbook/utils/diagram/types';
 import { isTypingTarget } from '@/features/playbook/utils/editor/keyboard';
 import { usePlayEditorStore } from '@/store/use-play-editor-store';
-import { ArrowLeft, Pencil, Save } from 'lucide-react';
+import { ArrowLeft, Pencil, Redo2, Save, Undo2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useConfirm } from '@/components/feedback/confirm-provider';
 import { Button } from '@/components/foundation/button/button';
 import { EditorStage } from './editor-stage';
+import { RosterPanel } from './roster-panel';
 import { ToolDock } from './tool-dock';
 
 type Props = {
@@ -44,16 +45,28 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
 
   const court = usePlayEditorStore((s) => s.court);
   const phase = usePlayEditorStore((s) => s.phase);
+  const rosterCount = usePlayEditorStore((s) => s.rosterCount);
   const tool = usePlayEditorStore((s) => s.tool);
   const selection = usePlayEditorStore((s) => s.selection);
   const isDirty = usePlayEditorStore((s) => s.isDirty);
+  const canUndo = usePlayEditorStore((s) => s.history.length > 0);
+  const canRedo = usePlayEditorStore((s) => s.future.length > 0);
   const setTool = usePlayEditorStore((s) => s.setTool);
   const select = usePlayEditorStore((s) => s.select);
+  const beginEdit = usePlayEditorStore((s) => s.beginEdit);
+  const endEdit = usePlayEditorStore((s) => s.endEdit);
   const moveObject = usePlayEditorStore((s) => s.moveObject);
   const rotateObject = usePlayEditorStore((s) => s.rotateObject);
+  const benchObject = usePlayEditorStore((s) => s.benchObject);
+  const unbenchObject = usePlayEditorStore((s) => s.unbenchObject);
+  const addSlot = usePlayEditorStore((s) => s.addSlot);
+  const matchManToMan = usePlayEditorStore((s) => s.matchManToMan);
+  const setBallHolder = usePlayEditorStore((s) => s.setBallHolder);
   const addAction = usePlayEditorStore((s) => s.addAction);
   const updateAction = usePlayEditorStore((s) => s.updateAction);
   const deleteAction = usePlayEditorStore((s) => s.deleteAction);
+  const undo = usePlayEditorStore((s) => s.undo);
+  const redo = usePlayEditorStore((s) => s.redo);
   const markSaved = usePlayEditorStore((s) => s.markSaved);
   const toDiagram = usePlayEditorStore((s) => s.toDiagram);
 
@@ -63,14 +76,28 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Delete' && event.key !== 'Backspace') return;
-      if (isTypingTarget(event.target) || selection?.kind !== 'action') return;
-      event.preventDefault();
-      deleteSelection();
+      if (isTypingTarget(event.target)) return;
+
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z') {
+        event.preventDefault();
+        if (event.shiftKey) redo();
+        else undo();
+        return;
+      }
+
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+
+      if (
+        (event.key === 'Delete' || event.key === 'Backspace') &&
+        selection?.kind === 'action'
+      ) {
+        event.preventDefault();
+        deleteSelection();
+      }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [selection, deleteSelection]);
+  }, [selection, deleteSelection, undo, redo]);
 
   const draw = useCallback(
     (
@@ -131,21 +158,6 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
     if (next && next !== name) renamePlay(next).catch(() => {});
   };
 
-  const selectedObject =
-    selection?.kind === 'object'
-      ? (phase.objects.find((o) => o.id === selection.id) ?? null)
-      : null;
-  const selectedAction =
-    selection?.kind === 'action'
-      ? (phase.actions.find((a) => a.id === selection.id) ?? null)
-      : null;
-
-  const selectionLabel = selectedObject
-    ? `${selectedObject.kind === 'defense' ? 'Defender' : 'Player'} ${selectedObject.label}`
-    : selectedAction
-      ? selectedAction.type[0].toUpperCase() + selectedAction.type.slice(1)
-      : 'Nothing selected';
-
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-slate-950 text-white">
       <header className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
@@ -179,18 +191,36 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
             )}
           </h1>
         </div>
-        <Button
-          variant="primary"
-          onClick={save}
-          disabled={!isDirty || isSaving}
-        >
-          <Save className="mr-2 h-4 w-4" />
-          {isSaving ? 'Saving…' : 'Save'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="close"
+            onClick={undo}
+            disabled={!canUndo}
+            aria-label="Undo"
+          >
+            <Undo2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="close"
+            onClick={redo}
+            disabled={!canRedo}
+            aria-label="Redo"
+          >
+            <Redo2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="primary"
+            onClick={save}
+            disabled={!isDirty || isSaving}
+          >
+            <Save className="mr-2 h-4 w-4" />
+            {isSaving ? 'Saving…' : 'Save'}
+          </Button>
+        </div>
       </header>
 
-      <div className="flex flex-1 flex-col gap-3 overflow-hidden p-3 lg:flex-row">
-        <div className="flex min-h-0 flex-1 flex-col gap-3">
+      <div className="flex flex-1 flex-col gap-2 overflow-hidden p-2 lg:flex-row">
+        <div className="flex min-h-0 flex-1 flex-col gap-2">
           <div className="flex min-h-0 flex-1 items-center justify-center">
             <EditorStage
               court={court}
@@ -200,9 +230,12 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
               selection={selection}
               onSelect={select}
               onDraw={draw}
+              onBeginEdit={beginEdit}
+              onEndEdit={endEdit}
               onMove={moveObject}
               onBend={(id, bend) => updateAction(id, { bend })}
               onRotate={rotateObject}
+              onSetBall={setBallHolder}
               onDelete={deleteSelection}
             />
           </div>
@@ -211,38 +244,18 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
           </div>
         </div>
 
-        <aside
-          aria-label="Selection"
-          className="w-full shrink-0 space-y-3 overflow-y-auto rounded-xl border border-white/10 bg-slate-900/60 p-4 lg:w-72"
-        >
-          <div>
-            <p className="text-xs tracking-wide text-gray-400 uppercase">
-              Court
-            </p>
-            <p className="text-sm capitalize">{court} court</p>
-          </div>
-          <div className="space-y-2">
-            <p className="text-xs tracking-wide text-gray-400 uppercase">
-              Selected
-            </p>
-            <p className="text-sm">{selectionLabel}</p>
-            {selectedAction && (
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={deleteSelection}
-                className="w-full"
-              >
-                Delete route
-              </Button>
-            )}
-          </div>
-          <p className="text-xs text-gray-500">
-            Pick a tool and drag from a player to draw. Select a route to bend
-            or delete it. <kbd>1</kbd>–<kbd>6</kbd> tools, <kbd>Del</kbd> to
-            delete.
-          </p>
-        </aside>
+        <RosterPanel
+          objects={phase.objects}
+          rosterCount={rosterCount}
+          ballHolderId={phase.ballHolderId}
+          selectedId={selection?.kind === 'object' ? selection.id : null}
+          onBench={benchObject}
+          onUnbench={unbenchObject}
+          onAddSlot={addSlot}
+          onMatchManToMan={matchManToMan}
+          onSetBall={setBallHolder}
+          onSelect={(id) => select({ kind: 'object', id })}
+        />
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { COURT_VIEWBOX } from '@/features/playbook/components/diagram/court';
 import type { CourtType, Phase, Point } from './types';
 
 // Stored coords are 0..100 on both axes. The court viewBox is 100 wide but
-// shorter (84 half / 168 full), so y (and any y-bearing offset) scales into
+// shorter (94 half / 188 full), so y (and any y-bearing offset) scales into
 // that height.
 export const courtScaleY = (court: CourtType) => COURT_VIEWBOX[court].h / 100;
 

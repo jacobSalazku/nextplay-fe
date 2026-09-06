@@ -6,7 +6,8 @@ const DEFENSE = '#DC3B33';
 const BALL = '#F97316';
 const STROKE = '#CFA068';
 
-const R = 3;
+const R = 2.6; // offense token radius
+const DR = 2.1; // defenders sit a touch smaller
 
 function OffenseToken({
   object,
@@ -18,13 +19,13 @@ function OffenseToken({
   return (
     <g transform={`translate(${object.x} ${object.y})`}>
       {hasBall && (
-        <circle r={R + 1.2} fill="none" stroke={BALL} strokeWidth={0.9} />
+        <circle r={R + 1} fill="none" stroke={BALL} strokeWidth={0.7} />
       )}
-      <circle r={R} fill={OFFENSE_FILL} stroke={STROKE} strokeWidth={0.5} />
+      <circle r={R} fill={OFFENSE_FILL} stroke={STROKE} strokeWidth={0.4} />
       <text
-        y={1.2}
+        y={1}
         textAnchor="middle"
-        fontSize={3.3}
+        fontSize={2.7}
         fontWeight={700}
         fill={OFFENSE_INK}
       >
@@ -42,19 +43,19 @@ function DefenseToken({ object }: { object: PlacedObject }) {
         transform={`rotate(${facing})`}
         fill="none"
         stroke={DEFENSE}
-        strokeWidth={1}
+        strokeWidth={0.75}
         strokeLinecap="round"
       >
-        <path d="M-7 -0.8 Q-4.6 -3.6 -2.6 -1.4" />
-        <path d="M7 -0.8 Q4.6 -3.6 2.6 -1.4" />
+        <path d="M-3.9 -0.5 Q-2.6 -2 -1.4 -0.8" />
+        <path d="M3.9 -0.5 Q2.6 -2 1.4 -0.8" />
       </g>
-      <circle r={R} fill="#fff" stroke={DEFENSE} strokeWidth={1} />
+      <circle r={DR} fill={DEFENSE} />
       <text
-        y={1.3}
+        y={0.85}
         textAnchor="middle"
-        fontSize={3.6}
+        fontSize={2.3}
         fontWeight={700}
-        fill={DEFENSE}
+        fill="#fff"
       >
         {object.label}
       </text>
