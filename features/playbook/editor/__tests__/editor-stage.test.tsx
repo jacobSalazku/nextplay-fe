@@ -38,22 +38,25 @@ afterEach(() => vi.restoreAllMocks());
 function renderStage(
   overrides: Partial<Parameters<typeof EditorStage>[0]> = {},
 ) {
-  const onSelect = vi.fn();
-  const onMove = vi.fn();
-  const onDraw = vi.fn();
+  const spies = {
+    onSelect: vi.fn(),
+    onMove: vi.fn(),
+    onDraw: vi.fn(),
+    onBend: vi.fn(),
+    onRotate: vi.fn(),
+    onDelete: vi.fn(),
+  };
   render(
     <EditorStage
       court="half"
       phase={phase}
       tool="select"
       selection={null}
-      onSelect={onSelect}
-      onMove={onMove}
-      onDraw={onDraw}
+      {...spies}
       {...overrides}
     />,
   );
-  return { onSelect, onMove, onDraw };
+  return spies;
 }
 
 describe('EditorStage — select tool', () => {
@@ -166,5 +169,93 @@ describe('EditorStage — drawing an action', () => {
 
     // Assert
     expect(onDraw).not.toHaveBeenCalled();
+  });
+});
+
+describe('EditorStage — editing a selection', () => {
+  const withStuff: Phase = {
+    id: 'p1',
+    objects: [
+      { id: 'o1', kind: 'offense', label: '1', x: 25, y: 25 },
+      { id: 'o2', kind: 'offense', label: '2', x: 75, y: 75 },
+      { id: 'x1', kind: 'defense', label: 'x1', x: 50, y: 50 },
+    ],
+    actions: [{ id: 'a1', type: 'pass', fromId: 'o1', toId: 'o2' }],
+  };
+  const selectAction = { kind: 'action', id: 'a1' } as const;
+
+  it('bends the selected route by the midpoint offset', () => {
+    // Arrange — bend handle is at the chord midpoint (50,50)
+    pinBox();
+    const { onBend } = renderStage({
+      phase: withStuff,
+      selection: selectAction,
+    });
+    const handle = screen.getByRole('button', { name: 'Bend route' });
+
+    // Act — drag it to court (50, 70) => clientY 140
+    fireEvent.pointerDown(handle, { pointerId: 1, clientX: 100, clientY: 100 });
+    fireEvent.pointerMove(handle, { pointerId: 1, clientX: 100, clientY: 140 });
+
+    // Assert
+    expect(onBend).toHaveBeenLastCalledWith('a1', { x: 0, y: 20 });
+  });
+
+  it('straightens the route when the handle returns near the midpoint', () => {
+    // Arrange
+    pinBox();
+    const { onBend } = renderStage({
+      phase: withStuff,
+      selection: selectAction,
+    });
+    const handle = screen.getByRole('button', { name: 'Bend route' });
+
+    // Act — barely off the midpoint
+    fireEvent.pointerDown(handle, { pointerId: 1, clientX: 100, clientY: 100 });
+    fireEvent.pointerMove(handle, { pointerId: 1, clientX: 102, clientY: 102 });
+
+    // Assert
+    expect(onBend).toHaveBeenLastCalledWith('a1', undefined);
+  });
+
+  it('deletes the selection from the on-canvas control', () => {
+    // Arrange
+    const { onDelete } = renderStage({
+      phase: withStuff,
+      selection: selectAction,
+    });
+
+    // Act
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'Delete' }));
+
+    // Assert
+    expect(onDelete).toHaveBeenCalledOnce();
+  });
+
+  it('rotates the selected defender', () => {
+    // Arrange
+    pinBox();
+    const { onRotate } = renderStage({
+      phase: withStuff,
+      selection: { kind: 'object', id: 'x1' },
+    });
+    const handle = screen.getByRole('button', { name: 'Rotate defender' });
+
+    // Act — drag to straight below the token (50, 60)
+    fireEvent.pointerDown(handle, { pointerId: 1, clientX: 118, clientY: 100 });
+    fireEvent.pointerMove(handle, { pointerId: 1, clientX: 100, clientY: 120 });
+
+    // Assert — 90deg (down, in screen coords)
+    expect(onRotate).toHaveBeenLastCalledWith('x1', 90);
+  });
+
+  it('offers no rotation handle for an offense token', () => {
+    // Act
+    renderStage({ phase: withStuff, selection: { kind: 'object', id: 'o1' } });
+
+    // Assert
+    expect(
+      screen.queryByRole('button', { name: 'Rotate defender' }),
+    ).not.toBeInTheDocument();
   });
 });

@@ -49,9 +49,16 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
   const setTool = usePlayEditorStore((s) => s.setTool);
   const select = usePlayEditorStore((s) => s.select);
   const moveObject = usePlayEditorStore((s) => s.moveObject);
+  const rotateObject = usePlayEditorStore((s) => s.rotateObject);
   const addAction = usePlayEditorStore((s) => s.addAction);
+  const updateAction = usePlayEditorStore((s) => s.updateAction);
+  const deleteAction = usePlayEditorStore((s) => s.deleteAction);
   const markSaved = usePlayEditorStore((s) => s.markSaved);
   const toDiagram = usePlayEditorStore((s) => s.toDiagram);
+
+  const deleteSelection = useCallback(() => {
+    if (selection?.kind === 'action') deleteAction(selection.id);
+  }, [selection, deleteAction]);
 
   const draw = useCallback(
     (
@@ -136,6 +143,9 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
               onSelect={select}
               onDraw={draw}
               onMove={moveObject}
+              onBend={(id, bend) => updateAction(id, { bend })}
+              onRotate={rotateObject}
+              onDelete={deleteSelection}
             />
           </div>
         </div>
