@@ -1,3 +1,4 @@
+import { StrictMode } from 'react';
 import { PlayEditor } from '../play-editor';
 import { seedDiagram } from '../seed-diagram';
 import type { PlacedObject } from '@/features/playbook/diagram/types';
@@ -56,6 +57,23 @@ afterEach(() => {
 });
 
 describe('PlayEditor', () => {
+  it('keeps the diagram loaded through a StrictMode remount', () => {
+    // Act — StrictMode double-invokes mount effects
+    renderWithClient(
+      <StrictMode>
+        <PlayEditor
+          playId="play-1"
+          routeKey="team~1"
+          name="Horns"
+          diagram={seedDiagram('half', objects)}
+        />
+      </StrictMode>,
+    );
+
+    // Assert — the token is still on the court, not reset away
+    expect(screen.getByRole('button', { name: 'Move 1' })).toBeInTheDocument();
+  });
+
   it('shows the play name and a disabled Save until something changes', () => {
     // Act
     renderEditor();

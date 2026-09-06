@@ -23,13 +23,18 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
   const confirm = useConfirm();
   const { savePlay, isSaving } = useUpdatePlay(routeKey, playId);
 
-  // Load this play into the singleton store once per mount. The page keys
-  // <PlayEditor> by play id, so navigating to another play remounts and
-  // re-runs this. Reset the store on unmount.
+  // Load this play into the singleton store. The initializer hydrates before
+  // the first paint (no empty flash); the effect re-hydrates after a
+  // StrictMode remount and resets the store on a real unmount. The page keys
+  // <PlayEditor> by play id, so switching plays remounts and re-runs both.
   useState(() => {
     usePlayEditorStore.getState().hydrate({ playId, routeKey, name, diagram });
   });
-  useEffect(() => () => usePlayEditorStore.getState().reset(), []);
+  useEffect(() => {
+    const store = usePlayEditorStore.getState();
+    store.hydrate({ playId, routeKey, name, diagram });
+    return store.reset;
+  }, [playId, routeKey, name, diagram]);
 
   const court = usePlayEditorStore((s) => s.court);
   const phase = usePlayEditorStore((s) => s.phase);
