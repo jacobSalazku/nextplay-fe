@@ -9,14 +9,11 @@ export function CourtDiagram({
   phase,
   ballHolderId,
   className,
-  stretch = false,
 }: {
   court: CourtType;
   phase: Phase;
   ballHolderId?: string;
   className?: string;
-  // fill the box on both axes instead of preserving the court's aspect ratio
-  stretch?: boolean;
 }) {
   const { w, h } = COURT_VIEWBOX[court];
   const projected = projectPhase(phase, court);
@@ -24,7 +21,7 @@ export function CourtDiagram({
   return (
     <svg
       viewBox={`0 0 ${w} ${h}`}
-      preserveAspectRatio={stretch ? 'none' : 'xMidYMid meet'}
+      preserveAspectRatio="xMidYMid meet"
       className={className}
       role="img"
       aria-label={`Play diagram, ${phase.objects.length} players`}

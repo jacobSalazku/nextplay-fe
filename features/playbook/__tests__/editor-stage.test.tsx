@@ -35,8 +35,8 @@ function pinBox(size = 200) {
 
 afterEach(() => vi.restoreAllMocks());
 
-// pinBox pins a 200x200 box; the court stretches to fill it, so court coords
-// map to client pixels at a flat 2x on both axes.
+// pinBox pins a 200x200 box and the stage maps it straight to 0..100 court
+// space (useCourtPointer with a null aspect), so court coords are a flat 2x.
 const at = (x: number, y: number) => ({ clientX: x * 2, clientY: y * 2 });
 
 function renderStage(

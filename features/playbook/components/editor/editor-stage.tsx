@@ -77,7 +77,8 @@ export function EditorStage({
   onDelete,
 }: Props) {
   const boxRef = useRef<HTMLDivElement>(null);
-  // the court stretches to fill the stage, so the box maps straight to court space
+  // the box is locked to the court's aspect ratio, so the court fills it with
+  // no letterbox and the box maps straight to court space
   const toCourt = useCourtPointer(boxRef, null);
   const interaction = useRef<Interaction>(null);
   const { w, h } = COURT_VIEWBOX[court];
@@ -199,18 +200,21 @@ export function EditorStage({
   };
 
   return (
-    <div ref={boxRef} className="relative h-full w-full touch-none select-none">
+    <div
+      ref={boxRef}
+      className="relative h-full max-w-full touch-none select-none"
+      style={{ aspectRatio: `${w} / ${h}` }}
+    >
       <CourtDiagram
         court={court}
         phase={phase}
         ballHolderId={ballHolderId}
-        stretch
         className="pointer-events-none absolute inset-0 h-full w-full"
       />
 
       <svg
         viewBox={`0 0 ${w} ${h}`}
-        preserveAspectRatio="none"
+        preserveAspectRatio="xMidYMid meet"
         className="absolute inset-0 h-full w-full"
         role="application"
         aria-label="Play editor canvas"
