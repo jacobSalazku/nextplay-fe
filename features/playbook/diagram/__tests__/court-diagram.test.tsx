@@ -76,4 +76,20 @@ describe('CourtDiagram', () => {
       '0 0 100 188',
     );
   });
+
+  it('scales a normalized y into the full-court viewBox height', () => {
+    // Arrange — a token at the very bottom of the court (y = 100)
+    const bottom: Phase = {
+      id: 'p1',
+      objects: [{ id: 'o1', kind: 'offense', label: '1', x: 50, y: 100 }],
+      actions: [],
+    };
+
+    // Act
+    const { container } = render(<CourtDiagram court="full" phase={bottom} />);
+
+    // Assert — 100 maps to the full 188-unit height, not 100
+    const token = container.querySelector('g[transform^="translate(50"]');
+    expect(token?.getAttribute('transform')).toBe('translate(50 188)');
+  });
 });
