@@ -66,13 +66,10 @@ describe('usePlayEditorStore', () => {
     usePlayEditorStore.getState().moveObject('o1', 1, 1);
 
     // Act
-    usePlayEditorStore.getState().markSaving();
     usePlayEditorStore.getState().markSaved();
 
     // Assert
-    const s = usePlayEditorStore.getState();
-    expect(s.status).toBe('idle');
-    expect(s.isDirty).toBe(false);
+    expect(usePlayEditorStore.getState().isDirty).toBe(false);
   });
 
   it('serialises the working phase back into a v1 diagram', () => {

@@ -43,14 +43,11 @@ describe('useCourtPointer', () => {
     });
   });
 
-  it('returns the origin when the element has no box yet', () => {
+  it('returns null when the element has no box yet', () => {
     // Arrange
     const { result } = renderHook(() => useCourtPointer({ current: null }));
 
     // Act / Assert
-    expect(result.current({ clientX: 10, clientY: 10 })).toEqual({
-      x: 0,
-      y: 0,
-    });
+    expect(result.current({ clientX: 10, clientY: 10 })).toBeNull();
   });
 });

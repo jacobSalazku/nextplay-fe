@@ -4,13 +4,14 @@ import type { Point } from '@/features/playbook/diagram/types';
 const clamp = (n: number, min: number, max: number) =>
   Math.min(max, Math.max(min, n));
 
-// Maps a pointer event to court coordinates (0..100 on both axes). The element
-// must be locked to the court's aspect ratio so there is no letterboxing.
+// Maps a pointer event to court coordinates (0..100 on both axes), or null if
+// the element has no box yet. The element must be locked to the court's aspect
+// ratio so there is no letterboxing.
 export function useCourtPointer(ref: RefObject<HTMLElement | null>) {
   return useCallback(
-    (event: { clientX: number; clientY: number }): Point => {
+    (event: { clientX: number; clientY: number }): Point | null => {
       const rect = ref.current?.getBoundingClientRect();
-      if (!rect || rect.width === 0 || rect.height === 0) return { x: 0, y: 0 };
+      if (!rect || rect.width === 0 || rect.height === 0) return null;
 
       return {
         x: clamp(((event.clientX - rect.left) / rect.width) * 100, 0, 100),

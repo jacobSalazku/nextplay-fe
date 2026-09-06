@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import CreatePlaySkeleton from '@/features/playbook/components/skeleton/create-play-skeleton';
+import PlayEditorSkeleton from '@/features/playbook/components/skeleton/play-editor-skeleton';
 import { asPlayDiagram } from '@/features/playbook/diagram/parse';
 import { PlayEditor } from '@/features/playbook/editor/play-editor';
 import { getPlay } from '@/features/playbook/queries/get-play';
@@ -42,6 +42,7 @@ async function EditorContent({
 
   return (
     <PlayEditor
+      key={play.id}
       playId={play.id}
       routeKey={routeKey}
       name={play.name}
@@ -54,7 +55,7 @@ export default async function EditPlayPage({ params }: PageProps) {
   const { routeKey, id } = await params;
 
   return (
-    <Suspense fallback={<CreatePlaySkeleton />}>
+    <Suspense fallback={<PlayEditorSkeleton />}>
       <EditorContent id={id} routeKey={routeKey} />
     </Suspense>
   );

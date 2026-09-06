@@ -2,7 +2,7 @@ import { PlayEditor } from '../play-editor';
 import { seedDiagram } from '../seed-diagram';
 import type { PlacedObject } from '@/features/playbook/diagram/types';
 import { usePlayEditorStore } from '@/store/use-play-editor-store';
-import { api, gqlData } from '@/test/msw/handlers';
+import { api, gqlData, gqlError } from '@/test/msw/handlers';
 import { server } from '@/test/msw/server';
 import { renderWithClient } from '@/test/utils';
 import { screen, waitFor } from '@testing-library/react';
@@ -98,6 +98,28 @@ describe('PlayEditor', () => {
       ),
     );
     expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
+  });
+
+  it('keeps the play dirty and Save enabled when the save fails', async () => {
+    // Arrange
+    pinBox();
+    const user = userEvent.setup();
+    server.use(api.mutation('UpdatePlay', () => gqlError('Server exploded')));
+    renderEditor();
+
+    // Act — drag, then a save that fails
+    const handle = screen.getByRole('button', { name: 'Move 1' });
+    await user.pointer([
+      { target: handle, keys: '[MouseLeft>]', coords: { x: 50, y: 50 } },
+      { target: handle, coords: { x: 100, y: 100 } },
+      { keys: '[/MouseLeft]' },
+    ]);
+    await user.click(screen.getByRole('button', { name: /save/i }));
+
+    // Assert — the coach can still retry
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /save/i })).toBeEnabled(),
+    );
   });
 
   it('leaves without confirming when there are no unsaved changes', async () => {

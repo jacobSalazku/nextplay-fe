@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUpdatePlay } from '../hooks/use-update-play';
 import type { PlayDiagram } from '@/features/playbook/diagram/types';
@@ -23,32 +23,31 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
   const confirm = useConfirm();
   const { savePlay, isSaving } = useUpdatePlay(routeKey, playId);
 
-  // Sync this play into the singleton store. Safe during render for an
-  // external store, and only fires when the play actually changes.
-  if (usePlayEditorStore.getState().playId !== playId) {
+  // Load this play into the singleton store once per mount. The page keys
+  // <PlayEditor> by play id, so navigating to another play remounts and
+  // re-runs this. Reset the store on unmount.
+  useState(() => {
     usePlayEditorStore.getState().hydrate({ playId, routeKey, name, diagram });
-  }
-  useEffect(() => usePlayEditorStore.getState().reset, []);
+  });
+  useEffect(() => () => usePlayEditorStore.getState().reset(), []);
 
-  const hydrated = usePlayEditorStore((s) => s.hydrated);
   const court = usePlayEditorStore((s) => s.court);
   const phase = usePlayEditorStore((s) => s.phase);
   const selectedId = usePlayEditorStore((s) => s.selectedId);
   const isDirty = usePlayEditorStore((s) => s.isDirty);
   const select = usePlayEditorStore((s) => s.select);
   const moveObject = usePlayEditorStore((s) => s.moveObject);
-  const markSaving = usePlayEditorStore((s) => s.markSaving);
   const markSaved = usePlayEditorStore((s) => s.markSaved);
   const toDiagram = usePlayEditorStore((s) => s.toDiagram);
 
   useUnsavedChangesWarning(isDirty);
 
   const save = async () => {
-    markSaving();
     try {
       await savePlay(toDiagram());
-    } finally {
       markSaved();
+    } catch {
+      // save failed (toasted globally) — keep isDirty so the coach can retry
     }
   };
 
@@ -89,16 +88,14 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 lg:flex-row">
         <div className="flex flex-1 items-start justify-center">
           <div className="w-full max-w-2xl">
-            {hydrated && (
-              <EditorStage
-                court={court}
-                phase={phase}
-                ballHolderId={phase.ballHolderId}
-                selectedId={selectedId}
-                onSelect={select}
-                onMove={moveObject}
-              />
-            )}
+            <EditorStage
+              court={court}
+              phase={phase}
+              ballHolderId={phase.ballHolderId}
+              selectedId={selectedId}
+              onSelect={select}
+              onMove={moveObject}
+            />
           </div>
         </div>
 
