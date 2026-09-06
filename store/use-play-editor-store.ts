@@ -256,11 +256,14 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
       commitPhase((p) => ({ ...p, objects: [...p.objects, ...added] }));
     },
 
-    setBallHolder: (id) =>
-      commitPhase((phase) => {
-        if (phase.ballHolderId === id) return withoutBall(phase);
-        return { ...phase, ballHolderId: id };
-      }),
+    setBallHolder: (id) => {
+      if (!get().phase.objects.some((o) => o.id === id)) return;
+      commitPhase((phase) =>
+        phase.ballHolderId === id
+          ? withoutBall(phase)
+          : { ...phase, ballHolderId: id },
+      );
+    },
 
     addAction: (input) => {
       if (get().phase.actions.length >= MAX_ACTIONS) return false;
