@@ -63,4 +63,38 @@ test.describe('play editor flow', () => {
       .evaluate((el) => (el as HTMLElement).style.left);
     expect(afterReload).toBe(moved);
   });
+
+  test('warns before leaving with unsaved changes', async ({ page }) => {
+    // Arrange — a fresh play with one dragged (unsaved) player
+    await page.goto(`/team/${TEAM}/playbook/play/new`);
+    await page.getByLabel('Name').fill('Unsaved play');
+    await page.getByRole('button', { name: 'Offense' }).click();
+    await page.getByRole('button', { name: /5-Out/ }).click();
+    await page.getByRole('button', { name: 'Create play' }).click();
+    await page.waitForURL(/\/playbook\/play\/[^/]+\/edit/);
+
+    const handle = page.getByRole('button', { name: 'Move 1' });
+    const box = (await handle.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + 90, box.y, { steps: 6 });
+    await page.mouse.up();
+
+    // Act — the editor's own back button
+    await page.getByRole('button', { name: /back to playbook/i }).click();
+
+    // Assert — confirm dialog, cancel keeps us in the editor
+    const dialog = page.getByRole('alertdialog', {
+      name: /leave without saving/i,
+    });
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole('button', { name: /cancel/i }).click();
+    await expect(page).toHaveURL(/\/edit/);
+
+    // Act — the browser Back button
+    await page.goBack();
+
+    // Assert — same guard
+    await expect(dialog).toBeVisible();
+  });
 });

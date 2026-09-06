@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUpdatePlay } from '../hooks/use-update-play';
 import type { PlayDiagram } from '@/features/playbook/diagram/types';
@@ -9,7 +9,7 @@ import { ArrowLeft, Save } from 'lucide-react';
 import { useConfirm } from '@/components/feedback/confirm-provider';
 import { Button } from '@/components/foundation/button/button';
 import { EditorStage } from './editor-stage';
-import { useUnsavedChangesWarning } from './use-unsaved-changes-warning';
+import { useNavigationGuard } from './use-navigation-guard';
 
 type Props = {
   playId: string;
@@ -24,15 +24,18 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
   const { savePlay, isSaving } = useUpdatePlay(routeKey, playId);
 
   // Load this play into the singleton store. The initializer hydrates before
-  // the first paint (no empty flash); the effect re-hydrates after a
-  // StrictMode remount and resets the store on a real unmount. The page keys
-  // <PlayEditor> by play id, so switching plays remounts and re-runs both.
+  // the first paint (no empty flash); the effect re-hydrates only if the store
+  // isn't already on this play (covers a StrictMode remount) — it must never
+  // clobber unsaved edits when the RSC re-renders after a refresh. The page
+  // keys <PlayEditor> by play id, so switching plays remounts and re-runs both.
   useState(() => {
     usePlayEditorStore.getState().hydrate({ playId, routeKey, name, diagram });
   });
   useEffect(() => {
     const store = usePlayEditorStore.getState();
-    store.hydrate({ playId, routeKey, name, diagram });
+    if (!store.hydrated || store.playId !== playId) {
+      store.hydrate({ playId, routeKey, name, diagram });
+    }
     return store.reset;
   }, [playId, routeKey, name, diagram]);
 
@@ -45,7 +48,24 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
   const markSaved = usePlayEditorStore((s) => s.markSaved);
   const toDiagram = usePlayEditorStore((s) => s.toDiagram);
 
-  useUnsavedChangesWarning(isDirty);
+  const toPlaybook = `/team/${routeKey}/playbook`;
+
+  const confirmDiscard = useCallback(
+    () =>
+      confirm({
+        title: 'Leave without saving?',
+        description: 'Your changes to this play will be lost.',
+        confirmLabel: 'Leave',
+        confirmVariant: 'danger',
+      }),
+    [confirm],
+  );
+
+  useNavigationGuard({
+    enabled: isDirty,
+    confirm: confirmDiscard,
+    onLeave: () => router.push(toPlaybook),
+  });
 
   const save = async () => {
     try {
@@ -57,16 +77,8 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
   };
 
   const leave = async () => {
-    const ok =
-      !isDirty ||
-      (await confirm({
-        title: 'Leave without saving?',
-        description: 'Your changes to this play will be lost.',
-        confirmLabel: 'Leave',
-        confirmVariant: 'danger',
-      }));
-
-    if (ok) router.push(`/team/${routeKey}/playbook`);
+    if (isDirty && !(await confirmDiscard())) return;
+    router.push(toPlaybook);
   };
 
   const selected = phase.objects.find((o) => o.id === selectedId) ?? null;
