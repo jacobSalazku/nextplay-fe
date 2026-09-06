@@ -29,4 +29,4 @@ fi
 pnpm exec prisma generate
 pnpm exec prisma migrate deploy
 node prisma/seed.js
-exec pnpm start
+exec node_modules/.bin/nest start
