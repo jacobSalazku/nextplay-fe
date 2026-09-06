@@ -19,7 +19,6 @@ test.describe('play editor routes (unauthenticated)', () => {
 // Creates a 5-Out play and lands in the editor.
 async function newPlay(page: Page) {
   await page.goto(`/team/${TEAM}/playbook/play/new`);
-  await page.getByRole('button', { name: 'Offense' }).click();
   await page.getByRole('button', { name: /5-Out/ }).click();
   await page.getByRole('button', { name: 'Create play' }).click();
   await page.waitForURL(/\/playbook\/play\/[^/]+\/edit/);

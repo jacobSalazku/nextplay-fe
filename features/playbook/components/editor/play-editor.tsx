@@ -7,7 +7,7 @@ import { useUpdatePlay } from '@/features/playbook/hooks/play/use-update-play';
 import type { PlayDiagram } from '@/features/playbook/utils/diagram/types';
 import { isTypingTarget } from '@/features/playbook/utils/editor/keyboard';
 import { usePlayEditorStore } from '@/store/use-play-editor-store';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Pencil, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { useConfirm } from '@/components/feedback/confirm-provider';
 import { Button } from '@/components/foundation/button/button';
@@ -171,9 +171,10 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
               <button
                 type="button"
                 onClick={startRenaming}
-                className="max-w-full truncate rounded px-1 hover:bg-white/5"
+                className="group flex max-w-full items-center gap-2 rounded px-1 hover:bg-white/5"
               >
-                {name}
+                <span className="truncate">{name}</span>
+                <Pencil className="h-3.5 w-3.5 shrink-0 text-gray-400 group-hover:text-gray-200" />
               </button>
             )}
           </h1>
@@ -188,30 +189,27 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
         </Button>
       </header>
 
-      <ToolDock tool={tool} onToolChange={setTool} />
-
-      <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 lg:flex-row">
-        <div className="flex flex-1 items-start justify-center">
-          <div className="w-full max-w-2xl">
-            <EditorStage
-              court={court}
-              phase={phase}
-              ballHolderId={phase.ballHolderId}
-              tool={tool}
-              selection={selection}
-              onSelect={select}
-              onDraw={draw}
-              onMove={moveObject}
-              onBend={(id, bend) => updateAction(id, { bend })}
-              onRotate={rotateObject}
-              onDelete={deleteSelection}
-            />
-          </div>
+      <div className="relative flex flex-1 flex-col gap-4 overflow-hidden p-4 lg:flex-row">
+        <div className="flex min-h-0 flex-1 items-center justify-center pb-20">
+          <EditorStage
+            className="max-h-full max-w-full"
+            court={court}
+            phase={phase}
+            ballHolderId={phase.ballHolderId}
+            tool={tool}
+            selection={selection}
+            onSelect={select}
+            onDraw={draw}
+            onMove={moveObject}
+            onBend={(id, bend) => updateAction(id, { bend })}
+            onRotate={rotateObject}
+            onDelete={deleteSelection}
+          />
         </div>
 
         <aside
           aria-label="Selection"
-          className="w-full shrink-0 space-y-3 rounded-xl border border-white/10 bg-slate-900/60 p-4 lg:w-72"
+          className="w-full shrink-0 space-y-3 overflow-y-auto rounded-xl border border-white/10 bg-slate-900/60 p-4 lg:w-72"
         >
           <div>
             <p className="text-xs tracking-wide text-gray-400 uppercase">
@@ -241,6 +239,12 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
             delete.
           </p>
         </aside>
+
+        <ToolDock
+          tool={tool}
+          onToolChange={setTool}
+          className="absolute bottom-5 left-1/2 -translate-x-1/2"
+        />
       </div>
     </div>
   );

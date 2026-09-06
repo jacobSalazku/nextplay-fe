@@ -46,9 +46,11 @@ const SHORTCUTS = new Map<string, EditorTool>([
 export function ToolDock({
   tool,
   onToolChange,
+  className,
 }: {
   tool: EditorTool;
   onToolChange: (tool: EditorTool) => void;
+  className?: string;
 }) {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -70,26 +72,31 @@ export function ToolDock({
     <div
       role="toolbar"
       aria-label="Drawing tools"
-      className="flex gap-1 overflow-x-auto border-b border-white/10 bg-slate-950 px-3 py-2"
+      className={cn(
+        'flex max-w-[calc(100vw-2rem)] gap-1 overflow-x-auto rounded-2xl border border-white/10 bg-slate-900/90 p-1.5 shadow-xl shadow-black/40 backdrop-blur',
+        className,
+      )}
     >
-      {TOOLS.map(({ tool: value, label, icon: Icon, shortcut }) => (
-        <button
-          key={value}
-          type="button"
-          aria-pressed={tool === value}
-          aria-keyshortcuts={shortcut}
-          title={`${label} (${shortcut})`}
-          onClick={() => onToolChange(value)}
-          className={cn(
-            'flex shrink-0 flex-col items-center gap-1 rounded-lg px-3 py-1.5 text-xs transition',
-            tool === value
-              ? 'bg-orange-500/20 text-orange-200'
-              : 'text-gray-400 hover:bg-white/5 hover:text-white',
-          )}
-        >
-          <Icon className="h-4 w-4" />
-          {label}
-        </button>
+      {TOOLS.map(({ tool: value, label, icon: Icon, shortcut }, index) => (
+        <div key={value} className="flex items-center">
+          {index === 1 && <div className="mx-1 h-8 w-px bg-white/10" />}
+          <button
+            type="button"
+            aria-pressed={tool === value}
+            aria-keyshortcuts={shortcut}
+            title={`${label} (${shortcut})`}
+            onClick={() => onToolChange(value)}
+            className={cn(
+              'flex shrink-0 flex-col items-center gap-1 rounded-xl px-3 py-1.5 text-xs transition',
+              tool === value
+                ? 'bg-orange-500/20 text-orange-200'
+                : 'text-gray-400 hover:bg-white/5 hover:text-white',
+            )}
+          >
+            <Icon className="h-4 w-4" />
+            {label}
+          </button>
+        </div>
       ))}
     </div>
   );

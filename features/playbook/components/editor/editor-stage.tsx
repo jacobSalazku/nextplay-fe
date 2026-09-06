@@ -29,11 +29,13 @@ import {
   nearestToken,
 } from '@/features/playbook/utils/editor/draw-geometry';
 import type { EditorTool, Selection } from '@/store/use-play-editor-store';
+import { cn } from '@/utils/tw-merge';
 
 type DrawEnd = { toId: string } | { toPoint: Point };
 type Chord = { from: Point; to: Point };
 
 type Props = {
+  className?: string;
   court: CourtType;
   phase: Phase;
   ballHolderId?: string;
@@ -64,6 +66,7 @@ const clamp = (n: number) => Math.min(100, Math.max(0, n));
 const rad = (deg: number) => (deg * Math.PI) / 180;
 
 export function EditorStage({
+  className,
   court,
   phase,
   ballHolderId,
@@ -188,7 +191,7 @@ export function EditorStage({
   return (
     <div
       ref={boxRef}
-      className="relative w-full touch-none select-none"
+      className={cn('relative h-full touch-none select-none', className)}
       style={{ aspectRatio: `${w} / ${h}` }}
     >
       <CourtDiagram
@@ -340,21 +343,26 @@ function ActionHandles({
 
   return (
     <>
-      <circle
+      <g
         role="button"
         aria-label="Bend route"
-        cx={handle.x}
-        cy={handle.y * sy}
-        r={2.4}
-        fill={ACCENT}
-        stroke="white"
-        strokeWidth={0.4}
         style={{ pointerEvents: 'all', cursor: 'grab' }}
         onPointerDown={(event) => onBendPointerDown(event, chord)}
-      />
+      >
+        <circle cx={handle.x} cy={handle.y * sy} r={3.2} fill="transparent" />
+        <circle
+          cx={handle.x}
+          cy={handle.y * sy}
+          r={1.7}
+          fill={ACCENT}
+          stroke="white"
+          strokeWidth={0.35}
+          style={{ pointerEvents: 'none' }}
+        />
+      </g>
       <DeleteControl
-        x={handle.x + 5}
-        y={handle.y * sy - 5}
+        x={handle.x + 4}
+        y={handle.y * sy - 4}
         onDelete={onDelete}
       />
     </>
@@ -420,11 +428,12 @@ function DeleteControl({
         onDelete();
       }}
     >
-      <circle r={2.6} fill="rgb(220 38 38)" />
+      <circle r={3.4} fill="transparent" />
+      <circle r={1.9} fill="rgb(220 38 38)" />
       <path
-        d="M-1 -1 L1 1 M-1 1 L1 -1"
+        d="M-0.75 -0.75 L0.75 0.75 M-0.75 0.75 L0.75 -0.75"
         stroke="white"
-        strokeWidth={0.6}
+        strokeWidth={0.5}
         strokeLinecap="round"
       />
     </g>

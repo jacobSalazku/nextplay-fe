@@ -52,21 +52,6 @@ describe('NewPlaySetup', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('blocks submit until a category is picked', async () => {
-    // Arrange
-    const user = userEvent.setup();
-    renderWithClient(
-      <NewPlaySetup routeKey="team~1" formations={formations} />,
-    );
-
-    // Act
-    await user.click(screen.getByRole('button', { name: 'Create play' }));
-
-    // Assert
-    expect(await screen.findByText('Pick a category')).toBeInTheDocument();
-    expect(push).not.toHaveBeenCalled();
-  });
-
   it('creates the play as "New play" with a seeded diagram', async () => {
     // Arrange
     const user = userEvent.setup();
@@ -82,7 +67,6 @@ describe('NewPlaySetup', () => {
     );
 
     // Act
-    await user.click(screen.getByRole('button', { name: 'Offense' }));
     await user.click(screen.getByRole('button', { name: /5-out/ }));
     await user.click(screen.getByRole('button', { name: 'Create play' }));
 

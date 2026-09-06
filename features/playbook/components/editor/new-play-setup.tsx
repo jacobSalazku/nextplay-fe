@@ -23,11 +23,9 @@ type Formation = {
   objects: unknown;
 };
 
-const CATEGORIES: { value: Category; label: string }[] = [
-  { value: Category.Offensive, label: 'Offense' },
-  { value: Category.Defensive, label: 'Defense' },
-  { value: Category.Special, label: 'Special' },
-];
+// category is chosen later, in the editor — seed a provisional value the
+// backend accepts at creation
+const DEFAULT_CATEGORY = Category.Offensive;
 
 const COURTS: { value: CourtType; label: string }[] = [
   { value: 'half', label: 'Half court' },
@@ -43,12 +41,7 @@ export function NewPlaySetup({
 }) {
   const { createPlay, isCreating } = useCreatePlay(routeKey);
 
-  const {
-    handleSubmit,
-    control,
-    setValue,
-    formState: { errors },
-  } = useForm<NewPlayData>({
+  const { handleSubmit, control, setValue } = useForm<NewPlayData>({
     resolver: zodResolver(newPlaySchema),
     defaultValues: { court: 'half', formationId: '' },
   });
@@ -64,7 +57,7 @@ export function NewPlaySetup({
     await createPlay({
       name: 'New play',
       description: '',
-      category: data.category,
+      category: DEFAULT_CATEGORY,
       diagram: seedDiagram(data.court, objects),
     }).catch(() => {});
   };
@@ -72,29 +65,12 @@ export function NewPlaySetup({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto flex w-full max-w-3xl flex-col gap-8 p-4 sm:p-6"
+      className="flex w-full flex-col gap-8 p-4 sm:p-6"
     >
-      <header>
-        <h1 className="text-2xl font-bold text-white">New play</h1>
-        <p className="text-sm text-gray-400">
-          Pick a court and a starting formation. You can move players and name
-          the play once the editor opens.
-        </p>
-      </header>
-
-      <Fieldset label="Category" error={errors.category?.message}>
-        <Controller
-          name="category"
-          control={control}
-          render={({ field }) => (
-            <OptionRow
-              options={CATEGORIES}
-              value={field.value}
-              onChange={field.onChange}
-            />
-          )}
-        />
-      </Fieldset>
+      <p className="text-sm text-gray-400">
+        Pick a court and a starting formation. You can move players, name the
+        play and set its category once the editor opens.
+      </p>
 
       <Fieldset label="Court">
         <Controller
@@ -119,7 +95,7 @@ export function NewPlaySetup({
           name="formationId"
           control={control}
           render={({ field }) => (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               <FormationOption
                 name="Empty court"
                 court={court}

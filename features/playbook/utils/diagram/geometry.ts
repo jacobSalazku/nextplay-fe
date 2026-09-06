@@ -50,16 +50,19 @@ export function routePath(
     : `M${fmt(a.x)} ${fmt(a.y)} L${fmt(b.x)} ${fmt(b.y)}`;
 
   if (type === 'dribble') {
-    const len = Math.hypot(b.x - a.x, b.y - a.y);
-    const segments = Math.max(8, Math.round(len / 2.4));
-    const amplitude = 1.8;
+    const len = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+    // a regular squiggle: ~6 court-units per full wave, tapering onto the
+    // straight line at the end so the arrowhead sits flush
+    const waves = Math.max(2, Math.round(len / 6));
+    const steps = waves * 10;
+    const amplitude = 1.5;
     let d = `M${fmt(a.x)} ${fmt(a.y)}`;
-    for (let i = 1; i <= segments; i++) {
-      const t = i / segments;
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps;
       const p = bezierPoint(a, b, ctrl, t);
       const pr = perpAt(a, b, ctrl, t);
-      const taper = t > 0.9 ? (1 - t) / 0.1 : 1;
-      const off = Math.sin(i * 0.9) * amplitude * taper;
+      const taper = Math.min(1, (1 - t) / 0.15);
+      const off = Math.sin(t * Math.PI * 2 * waves) * amplitude * taper;
       d += ` L${fmt(p.x + pr.x * off)} ${fmt(p.y + pr.y * off)}`;
     }
     return d;
