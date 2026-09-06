@@ -14,7 +14,7 @@ export default function PlayEditorSkeleton() {
       <div className="flex flex-1 flex-col gap-3 overflow-hidden p-3 lg:flex-row">
         <div className="flex min-h-0 flex-1 flex-col gap-3">
           <div className="flex min-h-0 flex-1 items-center justify-center">
-            <SkeletonBox className="aspect-[100/84] h-full max-w-full rounded-xl" />
+            <SkeletonBox className="aspect-[100/94] h-full max-w-full rounded-xl" />
           </div>
           <SkeletonBox className="mx-auto h-14 w-80 shrink-0 rounded-2xl" />
         </div>

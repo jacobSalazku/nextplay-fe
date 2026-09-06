@@ -7,17 +7,17 @@ import type {
 export const ROSTER_SIZE = 5; // slots shown per side on a fresh play
 export const MAX_PER_SIDE = 7; // the "+" button stops here
 
-// The rim, in stored 0..100 space (viewBox rim is ~13.5 of 84 tall).
-const RIM: Point = { x: 50, y: 16 };
+// The rim, in stored 0..100 space (viewBox rim is ~13.5 of 94 tall).
+const RIM: Point = { x: 50, y: 14 };
 
-// Where each position stands on an empty court — a 5-out alignment:
+// Where each position stands on an empty court — the 5-out alignment:
 // 1 point, 2/3 wings, 4/5 corners. Slots past 5 get a neutral spot.
 const ROLE_HOME: Record<number, Point> = {
-  1: { x: 50, y: 88 },
-  2: { x: 82, y: 62 },
-  3: { x: 18, y: 62 },
-  4: { x: 86, y: 24 },
-  5: { x: 14, y: 24 },
+  1: { x: 50, y: 82 },
+  2: { x: 16, y: 58 },
+  3: { x: 84, y: 58 },
+  4: { x: 28, y: 26 },
+  5: { x: 72, y: 26 },
 };
 
 const prefix = (kind: PlayObjectKind) => (kind === 'offense' ? 'o' : 'x');

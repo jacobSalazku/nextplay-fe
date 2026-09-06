@@ -219,8 +219,8 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
         </div>
       </header>
 
-      <div className="flex flex-1 flex-col gap-3 overflow-hidden p-3 lg:flex-row">
-        <div className="flex min-h-0 flex-1 flex-col gap-3">
+      <div className="flex flex-1 flex-col gap-2 overflow-hidden p-2 lg:flex-row">
+        <div className="flex min-h-0 flex-1 flex-col gap-2">
           <div className="flex min-h-0 flex-1 items-center justify-center">
             <EditorStage
               court={court}

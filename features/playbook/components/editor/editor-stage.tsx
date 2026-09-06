@@ -258,7 +258,7 @@ export function EditorStage({
                 fill="none"
                 stroke={active ? ACCENT : 'transparent'}
                 strokeOpacity={active ? 0.6 : 1}
-                strokeWidth={active ? 1.4 : 6}
+                strokeWidth={active ? 1 : 6}
                 strokeLinecap="round"
                 style={{ pointerEvents: 'all', cursor: 'pointer' }}
                 onPointerDown={(event) => {
@@ -279,8 +279,8 @@ export function EditorStage({
             )}
             fill="none"
             stroke={ACCENT}
-            strokeWidth={0.7}
-            strokeDasharray="1.6 1.6"
+            strokeWidth={0.55}
+            strokeDasharray="1.2 1.2"
             strokeLinecap="round"
             markerEnd={
               ARROW_ACTIONS.has(tool) ? 'url(#route-arrow)' : undefined
@@ -294,7 +294,7 @@ export function EditorStage({
               <circle
                 cx={object.x}
                 cy={object.y * sy}
-                r={4.2}
+                r={3.4}
                 fill="none"
                 stroke={ACCENT}
                 strokeWidth={0.5}
@@ -322,9 +322,9 @@ export function EditorStage({
                     ? `Take the ball from ${object.label}`
                     : `Give the ball to ${object.label}`
                 }
-                cx={object.x + 2.3}
-                cy={object.y * sy + 2.3}
-                r={1.4}
+                cx={object.x + 1.9}
+                cy={object.y * sy + 1.9}
+                r={1.1}
                 fill={ballHolderId === object.id ? BALL : 'white'}
                 stroke={ballHolderId === object.id ? 'white' : '#CFA068'}
                 strokeWidth={0.4}
@@ -401,11 +401,11 @@ function ActionHandles({
         style={{ pointerEvents: 'all', cursor: 'grab' }}
         onPointerDown={(event) => onBendPointerDown(event, chord)}
       >
-        <circle cx={handle.x} cy={handle.y * sy} r={3.2} fill="transparent" />
+        <circle cx={handle.x} cy={handle.y * sy} r={3} fill="transparent" />
         <circle
           cx={handle.x}
           cy={handle.y * sy}
-          r={1.7}
+          r={1.35}
           fill={ACCENT}
           stroke="white"
           strokeWidth={0.35}
@@ -413,8 +413,8 @@ function ActionHandles({
         />
       </g>
       <DeleteControl
-        x={handle.x + 4}
-        y={handle.y * sy - 4}
+        x={handle.x + 3.4}
+        y={handle.y * sy - 3.4}
         onDelete={onDelete}
       />
     </>
@@ -449,7 +449,7 @@ function RotationHandle({
         aria-label="Rotate defender"
         cx={hx}
         cy={hy * sy}
-        r={2.2}
+        r={1.8}
         fill={ACCENT}
         stroke="white"
         strokeWidth={0.4}
@@ -480,8 +480,8 @@ function DeleteControl({
         onDelete();
       }}
     >
-      <circle r={3.4} fill="transparent" />
-      <circle r={1.9} fill="rgb(220 38 38)" />
+      <circle r={3.2} fill="transparent" />
+      <circle r={1.5} fill="rgb(220 38 38)" />
       <path
         d="M-0.75 -0.75 L0.75 0.75 M-0.75 0.75 L0.75 -0.75"
         stroke="white"

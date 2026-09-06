@@ -35,12 +35,12 @@ describe('roster helpers', () => {
   });
 
   it('places a man-to-man defender a quarter of the way to the rim', () => {
-    // Arrange — attacker at (40, 60), rim at (50, 16)
+    // Arrange — attacker at (40, 60), rim at (50, 14)
     const at = manToManPosition({ x: 40, y: 60 });
 
     // Assert
     expect(at.x).toBeCloseTo(42.5);
-    expect(at.y).toBeCloseTo(49);
+    expect(at.y).toBeCloseTo(48.5);
   });
 
   it('makes a labelled slot object at a given spot', () => {
