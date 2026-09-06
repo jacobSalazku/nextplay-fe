@@ -101,7 +101,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Install backend deps
         working-directory: nextplay-be
-        run: pnpm install --frozen-lockfile
+        # standalone: nextplay-be sits inside the frontend's pnpm workspace
+        run: pnpm install --frozen-lockfile --ignore-workspace
 
       - run: pnpm exec playwright install --with-deps chromium
 

@@ -25,8 +25,12 @@ if [ -z "${JWT_PRIVATE_KEY_BASE64:-}" ]; then
   ')"
 fi
 
-[ -d node_modules ] || pnpm install --frozen-lockfile
-pnpm exec prisma generate
-pnpm exec prisma migrate deploy
+# --ignore-workspace: nextplay-be is checked out under the frontend's pnpm
+# workspace root in CI, so it must be installed as standalone.
+[ -x node_modules/.bin/nest ] ||
+  pnpm install --frozen-lockfile --ignore-workspace
+
+./node_modules/.bin/prisma generate
+./node_modules/.bin/prisma migrate deploy
 node prisma/seed.js
-exec node_modules/.bin/nest start
+exec ./node_modules/.bin/nest start
