@@ -6,7 +6,8 @@ const DEFENSE = '#DC3B33';
 const BALL = '#F97316';
 const STROKE = '#CFA068';
 
-const R = 2.6;
+const R = 2.6; // offense token radius
+const DR = 2.1; // defenders sit a touch smaller
 
 function OffenseToken({
   object,
@@ -42,19 +43,19 @@ function DefenseToken({ object }: { object: PlacedObject }) {
         transform={`rotate(${facing})`}
         fill="none"
         stroke={DEFENSE}
-        strokeWidth={0.9}
+        strokeWidth={0.75}
         strokeLinecap="round"
       >
-        <path d="M-4.9 -0.6 Q-3.2 -2.5 -1.8 -1" />
-        <path d="M4.9 -0.6 Q3.2 -2.5 1.8 -1" />
+        <path d="M-3.9 -0.5 Q-2.6 -2 -1.4 -0.8" />
+        <path d="M3.9 -0.5 Q2.6 -2 1.4 -0.8" />
       </g>
-      <circle r={R} fill="#fff" stroke={DEFENSE} strokeWidth={0.9} />
+      <circle r={DR} fill={DEFENSE} />
       <text
-        y={1}
+        y={0.85}
         textAnchor="middle"
-        fontSize={2.7}
+        fontSize={2.3}
         fontWeight={700}
-        fill={DEFENSE}
+        fill="#fff"
       >
         {object.label}
       </text>

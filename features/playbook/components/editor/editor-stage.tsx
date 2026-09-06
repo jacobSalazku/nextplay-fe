@@ -405,16 +405,16 @@ function ActionHandles({
         <circle
           cx={handle.x}
           cy={handle.y * sy}
-          r={1.35}
+          r={1}
           fill={ACCENT}
           stroke="white"
-          strokeWidth={0.35}
+          strokeWidth={0.3}
           style={{ pointerEvents: 'none' }}
         />
       </g>
       <DeleteControl
-        x={handle.x + 3.4}
-        y={handle.y * sy - 3.4}
+        x={handle.x + 3}
+        y={handle.y * sy - 3}
         onDelete={onDelete}
       />
     </>
@@ -442,20 +442,25 @@ function RotationHandle({
         x2={hx}
         y2={hy * sy}
         stroke={ACCENT}
-        strokeWidth={0.5}
+        strokeWidth={0.4}
       />
-      <circle
+      <g
         role="button"
         aria-label="Rotate defender"
-        cx={hx}
-        cy={hy * sy}
-        r={1.8}
-        fill={ACCENT}
-        stroke="white"
-        strokeWidth={0.4}
         style={{ pointerEvents: 'all', cursor: 'grab' }}
         onPointerDown={onPointerDown}
-      />
+      >
+        <circle cx={hx} cy={hy * sy} r={2.6} fill="transparent" />
+        <circle
+          cx={hx}
+          cy={hy * sy}
+          r={1.2}
+          fill={ACCENT}
+          stroke="white"
+          strokeWidth={0.3}
+          style={{ pointerEvents: 'none' }}
+        />
+      </g>
     </>
   );
 }
@@ -480,12 +485,12 @@ function DeleteControl({
         onDelete();
       }}
     >
-      <circle r={3.2} fill="transparent" />
-      <circle r={1.5} fill="rgb(220 38 38)" />
+      <circle r={3} fill="transparent" />
+      <circle r={1.1} fill="rgb(220 38 38)" />
       <path
-        d="M-0.75 -0.75 L0.75 0.75 M-0.75 0.75 L0.75 -0.75"
+        d="M-0.5 -0.5 L0.5 0.5 M-0.5 0.5 L0.5 -0.5"
         stroke="white"
-        strokeWidth={0.5}
+        strokeWidth={0.4}
         strokeLinecap="round"
       />
     </g>
