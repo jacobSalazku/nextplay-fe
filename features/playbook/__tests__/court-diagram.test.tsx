@@ -73,7 +73,7 @@ describe('CourtDiagram', () => {
 
     // Assert
     expect(container.querySelector('svg')?.getAttribute('viewBox')).toBe(
-      '0 0 100 188',
+      '0 0 100 168',
     );
   });
 
@@ -88,8 +88,8 @@ describe('CourtDiagram', () => {
     // Act
     const { container } = render(<CourtDiagram court="full" phase={bottom} />);
 
-    // Assert — 100 maps to the full 188-unit height, not 100
+    // Assert — 100 maps to the full 168-unit height, not 100
     const token = container.querySelector('g[transform^="translate(50"]');
-    expect(token?.getAttribute('transform')).toBe('translate(50 188)');
+    expect(token?.getAttribute('transform')).toBe('translate(50 168)');
   });
 });
