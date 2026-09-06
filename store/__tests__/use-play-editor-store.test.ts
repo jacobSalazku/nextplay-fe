@@ -189,8 +189,8 @@ describe('usePlayEditorStore', () => {
     expect(store().phase.ballHolderId).toBeUndefined();
   });
 
-  it('un-benches a player at its home position', () => {
-    // Arrange
+  it('un-benches a player back at its formation spot', () => {
+    // Arrange — o2 was seeded at (20, 55)
     hydrate();
     store().benchObject('o2');
 
@@ -199,10 +199,22 @@ describe('usePlayEditorStore', () => {
 
     // Assert
     expect(store().phase.objects.find((o) => o.id === 'o2')).toMatchObject({
-      id: 'o2',
-      kind: 'offense',
-      label: '2',
+      x: 20,
+      y: 55,
     });
+  });
+
+  it('un-benches a fresh slot at its role home', () => {
+    // Arrange — o3 was never on court
+    hydrate();
+
+    // Act
+    store().unbenchObject('o3');
+
+    // Assert — a real spot, not (0,0)
+    const o3 = store().phase.objects.find((o) => o.id === 'o3');
+    expect(o3!.x).toBeGreaterThan(0);
+    expect(o3!.y).toBeGreaterThan(0);
   });
 
   it('adds a sixth player with the + slot and caps at seven', () => {

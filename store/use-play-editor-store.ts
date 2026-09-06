@@ -12,6 +12,7 @@ import {
   makeSlotObject,
   manToManPosition,
   MAX_PER_SIDE,
+  roleHome,
   ROSTER_SIZE,
   slotKind,
   slotNumber,
@@ -47,6 +48,9 @@ type PlayEditorState = {
   court: CourtType;
   phase: Phase;
   rosterCount: RosterCount;
+  // last known court spot per slot id — seeded from the formation, updated on
+  // move, used to put a benched player back where they belong
+  homes: Record<string, Point>;
   tool: EditorTool;
   selection: Selection;
   isDirty: boolean;
@@ -85,6 +89,7 @@ const initialState = {
   court: 'half' as CourtType,
   phase: EMPTY_PHASE,
   rosterCount: { offense: ROSTER_SIZE, defense: ROSTER_SIZE } as RosterCount,
+  homes: {} as Record<string, Point>,
   tool: 'select' as EditorTool,
   selection: null as Selection,
   isDirty: false,
@@ -159,6 +164,9 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
         court: diagram.court,
         phase: diagram.phases[0],
         rosterCount: rosterCountFor(diagram.phases[0].objects),
+        homes: Object.fromEntries(
+          diagram.phases[0].objects.map((o) => [o.id, { x: o.x, y: o.y }]),
+        ),
       });
     },
 
@@ -179,11 +187,13 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
       pendingSnapshot = null;
     },
 
-    moveObject: (id, x, y) =>
+    moveObject: (id, x, y) => {
+      set((state) => ({ homes: { ...state.homes, [id]: { x, y } } }));
       editPhase((phase) => ({
         ...phase,
         objects: patchById(phase.objects, id, (o) => ({ ...o, x, y })),
-      })),
+      }));
+    },
 
     rotateObject: (id, facing) =>
       editPhase((phase) => ({
@@ -212,7 +222,9 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
 
     unbenchObject: (id) => {
       if (get().phase.objects.some((o) => o.id === id)) return;
-      const object = makeSlotObject(slotKind(id), slotNumber(id));
+      const at = get().homes[id] ?? roleHome(id);
+      const object = makeSlotObject(slotKind(id), slotNumber(id), at);
+      set((state) => ({ homes: { ...state.homes, [id]: at } }));
       commitPhase((phase) => ({
         ...phase,
         objects: [...phase.objects, object],
@@ -232,7 +244,7 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
       const onCourt = new Set(
         phase.objects.filter((o) => o.kind === 'defense').map((o) => o.id),
       );
-      const added = offense
+      const added: PlacedObject[] = offense
         .map((o) => ({ o, id: `x${slotNumber(o.id)}` }))
         .filter(({ id }) => !onCourt.has(id))
         .map(({ o, id }) => ({
@@ -247,12 +259,16 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
         get().rosterCount.defense,
         ...added.map((d) => slotNumber(d.id)),
       );
-      set({
+      set((state) => ({
         rosterCount: {
-          ...get().rosterCount,
+          ...state.rosterCount,
           defense: Math.min(MAX_PER_SIDE, maxN),
         },
-      });
+        homes: {
+          ...state.homes,
+          ...Object.fromEntries(added.map((d) => [d.id, { x: d.x, y: d.y }])),
+        },
+      }));
       commitPhase((p) => ({ ...p, objects: [...p.objects, ...added] }));
     },
 
