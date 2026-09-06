@@ -13,6 +13,7 @@ import {
   Target,
   type LucideIcon,
 } from 'lucide-react';
+import { isTypingTarget } from './keyboard';
 
 type ToolDef = {
   tool: EditorTool;
@@ -41,15 +42,6 @@ const SHORTCUTS = new Map<string, EditorTool>([
   ['5', 'shot'],
   ['6', 'handoff'],
 ]);
-
-function isTypingTarget(target: EventTarget | null) {
-  const el = target as HTMLElement | null;
-  return (
-    !!el &&
-    (el.isContentEditable ||
-      /^(input|textarea|select)$/i.test(el.tagName ?? ''))
-  );
-}
 
 export function ToolDock({
   tool,

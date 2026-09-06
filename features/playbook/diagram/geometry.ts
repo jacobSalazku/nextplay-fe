@@ -82,34 +82,44 @@ export function routePath(
   return main;
 }
 
+// The straight endpoints of an action in the coord space of `objects`, or null
+// if an endpoint is missing. `from` is the source token; `to` is the target
+// token or the free `toPoint`.
+export function actionChord(
+  action: Pick<Action, 'fromId' | 'toId' | 'toPoint'>,
+  objects: PlacedObject[],
+): { from: Point; to: Point } | null {
+  const from = objects.find((o) => o.id === action.fromId);
+  if (!from) return null;
+
+  const target =
+    action.toId != null
+      ? objects.find((o) => o.id === action.toId)
+      : action.toPoint;
+  if (!target) return null;
+
+  return { from: { x: from.x, y: from.y }, to: { x: target.x, y: target.y } };
+}
+
 export function actionEndpoints(
   action: Action,
   objects: PlacedObject[],
 ): { a: Point; b: Point; ctrl: Point | null } | null {
-  const from = objects.find((o) => o.id === action.fromId);
-  if (!from) return null;
+  const chord = actionChord(action, objects);
+  if (!chord) return null;
 
-  let to: Point | undefined;
-  if (action.toId != null) {
-    const target = objects.find((o) => o.id === action.toId);
-    if (target) to = { x: target.x, y: target.y };
-  } else if (action.toPoint != null) {
-    to = { x: action.toPoint.x, y: action.toPoint.y };
-  }
-  if (!to) return null;
-
-  const a = { x: from.x, y: from.y };
+  const { from: a, to: b } = chord;
   // `bend` is an offset from the midpoint of the straight a->b line, so the
   // curve follows when an endpoint moves. Absent / zero == straight.
   const bent = action.bend && (action.bend.x !== 0 || action.bend.y !== 0);
   const ctrl = bent
     ? {
-        x: (a.x + to.x) / 2 + action.bend!.x,
-        y: (a.y + to.y) / 2 + action.bend!.y,
+        x: (a.x + b.x) / 2 + action.bend!.x,
+        y: (a.y + b.y) / 2 + action.bend!.y,
       }
     : null;
 
-  return { a, b: to, ctrl };
+  return { a, b, ctrl };
 }
 
 export const ARROW_ACTIONS: ReadonlySet<Action['type']> = new Set([

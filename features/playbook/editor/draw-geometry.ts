@@ -1,25 +1,11 @@
+import { actionChord } from '@/features/playbook/diagram/geometry';
 import type {
   Action,
   PlacedObject,
   Point,
 } from '@/features/playbook/diagram/types';
 
-// Drop the bend and treat the route as straight for editor hit-testing.
-export function actionChord(
-  action: Pick<Action, 'fromId' | 'toId' | 'toPoint'>,
-  objects: PlacedObject[],
-): { from: Point; to: Point } | null {
-  const from = objects.find((o) => o.id === action.fromId);
-  if (!from) return null;
-
-  const to =
-    action.toId != null
-      ? objects.find((o) => o.id === action.toId)
-      : action.toPoint;
-  if (!to) return null;
-
-  return { from: { x: from.x, y: from.y }, to: { x: to.x, y: to.y } };
-}
+export { actionChord };
 
 function midpoint(a: Point, b: Point): Point {
   return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };

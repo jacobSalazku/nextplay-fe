@@ -60,96 +60,92 @@ const initialState = {
   isDirty: false,
 };
 
+const patchById = <T extends { id: string }>(
+  list: T[],
+  id: string,
+  patch: (item: T) => T,
+): T[] => list.map((item) => (item.id === id ? patch(item) : item));
+
 // Editor state for one play. A singleton, so `<PlayEditor>` hydrates it for the
 // current play and resets on unmount. In-flight save state lives with the
 // mutation hook, not here. One phase for now — the phase strip comes later.
-export const usePlayEditorStore = create<PlayEditorState>((set, get) => ({
-  ...initialState,
+export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
+  // Every phase edit clones the phase and marks the play dirty.
+  const editPhase = (fn: (phase: Phase) => Phase) =>
+    set((state) => ({ isDirty: true, phase: fn(state.phase) }));
 
-  hydrate: ({ playId, routeKey, name, diagram }) =>
-    set({
-      ...initialState,
-      hydrated: true,
-      playId,
-      routeKey,
-      name,
-      court: diagram.court,
-      phase: diagram.phases[0],
-    }),
+  return {
+    ...initialState,
 
-  reset: () => set(initialState),
+    hydrate: ({ playId, routeKey, name, diagram }) =>
+      set({
+        ...initialState,
+        hydrated: true,
+        playId,
+        routeKey,
+        name,
+        court: diagram.court,
+        phase: diagram.phases[0],
+      }),
 
-  setTool: (tool) => set({ tool, selection: null }),
+    reset: () => set(initialState),
 
-  select: (selection) => set({ selection }),
+    setTool: (tool) => set({ tool, selection: null }),
 
-  moveObject: (id, x, y) =>
-    set((state) => ({
-      isDirty: true,
-      phase: {
-        ...state.phase,
-        objects: state.phase.objects.map((object) =>
-          object.id === id ? { ...object, x, y } : object,
-        ),
-      },
-    })),
+    select: (selection) => set({ selection }),
 
-  rotateObject: (id, facing) =>
-    set((state) => ({
-      isDirty: true,
-      phase: {
-        ...state.phase,
-        objects: state.phase.objects.map((object) =>
-          object.id === id ? { ...object, facing } : object,
-        ),
-      },
-    })),
+    moveObject: (id, x, y) =>
+      editPhase((phase) => ({
+        ...phase,
+        objects: patchById(phase.objects, id, (o) => ({ ...o, x, y })),
+      })),
 
-  addAction: (input) => {
-    const { phase } = get();
-    if (phase.actions.length >= MAX_ACTIONS) return false;
+    rotateObject: (id, facing) =>
+      editPhase((phase) => ({
+        ...phase,
+        objects: patchById(phase.objects, id, (o) => ({ ...o, facing })),
+      })),
 
-    const action: Action = { ...input, id: newActionId() };
-    set({
-      isDirty: true,
-      phase: { ...phase, actions: [...phase.actions, action] },
-      selection: { kind: 'action', id: action.id },
-    });
-    return true;
-  },
+    addAction: (input) => {
+      if (get().phase.actions.length >= MAX_ACTIONS) return false;
 
-  updateAction: (id, patch) =>
-    set((state) => ({
-      isDirty: true,
-      phase: {
-        ...state.phase,
-        actions: state.phase.actions.map((action) => {
-          if (action.id !== id) return action;
+      const action: Action = { ...input, id: newActionId() };
+      editPhase((phase) => ({
+        ...phase,
+        actions: [...phase.actions, action],
+      }));
+      set({ selection: { kind: 'action', id: action.id } });
+      return true;
+    },
+
+    updateAction: (id, patch) =>
+      editPhase((phase) => ({
+        ...phase,
+        actions: patchById(phase.actions, id, (action) => {
           const next = { ...action, ...patch };
           if (next.bend == null) delete next.bend;
           return next;
         }),
-      },
-    })),
+      })),
 
-  deleteAction: (id) =>
-    set((state) => ({
-      isDirty: true,
-      phase: {
-        ...state.phase,
-        actions: state.phase.actions.filter((action) => action.id !== id),
-      },
-      selection:
+    deleteAction: (id) => {
+      editPhase((phase) => ({
+        ...phase,
+        actions: phase.actions.filter((action) => action.id !== id),
+      }));
+      set((state) =>
         state.selection?.kind === 'action' && state.selection.id === id
-          ? null
-          : state.selection,
-    })),
+          ? { selection: null }
+          : {},
+      );
+    },
 
-  // Success only — a failed save must leave isDirty set so the coach can retry.
-  markSaved: () => set({ isDirty: false }),
+    // Success only — a failed save must leave isDirty set so the coach can retry.
+    markSaved: () => set({ isDirty: false }),
 
-  toDiagram: () => {
-    const { court, phase } = get();
-    return { version: 1, court, phases: [phase], timeline: [] };
-  },
-}));
+    toDiagram: () => {
+      const { court, phase } = get();
+      return { version: 1, court, phases: [phase], timeline: [] };
+    },
+  };
+});

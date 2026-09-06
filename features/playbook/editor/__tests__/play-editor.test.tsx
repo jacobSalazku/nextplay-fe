@@ -6,7 +6,7 @@ import { usePlayEditorStore } from '@/store/use-play-editor-store';
 import { api, gqlData, gqlError } from '@/test/msw/handlers';
 import { server } from '@/test/msw/server';
 import { renderWithClient } from '@/test/utils';
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -18,6 +18,8 @@ vi.mock('next/navigation', () => ({
 
 const objects: PlacedObject[] = [
   { id: 'o1', kind: 'offense', label: '1', x: 25, y: 25 },
+  { id: 'o2', kind: 'offense', label: '2', x: 75, y: 75 },
+  { id: 'x1', kind: 'defense', label: 'x2', x: 50, y: 50 },
 ];
 
 function pinBox() {
@@ -180,5 +182,61 @@ describe('PlayEditor', () => {
     await waitFor(() =>
       expect(push).toHaveBeenCalledWith('/team/team~1/playbook'),
     );
+  });
+});
+
+describe('PlayEditor — selection panel', () => {
+  const store = () => usePlayEditorStore.getState();
+
+  it('deletes the selected route with the Delete key', async () => {
+    // Arrange
+    const user = userEvent.setup();
+    renderEditor();
+    act(() => {
+      store().addAction({ type: 'pass', fromId: 'o1', toId: 'o2' });
+    });
+    const { id } = store().phase.actions[0];
+
+    // Act
+    await user.keyboard('{Delete}');
+
+    // Assert
+    expect(store().phase.actions).toHaveLength(0);
+    expect(store().selection).toBeNull();
+    expect(id).toBeDefined();
+  });
+
+  it('shows the route type and a Delete route button', async () => {
+    // Arrange
+    const user = userEvent.setup();
+    renderEditor();
+    act(() => {
+      store().addAction({ type: 'screen', fromId: 'o1', toId: 'o2' });
+    });
+
+    // Assert — the panel reflects the selection
+    const panel = screen.getByRole('complementary');
+    expect(within(panel).getByText('Screen')).toBeInTheDocument();
+
+    // Act
+    await user.click(
+      within(panel).getByRole('button', { name: /delete route/i }),
+    );
+
+    // Assert
+    expect(store().phase.actions).toHaveLength(0);
+  });
+
+  it('labels a selected defender', () => {
+    // Arrange
+    renderEditor();
+
+    // Act
+    act(() => store().select({ kind: 'object', id: 'x1' }));
+
+    // Assert
+    expect(
+      within(screen.getByRole('complementary')).getByText('Defender x2'),
+    ).toBeInTheDocument();
   });
 });

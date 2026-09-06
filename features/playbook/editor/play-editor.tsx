@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { useConfirm } from '@/components/feedback/confirm-provider';
 import { Button } from '@/components/foundation/button/button';
 import { EditorStage } from './editor-stage';
+import { isTypingTarget } from './keyboard';
 import { ToolDock } from './tool-dock';
 import { useNavigationGuard } from './use-navigation-guard';
 
@@ -60,6 +61,17 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
     if (selection?.kind === 'action') deleteAction(selection.id);
   }, [selection, deleteAction]);
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Delete' && event.key !== 'Backspace') return;
+      if (isTypingTarget(event.target) || selection?.kind !== 'action') return;
+      event.preventDefault();
+      deleteSelection();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [selection, deleteSelection]);
+
   const draw = useCallback(
     (
       fromId: string,
@@ -109,6 +121,16 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
     selection?.kind === 'object'
       ? (phase.objects.find((o) => o.id === selection.id) ?? null)
       : null;
+  const selectedAction =
+    selection?.kind === 'action'
+      ? (phase.actions.find((a) => a.id === selection.id) ?? null)
+      : null;
+
+  const selectionLabel = selectedObject
+    ? `${selectedObject.kind === 'defense' ? 'Defender' : 'Player'} ${selectedObject.label}`
+    : selectedAction
+      ? selectedAction.type[0].toUpperCase() + selectedAction.type.slice(1)
+      : 'Nothing selected';
 
   return (
     <div className="flex h-screen flex-col bg-slate-950 text-white">
@@ -157,18 +179,26 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
             </p>
             <p className="text-sm capitalize">{court} court</p>
           </div>
-          <div>
+          <div className="space-y-2">
             <p className="text-xs tracking-wide text-gray-400 uppercase">
               Selected
             </p>
-            <p className="text-sm">
-              {selectedObject
-                ? `Player ${selectedObject.label}`
-                : 'Nothing selected'}
-            </p>
+            <p className="text-sm">{selectionLabel}</p>
+            {selectedAction && (
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={deleteSelection}
+                className="w-full"
+              >
+                Delete route
+              </Button>
+            )}
           </div>
           <p className="text-xs text-gray-500">
-            Drag a player to reposition. Actions and phases come next.
+            Pick a tool and drag from a player to draw. Select a route to bend
+            or delete it. <kbd>1</kbd>–<kbd>6</kbd> tools, <kbd>Del</kbd> to
+            delete.
           </p>
         </aside>
       </div>
