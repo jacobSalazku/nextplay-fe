@@ -222,6 +222,29 @@ describe('PlayEditor — selection', () => {
   });
 });
 
+describe('PlayEditor — phases', () => {
+  const store = () => usePlayEditorStore.getState();
+
+  it('adds a phase and switches to it from the strip', async () => {
+    // Arrange
+    const user = userEvent.setup();
+    renderEditor();
+
+    // Act — add a phase
+    await user.click(screen.getByRole('button', { name: 'Add phase' }));
+
+    // Assert — two thumbnails, the new one current
+    expect(screen.getAllByRole('tab')).toHaveLength(2);
+    expect(store().activePhaseIndex).toBe(1);
+
+    // Act — go back to phase 1
+    await user.click(screen.getByRole('tab', { name: 'Phase 1' }));
+
+    // Assert
+    expect(store().activePhaseIndex).toBe(0);
+  });
+});
+
 describe('PlayEditor — rename', () => {
   it('renames the play from the header title', async () => {
     // Arrange

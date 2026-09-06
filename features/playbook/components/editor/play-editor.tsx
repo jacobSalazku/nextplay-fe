@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { useConfirm } from '@/components/feedback/confirm-provider';
 import { Button } from '@/components/foundation/button/button';
 import { EditorStage } from './editor-stage';
+import { PhaseStrip } from './phase-strip';
 import { RosterPanel } from './roster-panel';
 import { ToolDock } from './tool-dock';
 
@@ -44,6 +45,8 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
   }, [playId, routeKey, name, diagram]);
 
   const court = usePlayEditorStore((s) => s.court);
+  const phases = usePlayEditorStore((s) => s.phases);
+  const activePhaseIndex = usePlayEditorStore((s) => s.activePhaseIndex);
   const phase = usePlayEditorStore((s) => s.phases[s.activePhaseIndex]);
   const rosterCount = usePlayEditorStore((s) => s.rosterCount);
   const tool = usePlayEditorStore((s) => s.tool);
@@ -53,6 +56,10 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
   const canRedo = usePlayEditorStore((s) => s.future.length > 0);
   const setTool = usePlayEditorStore((s) => s.setTool);
   const select = usePlayEditorStore((s) => s.select);
+  const addPhase = usePlayEditorStore((s) => s.addPhase);
+  const deletePhase = usePlayEditorStore((s) => s.deletePhase);
+  const setActivePhase = usePlayEditorStore((s) => s.setActivePhase);
+  const reorderPhase = usePlayEditorStore((s) => s.reorderPhase);
   const beginEdit = usePlayEditorStore((s) => s.beginEdit);
   const endEdit = usePlayEditorStore((s) => s.endEdit);
   const moveObject = usePlayEditorStore((s) => s.moveObject);
@@ -239,8 +246,17 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
               onDelete={deleteSelection}
             />
           </div>
-          <div className="flex shrink-0 justify-center">
+          <div className="flex shrink-0 flex-wrap items-center justify-between gap-3">
             <ToolDock tool={tool} onToolChange={setTool} />
+            <PhaseStrip
+              phases={phases}
+              court={court}
+              activeIndex={activePhaseIndex}
+              onSelect={setActivePhase}
+              onAdd={addPhase}
+              onDelete={deletePhase}
+              onReorder={reorderPhase}
+            />
           </div>
         </div>
 
