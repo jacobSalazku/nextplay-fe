@@ -6,9 +6,11 @@ import { useUpdatePlay } from '../hooks/use-update-play';
 import type { PlayDiagram } from '@/features/playbook/diagram/types';
 import { usePlayEditorStore } from '@/store/use-play-editor-store';
 import { ArrowLeft, Save } from 'lucide-react';
+import { toast } from 'sonner';
 import { useConfirm } from '@/components/feedback/confirm-provider';
 import { Button } from '@/components/foundation/button/button';
 import { EditorStage } from './editor-stage';
+import { ToolDock } from './tool-dock';
 import { useNavigationGuard } from './use-navigation-guard';
 
 type Props = {
@@ -41,12 +43,27 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
 
   const court = usePlayEditorStore((s) => s.court);
   const phase = usePlayEditorStore((s) => s.phase);
+  const tool = usePlayEditorStore((s) => s.tool);
   const selection = usePlayEditorStore((s) => s.selection);
   const isDirty = usePlayEditorStore((s) => s.isDirty);
+  const setTool = usePlayEditorStore((s) => s.setTool);
   const select = usePlayEditorStore((s) => s.select);
   const moveObject = usePlayEditorStore((s) => s.moveObject);
+  const addAction = usePlayEditorStore((s) => s.addAction);
   const markSaved = usePlayEditorStore((s) => s.markSaved);
   const toDiagram = usePlayEditorStore((s) => s.toDiagram);
+
+  const draw = useCallback(
+    (
+      fromId: string,
+      end: { toId: string } | { toPoint: { x: number; y: number } },
+    ) => {
+      if (tool === 'select') return;
+      const ok = addAction({ type: tool, fromId, ...end });
+      if (!ok) toast.error('Max 30 actions per phase');
+    },
+    [tool, addAction],
+  );
 
   const toPlaybook = `/team/${routeKey}/playbook`;
 
@@ -105,6 +122,8 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
         </Button>
       </header>
 
+      <ToolDock tool={tool} onToolChange={setTool} />
+
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 lg:flex-row">
         <div className="flex flex-1 items-start justify-center">
           <div className="w-full max-w-2xl">
@@ -112,8 +131,10 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
               court={court}
               phase={phase}
               ballHolderId={phase.ballHolderId}
+              tool={tool}
               selection={selection}
               onSelect={select}
+              onDraw={draw}
               onMove={moveObject}
             />
           </div>

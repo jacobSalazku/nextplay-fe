@@ -1,24 +1,8 @@
 import { Court, COURT_VIEWBOX } from './court';
+import { projectPhase } from './project';
 import { Route, RouteArrowMarker } from './route';
 import { Token } from './tokens';
-import type { CourtType, Phase, Point } from './types';
-
-// Stored coords are 0..100 on both axes; scale y into the court's viewBox height
-// so the same diagram renders correctly on a half or full court.
-function projectPhase(phase: Phase, court: CourtType): Phase {
-  const sy = COURT_VIEWBOX[court].h / 100;
-  const scaleY = <T extends Point>(p: T): T => ({ ...p, y: p.y * sy });
-
-  return {
-    ...phase,
-    objects: phase.objects.map(scaleY),
-    actions: phase.actions.map((action) => ({
-      ...action,
-      ...(action.toPoint ? { toPoint: scaleY(action.toPoint) } : null),
-      ...(action.bend ? { bend: scaleY(action.bend) } : null),
-    })),
-  };
-}
+import type { CourtType, Phase } from './types';
 
 export function CourtDiagram({
   court,
