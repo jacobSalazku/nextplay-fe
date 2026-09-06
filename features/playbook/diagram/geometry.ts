@@ -98,7 +98,18 @@ export function actionEndpoints(
   }
   if (!to) return null;
 
-  return { a: { x: from.x, y: from.y }, b: to, ctrl: action.bend ?? null };
+  const a = { x: from.x, y: from.y };
+  // `bend` is an offset from the midpoint of the straight a->b line, so the
+  // curve follows when an endpoint moves. Absent / zero == straight.
+  const bent = action.bend && (action.bend.x !== 0 || action.bend.y !== 0);
+  const ctrl = bent
+    ? {
+        x: (a.x + to.x) / 2 + action.bend!.x,
+        y: (a.y + to.y) / 2 + action.bend!.y,
+      }
+    : null;
+
+  return { a, b: to, ctrl };
 }
 
 export const ARROW_ACTIONS: ReadonlySet<Action['type']> = new Set([

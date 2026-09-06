@@ -101,4 +101,21 @@ describe('actionEndpoints', () => {
     // Assert
     expect(ends).toBeNull();
   });
+
+  it('resolves bend as an offset from the chord midpoint', () => {
+    // Act — midpoint of (20,80)->(70,20) is (45,50)
+    const ends = actionEndpoints(
+      {
+        id: 'a1',
+        type: 'cut',
+        fromId: 'o1',
+        toId: 'o5',
+        bend: { x: 4, y: -6 },
+      },
+      objects,
+    );
+
+    // Assert
+    expect(ends?.ctrl).toEqual({ x: 49, y: 44 });
+  });
 });
