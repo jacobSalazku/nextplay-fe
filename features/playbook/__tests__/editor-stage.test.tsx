@@ -44,10 +44,13 @@ function renderStage(
 ) {
   const spies = {
     onSelect: vi.fn(),
+    onBeginEdit: vi.fn(),
+    onEndEdit: vi.fn(),
     onMove: vi.fn(),
     onDraw: vi.fn(),
     onBend: vi.fn(),
     onRotate: vi.fn(),
+    onSetBall: vi.fn(),
     onDelete: vi.fn(),
   };
   render(

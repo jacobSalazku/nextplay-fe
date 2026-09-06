@@ -40,10 +40,13 @@ type Props = {
   tool: EditorTool;
   selection: Selection;
   onSelect: (selection: Selection) => void;
+  onBeginEdit: () => void;
+  onEndEdit: () => void;
   onMove: (id: string, x: number, y: number) => void;
   onDraw: (fromId: string, end: DrawEnd) => void;
   onBend: (actionId: string, bend: Point | undefined) => void;
   onRotate: (id: string, facing: number) => void;
+  onSetBall: (id: string) => void;
   onDelete: () => void;
 };
 
@@ -52,6 +55,7 @@ const MIN_DRAW_LEN = 4; // court units — discard shorter drags
 const TOKEN_HIT_R = 5; // court units — the invisible grab circle
 const ROTATE_ARM = 9; // court units — rotation handle distance from the token
 const ACCENT = 'rgb(251 146 60)';
+const BALL = '#F97316';
 
 type Interaction =
   | { kind: 'move'; id: string; grab: Point; frame: number; last: Point }
@@ -70,10 +74,13 @@ export function EditorStage({
   tool,
   selection,
   onSelect,
+  onBeginEdit,
+  onEndEdit,
   onMove,
   onDraw,
   onBend,
   onRotate,
+  onSetBall,
   onDelete,
 }: Props) {
   const boxRef = useRef<HTMLDivElement>(null);
@@ -120,6 +127,7 @@ export function EditorStage({
   ) => {
     event.stopPropagation();
     event.currentTarget.setPointerCapture?.(event.pointerId);
+    onBeginEdit();
     interaction.current = next;
   };
 
@@ -133,6 +141,7 @@ export function EditorStage({
       setPreview({ from, to: point ?? from });
     } else {
       onSelect({ kind: 'object', id: object.id });
+      onBeginEdit();
       // keep the point you grabbed under the cursor instead of snapping the
       // token's centre to it
       const grab = point
@@ -168,6 +177,7 @@ export function EditorStage({
     const current = interaction.current;
     interaction.current = null;
     setPreview(null);
+    onEndEdit();
     event.currentTarget.releasePointerCapture?.(event.pointerId);
 
     const point = toCourt(event);
@@ -304,6 +314,27 @@ export function EditorStage({
               }}
               onPointerDown={startToken(object)}
             />
+            {object.kind === 'offense' && !drawing && (
+              <circle
+                role="button"
+                aria-label={
+                  ballHolderId === object.id
+                    ? `Take the ball from ${object.label}`
+                    : `Give the ball to ${object.label}`
+                }
+                cx={object.x + 2.3}
+                cy={object.y * sy + 2.3}
+                r={1.4}
+                fill={ballHolderId === object.id ? BALL : 'white'}
+                stroke={ballHolderId === object.id ? 'white' : '#CFA068'}
+                strokeWidth={0.4}
+                style={{ pointerEvents: 'all', cursor: 'pointer' }}
+                onPointerDown={(event) => {
+                  event.stopPropagation();
+                  onSetBall(object.id);
+                }}
+              />
+            )}
           </g>
         ))}
 

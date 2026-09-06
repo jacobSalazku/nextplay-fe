@@ -6,7 +6,7 @@ import { usePlayEditorStore } from '@/store/use-play-editor-store';
 import { api, gqlData, gqlError } from '@/test/msw/handlers';
 import { server } from '@/test/msw/server';
 import { renderWithClient } from '@/test/utils';
-import { act, screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -185,7 +185,7 @@ describe('PlayEditor', () => {
   });
 });
 
-describe('PlayEditor — selection panel', () => {
+describe('PlayEditor — selection', () => {
   const store = () => usePlayEditorStore.getState();
 
   it('deletes the selected route with the Delete key', async () => {
@@ -206,28 +206,7 @@ describe('PlayEditor — selection panel', () => {
     expect(id).toBeDefined();
   });
 
-  it('shows the route type and a Delete route button', async () => {
-    // Arrange
-    const user = userEvent.setup();
-    renderEditor();
-    act(() => {
-      store().addAction({ type: 'screen', fromId: 'o1', toId: 'o2' });
-    });
-
-    // Assert — the panel reflects the selection
-    const panel = screen.getByRole('complementary');
-    expect(within(panel).getByText('Screen')).toBeInTheDocument();
-
-    // Act
-    await user.click(
-      within(panel).getByRole('button', { name: /delete route/i }),
-    );
-
-    // Assert
-    expect(store().phase.actions).toHaveLength(0);
-  });
-
-  it('labels a selected defender', () => {
+  it('marks the roster chip for the selected player', () => {
     // Arrange
     renderEditor();
 
@@ -236,8 +215,8 @@ describe('PlayEditor — selection panel', () => {
 
     // Assert
     expect(
-      within(screen.getByRole('complementary')).getByText('Defender x2'),
-    ).toBeInTheDocument();
+      screen.getByRole('button', { name: 'Opponent 1, on court' }),
+    ).toHaveClass('ring-2');
   });
 });
 
