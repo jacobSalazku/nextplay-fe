@@ -44,7 +44,7 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
   }, [playId, routeKey, name, diagram]);
 
   const court = usePlayEditorStore((s) => s.court);
-  const phase = usePlayEditorStore((s) => s.phase);
+  const phase = usePlayEditorStore((s) => s.phases[s.activePhaseIndex]);
   const rosterCount = usePlayEditorStore((s) => s.rosterCount);
   const tool = usePlayEditorStore((s) => s.tool);
   const selection = usePlayEditorStore((s) => s.selection);

@@ -197,13 +197,13 @@ describe('PlayEditor — selection', () => {
     act(() => {
       store().addAction({ type: 'pass', fromId: 'o1', toId: 'o2' });
     });
-    const { id } = store().phase.actions[0];
+    const { id } = store().phases[store().activePhaseIndex].actions[0];
 
     // Act
     await user.keyboard('{Delete}');
 
     // Assert
-    expect(store().phase.actions).toHaveLength(0);
+    expect(store().phases[store().activePhaseIndex].actions).toHaveLength(0);
     expect(store().selection).toBeNull();
     expect(id).toBeDefined();
   });
