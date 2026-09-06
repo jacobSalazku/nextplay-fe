@@ -169,7 +169,12 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
     <div className="fixed inset-0 z-40 flex flex-col bg-slate-950 text-white">
       <header className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
         <div className="flex min-w-0 items-center gap-3">
-          <Button variant="close" onClick={leave} aria-label="Back to playbook">
+          <Button
+            variant="close"
+            className="text-gray-200 hover:bg-white/10 hover:text-white"
+            onClick={leave}
+            aria-label="Back to playbook"
+          >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <h1 className="min-w-0 truncate text-lg font-semibold">
@@ -201,6 +206,7 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
         <div className="flex items-center gap-2">
           <Button
             variant="close"
+            className="text-gray-200 hover:bg-white/10 hover:text-white disabled:text-gray-600"
             onClick={undo}
             disabled={!canUndo}
             aria-label="Undo"
@@ -209,6 +215,7 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
           </Button>
           <Button
             variant="close"
+            className="text-gray-200 hover:bg-white/10 hover:text-white disabled:text-gray-600"
             onClick={redo}
             disabled={!canRedo}
             aria-label="Redo"
@@ -236,6 +243,7 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
               tool={tool}
               selection={selection}
               onSelect={select}
+              onPickSelect={() => setTool('select')}
               onDraw={draw}
               onBeginEdit={beginEdit}
               onEndEdit={endEdit}

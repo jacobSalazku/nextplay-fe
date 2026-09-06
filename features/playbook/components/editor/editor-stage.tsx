@@ -40,6 +40,7 @@ type Props = {
   tool: EditorTool;
   selection: Selection;
   onSelect: (selection: Selection) => void;
+  onPickSelect: () => void;
   onBeginEdit: () => void;
   onEndEdit: () => void;
   onMove: (id: string, x: number, y: number) => void;
@@ -74,6 +75,7 @@ export function EditorStage({
   tool,
   selection,
   onSelect,
+  onPickSelect,
   onBeginEdit,
   onEndEdit,
   onMove,
@@ -188,7 +190,13 @@ export function EditorStage({
         point.x - current.from.x,
         point.y - current.from.y,
       );
-      if (length < MIN_DRAW_LEN) return;
+      // a click (not a drag) on a token while a draw tool is active =
+      // select that player and drop back to the select tool
+      if (length < MIN_DRAW_LEN) {
+        onSelect({ kind: 'object', id: current.fromId });
+        onPickSelect();
+        return;
+      }
 
       const hit = nearestToken(
         point,
@@ -310,7 +318,7 @@ export function EditorStage({
               fill="transparent"
               style={{
                 pointerEvents: 'all',
-                cursor: drawing ? 'crosshair' : 'grab',
+                cursor: 'pointer',
               }}
               onPointerDown={startToken(object)}
             />

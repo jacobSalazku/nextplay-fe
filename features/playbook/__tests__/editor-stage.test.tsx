@@ -44,6 +44,7 @@ function renderStage(
 ) {
   const spies = {
     onSelect: vi.fn(),
+    onPickSelect: vi.fn(),
     onBeginEdit: vi.fn(),
     onEndEdit: vi.fn(),
     onMove: vi.fn(),
@@ -200,18 +201,20 @@ describe('EditorStage — drawing an action', () => {
     expect(onDraw).toHaveBeenCalledWith('o1', { toPoint: { x: 45, y: 45 } });
   });
 
-  it('discards a drag that is too short', () => {
+  it('discards a drag that is too short and selects the token instead', () => {
     // Arrange
     pinBox();
-    const { onDraw } = renderStage({ tool: 'cut' });
+    const { onDraw, onSelect, onPickSelect } = renderStage({ tool: 'cut' });
     const from = screen.getByRole('button', { name: 'Draw from player 1' });
 
-    // Act — barely moved
+    // Act — barely moved: a click, not a drag
     fireEvent.pointerDown(from, { pointerId: 1, ...at(25, 25) });
     fireEvent.pointerUp(from, { pointerId: 1, ...at(27, 27) });
 
-    // Assert
+    // Assert — no route; the player is selected and we're back on the select tool
     expect(onDraw).not.toHaveBeenCalled();
+    expect(onSelect).toHaveBeenLastCalledWith({ kind: 'object', id: 'o1' });
+    expect(onPickSelect).toHaveBeenCalledOnce();
   });
 });
 
