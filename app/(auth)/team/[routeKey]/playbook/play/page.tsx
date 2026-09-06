@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
+import { CourtDiagram } from '@/features/playbook/components/diagram/court-diagram';
 import PlanViewSkeleton from '@/features/playbook/components/skeleton/plan-view-skeleton';
-import { CourtDiagram } from '@/features/playbook/diagram/court-diagram';
-import { asPlayDiagram } from '@/features/playbook/diagram/parse';
-import { getPlay } from '@/features/playbook/queries/get-play';
+import { getPlay } from '@/features/playbook/queries/play/get-play';
+import { asPlayDiagram } from '@/features/playbook/utils/diagram/parse';
 import { playbookSearchParamsCache } from '@/utils/search-params';
 import { sanitizeRichText } from '@/lib/sanitize-rich-text';
 

@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { getPracticePreparationById } from '@/features/playbook/queries/get-practice-preparation-by-id';
+import { getPracticePreparationById } from '@/features/playbook/queries/practice/get-practice-preparation-by-id';
 import { practiceSearchParamsCache } from '@/utils/search-params';
 import { sanitizeRichText } from '@/lib/sanitize-rich-text';
 

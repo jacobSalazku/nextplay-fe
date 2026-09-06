@@ -1,4 +1,4 @@
-import { useCreateGameplan } from '@/features/playbook/hooks/use-create-gameplan';
+import { useCreateGameplan } from '@/features/playbook/hooks/gameplan/use-create-gameplan';
 import { useCoachDashboardStore } from '@/store/use-coach-dashboard-store';
 import { api, gqlData, gqlError } from '@/test/msw/handlers';
 import { server } from '@/test/msw/server';

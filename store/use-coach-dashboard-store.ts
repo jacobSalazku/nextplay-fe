@@ -1,4 +1,4 @@
-import { Mode } from '@/features/playbook/form/gameplan-form';
+import { Mode } from '@/features/playbook/components/form/gameplan-form';
 import { CoachDashTab } from '@/features/playbook/utils/types';
 import { create } from 'zustand';
 import { GamePlan } from '@/graphql/graphql';

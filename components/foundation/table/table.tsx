@@ -4,7 +4,6 @@ import type { ComponentProps } from 'react';
 import { cn } from '@/utils/tw-merge';
 
 type TableProps = ComponentProps<'table'> & {
-  /** Extra classes for the scroll container that wraps the table. */
   containerClassName?: string;
 };
 

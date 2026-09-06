@@ -7,18 +7,15 @@ import { toast } from 'sonner';
 declare module '@tanstack/react-query' {
   interface Register {
     mutationMeta: {
-      /** Opt out of the global error toast — for mutations that render their
-       *  own error UI (inline form errors, a status card, a background autosave). */
+      // Opt out of the global error toast — for mutations that render their
       skipGlobalErrorToast?: boolean;
     };
   }
 }
 
-/**
- * The app's QueryClient. Every mutation failure is logged and toasted from the
- * shared `MutationCache`, unless the mutation sets
- * `meta: { skipGlobalErrorToast: true }`.
- */
+// The app's QueryClient. Every mutation failure is logged and toasted from the
+// shared `MutationCache`, unless the mutation sets
+
 export function createQueryClient(): QueryClient {
   return new QueryClient({
     mutationCache: new MutationCache({
