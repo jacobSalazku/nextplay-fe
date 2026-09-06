@@ -15,20 +15,34 @@ function HalfCourtLines({ flip = false }: { flip?: boolean }) {
       fill="none"
       stroke={LINE}
       strokeWidth={0.6}
+      strokeLinecap="round"
     >
-      <line x1="6" y1="4" x2="94" y2="4" />
-      <line x1="6" y1="4" x2="6" y2="94" />
-      <line x1="94" y1="4" x2="94" y2="94" />
+      {/* baseline + sidelines */}
+      <line x1="5" y1="4" x2="95" y2="4" />
+      <line x1="5" y1="4" x2="5" y2="94" />
+      <line x1="95" y1="4" x2="95" y2="94" />
 
-      <rect x="38" y="4" width="24" height="36" />
-      <line x1="45" y1="4" x2="45" y2="40" stroke={LINE_FAINT} />
-      <line x1="55" y1="4" x2="55" y2="40" stroke={LINE_FAINT} />
-      <circle cx="50" cy="40" r="9" />
-      <circle cx="50" cy="13" r="1.6" />
-      <line x1="45" y1="9" x2="55" y2="9" strokeWidth={0.9} />
-      <path d="M42 13 a8 8 0 0 0 16 0" stroke={LINE_FAINT} />
+      {/* the paint, with the free-throw line at its far edge */}
+      <rect x="36" y="4" width="28" height="36" />
+      <circle cx="50" cy="40" r="10" />
 
-      <path d="M12 4 v18 A44 44 0 0 0 88 22 V4" />
+      {/* backboard + rim + restricted area */}
+      <line x1="43" y1="11" x2="57" y2="11" strokeWidth={0.9} />
+      <circle cx="50" cy="14" r="1.5" />
+      <path d="M43 14 A7 7 0 0 0 57 14" stroke={LINE_FAINT} />
+
+      {/* three-point line: corners at 3ft, arc 23.75ft from the rim */}
+      <path d="M11 4 V30 A42 42 0 0 0 89 30 V4" />
+
+      {/* lane hash marks */}
+      <g stroke={LINE_FAINT}>
+        <line x1="34" y1="16" x2="36" y2="16" />
+        <line x1="34" y1="24" x2="36" y2="24" />
+        <line x1="34" y1="32" x2="36" y2="32" />
+        <line x1="64" y1="16" x2="66" y2="16" />
+        <line x1="64" y1="24" x2="66" y2="24" />
+        <line x1="64" y1="32" x2="66" y2="32" />
+      </g>
     </g>
   );
 }
@@ -67,8 +81,8 @@ export function Court({ court }: { court: CourtType }) {
           <HalfCourtLines />
           <HalfCourtLines flip />
           <g fill="none" stroke={LINE} strokeWidth={0.6}>
-            <line x1="6" y1="94" x2="94" y2="94" />
-            <circle cx="50" cy="94" r="9" />
+            <line x1="5" y1="94" x2="95" y2="94" />
+            <circle cx="50" cy="94" r="10" />
           </g>
         </>
       )}

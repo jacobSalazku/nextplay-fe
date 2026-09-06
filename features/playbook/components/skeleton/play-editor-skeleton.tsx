@@ -11,9 +11,9 @@ export default function PlayEditorSkeleton() {
         <SkeletonBox className="h-9 w-24 rounded-md" />
       </header>
 
-      <div className="flex flex-1 flex-col gap-4 overflow-hidden p-4 lg:flex-row">
-        <div className="flex min-h-0 flex-1 items-center justify-center">
-          <SkeletonBox className="aspect-[100/94] h-full max-h-full rounded-xl" />
+      <div className="flex flex-1 flex-col gap-3 overflow-hidden p-3 lg:flex-row">
+        <div className="flex min-h-0 flex-1 items-center justify-center pb-16">
+          <SkeletonBox className="aspect-[100/94] max-h-full w-full rounded-xl" />
         </div>
         <div className="w-full shrink-0 space-y-3 rounded-xl border border-white/10 bg-slate-900/60 p-4 lg:w-72">
           <SkeletonBox className="h-4 w-16" />

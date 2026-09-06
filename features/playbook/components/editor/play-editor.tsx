@@ -189,10 +189,10 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
         </Button>
       </header>
 
-      <div className="relative flex flex-1 flex-col gap-4 overflow-hidden p-4 lg:flex-row">
-        <div className="flex min-h-0 flex-1 items-center justify-center pb-20">
+      <div className="relative flex flex-1 flex-col gap-3 overflow-hidden p-3 lg:flex-row">
+        <div className="flex min-h-0 flex-1 items-center justify-center pb-16">
           <EditorStage
-            className="max-h-full max-w-full"
+            className="max-h-full"
             court={court}
             phase={phase}
             ballHolderId={phase.ballHolderId}

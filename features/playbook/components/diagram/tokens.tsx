@@ -6,7 +6,7 @@ const DEFENSE = '#DC3B33';
 const BALL = '#F97316';
 const STROKE = '#CFA068';
 
-const R = 3.6;
+const R = 3;
 
 function OffenseToken({
   object,
@@ -18,13 +18,13 @@ function OffenseToken({
   return (
     <g transform={`translate(${object.x} ${object.y})`}>
       {hasBall && (
-        <circle r={R + 1.4} fill="none" stroke={BALL} strokeWidth={1} />
+        <circle r={R + 1.2} fill="none" stroke={BALL} strokeWidth={0.9} />
       )}
       <circle r={R} fill={OFFENSE_FILL} stroke={STROKE} strokeWidth={0.5} />
       <text
-        y={1.4}
+        y={1.2}
         textAnchor="middle"
-        fontSize={4}
+        fontSize={3.3}
         fontWeight={700}
         fill={OFFENSE_INK}
       >

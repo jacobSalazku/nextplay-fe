@@ -191,7 +191,10 @@ export function EditorStage({
   return (
     <div
       ref={boxRef}
-      className={cn('relative h-full touch-none select-none', className)}
+      className={cn(
+        'relative h-full max-w-full touch-none select-none',
+        className,
+      )}
       style={{ aspectRatio: `${w} / ${h}` }}
     >
       <CourtDiagram
