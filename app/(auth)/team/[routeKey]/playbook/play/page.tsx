@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
-import Image from 'next/image';
 import PlanViewSkeleton from '@/features/playbook/components/skeleton/plan-view-skeleton';
+import { CourtDiagram } from '@/features/playbook/diagram/court-diagram';
+import { asPlayDiagram } from '@/features/playbook/diagram/parse';
 import { getPlay } from '@/features/playbook/queries/get-play';
 import { playbookSearchParamsCache } from '@/utils/search-params';
 import { sanitizeRichText } from '@/lib/sanitize-rich-text';
@@ -32,6 +33,7 @@ async function PlayView({ params, searchParams }: PageProps) {
 
 async function PlayContent({ id, routeKey }: { id: string; routeKey: string }) {
   const play = await getPlay(id, routeKey);
+  const diagram = asPlayDiagram(play?.diagram);
 
   if (!play) {
     return (
@@ -56,13 +58,18 @@ async function PlayContent({ id, routeKey }: { id: string; routeKey: string }) {
             }}
           />
           <div className="mb-4 shrink-0 sm:mr-6 sm:mb-0 sm:w-2/5">
-            <Image
-              src={play?.canvas}
-              alt={play.name}
-              className="h-auto w-full rounded-xl border-2 object-cover"
-              width={600}
-              height={600}
-            />
+            {diagram ? (
+              <CourtDiagram
+                court={diagram.court}
+                phase={diagram.phases[0]}
+                ballHolderId={diagram.phases[0].ballHolderId}
+                className="h-auto w-full rounded-xl border-2"
+              />
+            ) : (
+              <p className="rounded-xl border-2 border-dashed border-white/20 p-8 text-center text-sm text-gray-400">
+                This play has no diagram yet.
+              </p>
+            )}
           </div>
         </div>
       </div>

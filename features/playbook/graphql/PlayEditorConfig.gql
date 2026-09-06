@@ -1,0 +1,11 @@
+query PlayEditorConfig {
+  playEditorConfig {
+    courts
+    formations {
+      id
+      name
+      court
+      objects
+    }
+  }
+}

@@ -6,6 +6,7 @@ mutation CreatePlay($input: CreatePlayInput!) {
     description
     category
     canvas
+    diagram
     createdAt
     updatedAt
   }
