@@ -4,9 +4,9 @@ import type {
   PlacedObject,
   PlayObjectKind,
 } from '@/features/playbook/utils/diagram/types';
-import { MAX_PER_SIDE, slotId } from '@/features/playbook/utils/editor/roster';
-import { cn } from '@/utils/tw-merge';
-import { Plus } from 'lucide-react';
+import { slotId } from '@/features/playbook/utils/editor/roster';
+import { AddSlot } from './roster/add-slot';
+import { RosterChip } from './roster/roster-chip';
 
 type Props = {
   objects: PlacedObject[];
@@ -40,7 +40,7 @@ export function RosterPanel({
       const id = slotId(kind, i + 1);
       const present = onCourt.has(id);
       return (
-        <Chip
+        <RosterChip
           key={id}
           n={i + 1}
           kind={kind}
@@ -81,7 +81,7 @@ export function RosterPanel({
           <button
             type="button"
             onClick={onMatchManToMan}
-            className="text-[11px] font-medium text-orange-300 hover:text-orange-200"
+            className="cursor-pointer text-[11px] font-medium text-orange-300 hover:text-orange-200"
           >
             Match man-to-man
           </button>
@@ -96,108 +96,5 @@ export function RosterPanel({
         </div>
       </section>
     </aside>
-  );
-}
-
-function AddSlot({
-  kind,
-  count,
-  onAdd,
-}: {
-  kind: PlayObjectKind;
-  count: number;
-  onAdd: (kind: PlayObjectKind) => void;
-}) {
-  if (count >= MAX_PER_SIDE) return null;
-  return (
-    <button
-      type="button"
-      aria-label={`Add ${kind === 'offense' ? 'player' : 'opponent'}`}
-      onClick={() => onAdd(kind)}
-      className="flex aspect-square items-center justify-center rounded-lg border border-dashed border-white/15 text-gray-500 hover:border-white/30 hover:text-gray-300"
-    >
-      <Plus className="h-4 w-4" />
-    </button>
-  );
-}
-
-function Chip({
-  n,
-  kind,
-  present,
-  hasBall,
-  selected,
-  onToggle,
-  onBall,
-  onSelect,
-}: {
-  n: number;
-  kind: PlayObjectKind;
-  present: boolean;
-  hasBall: boolean;
-  selected: boolean;
-  onToggle: () => void;
-  onBall: () => void;
-  onSelect: () => void;
-}) {
-  const offense = kind === 'offense';
-
-  return (
-    <div className="relative">
-      <button
-        type="button"
-        aria-pressed={present}
-        aria-label={`${offense ? 'Player' : 'Opponent'} ${n}, ${present ? 'on court' : 'benched'}`}
-        onClick={() => {
-          if (present) onSelect();
-          onToggle();
-        }}
-        className={cn(
-          'flex aspect-square w-full items-center justify-center rounded-lg border pt-1 text-lg font-bold transition',
-          present && offense && 'border-slate-500 bg-slate-700 text-white',
-          present && !offense && 'border-red-400 bg-red-600 text-white',
-          !present &&
-            offense &&
-            'border-white/10 bg-slate-900/40 text-gray-600',
-          !present &&
-            !offense &&
-            'border-red-400/25 bg-transparent text-red-300/40',
-          selected && 'ring-2 ring-orange-400',
-        )}
-      >
-        {!offense && <Eyebrows />}
-        {n}
-      </button>
-
-      {offense && present && (
-        <button
-          type="button"
-          aria-label={
-            hasBall ? `Take the ball from ${n}` : `Give the ball to ${n}`
-          }
-          onClick={onBall}
-          className={cn(
-            'absolute -top-1 -right-1 h-4 w-4 rounded-full border border-slate-900 transition',
-            hasBall ? 'bg-orange-500' : 'bg-white/70 hover:bg-white',
-          )}
-        />
-      )}
-    </div>
-  );
-}
-
-function Eyebrows() {
-  return (
-    <svg
-      viewBox="-10 -8 20 8"
-      className="pointer-events-none absolute top-1.5 h-2 w-6"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.4}
-      strokeLinecap="round"
-    >
-      <path d="M-8 -1 Q-5 -5 -2 -2" />
-      <path d="M8 -1 Q5 -5 2 -2" />
-    </svg>
   );
 }

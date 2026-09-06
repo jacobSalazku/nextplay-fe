@@ -94,7 +94,7 @@ export function PhaseStrip({
             aria-label={`Phase ${index + 1}${index === activeIndex ? ', current' : ''}`}
             onPointerDown={onPointerDown(index)}
             className={cn(
-              'block w-20 touch-none overflow-hidden rounded-md border bg-slate-800',
+              'block w-20 touch-none overflow-hidden rounded-md border bg-slate-800 cursor-pointer',
               index === activeIndex
                 ? 'border-orange-400 ring-1 ring-orange-400'
                 : 'border-white/10 hover:border-white/25',
@@ -116,7 +116,7 @@ export function PhaseStrip({
               aria-label={`Delete phase ${index + 1}`}
               onPointerDown={(event) => event.stopPropagation()}
               onClick={() => onDelete(index)}
-              className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-slate-900/80 text-gray-200 hover:bg-red-600 hover:text-white"
+              className="absolute top-1 right-1 flex h-4 w-4 cursor-pointer items-center justify-center rounded-full bg-slate-900/80 text-gray-200 hover:bg-red-600 hover:text-white"
             >
               <X className="h-2.5 w-2.5" />
             </button>
@@ -129,7 +129,7 @@ export function PhaseStrip({
           type="button"
           aria-label="Add phase"
           onClick={onAdd}
-          className="flex aspect-square w-20 shrink-0 items-center justify-center rounded-md border border-dashed border-white/15 text-gray-500 hover:border-white/30 hover:text-gray-300"
+          className="flex aspect-square w-20 shrink-0 cursor-pointer items-center justify-center rounded-md border border-dashed border-white/15 text-gray-500 hover:border-white/30 hover:text-gray-300"
         >
           <Plus className="h-4 w-4" />
         </button>

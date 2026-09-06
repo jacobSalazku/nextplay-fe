@@ -7,6 +7,9 @@ import type {
 
 export { actionChord };
 
+// The straight from→to endpoints of a route.
+export type Chord = { from: Point; to: Point };
+
 function midpoint(a: Point, b: Point): Point {
   return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
 }
@@ -28,10 +31,7 @@ const STRAIGHT_SNAP = 3;
 
 // The bend offset for a handle dropped at `point`; null when it is close enough
 // to the chord midpoint to count as straight.
-export function bendOffset(
-  chord: { from: Point; to: Point },
-  point: Point,
-): Point | null {
+export function bendOffset(chord: Chord, point: Point): Point | null {
   const mid = midpoint(chord.from, chord.to);
   const offset = { x: point.x - mid.x, y: point.y - mid.y };
   return Math.hypot(offset.x, offset.y) < STRAIGHT_SNAP ? null : offset;
