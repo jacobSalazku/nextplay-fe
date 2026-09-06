@@ -5,7 +5,7 @@ import type {
 } from '@/features/playbook/utils/diagram/types';
 
 export const ROSTER_SIZE = 5; // slots shown per side on a fresh play
-export const MAX_PER_SIDE = 7; // the "+" button stops here
+export const MAX_PER_SIDE = 6; // the "+" button stops here (6 + 6 <= the BE's 12)
 
 // The rim, in stored 0..100 space (viewBox rim is ~13.5 of 94 tall).
 const RIM: Point = { x: 50, y: 14 };

@@ -217,7 +217,7 @@ describe('usePlayEditorStore', () => {
     expect(o3!.y).toBeGreaterThan(0);
   });
 
-  it('adds a sixth player with the + slot and caps at seven', () => {
+  it('adds a sixth player with the + slot and caps there', () => {
     // Arrange
     hydrate();
 
@@ -229,11 +229,10 @@ describe('usePlayEditorStore', () => {
     expect(store().rosterCount.offense).toBe(6);
 
     // Act — push past the cap
-    store().addSlot('offense'); // o7
     store().addSlot('offense'); // refused
 
     // Assert
-    expect(store().rosterCount.offense).toBe(7);
+    expect(store().rosterCount.offense).toBe(6);
   });
 
   it('matches every attacker man-to-man', () => {
