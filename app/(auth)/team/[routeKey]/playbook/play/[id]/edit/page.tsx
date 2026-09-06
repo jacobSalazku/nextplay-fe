@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { PlayEditor } from '@/features/playbook/components/editor/play-editor';
 import PlayEditorSkeleton from '@/features/playbook/components/skeleton/play-editor-skeleton';
-import { asPlayDiagram } from '@/features/playbook/diagram/parse';
-import { PlayEditor } from '@/features/playbook/editor/play-editor';
-import { getPlay } from '@/features/playbook/queries/get-play';
+import { getPlay } from '@/features/playbook/queries/play/get-play';
+import { asPlayDiagram } from '@/features/playbook/utils/diagram/parse';
 
 type PageProps = {
   params: Promise<{ routeKey: string; id: string }>;

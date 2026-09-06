@@ -5,7 +5,7 @@ import { createQueryClient } from '@/lib/graphql/query-client';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
-/** Run one mutation through the client's shared MutationCache. */
+// Run one mutation through the client's shared MutationCache.
 async function runFailingMutation(
   reason: unknown,
   meta?: { skipGlobalErrorToast?: boolean },

@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
+import { PlayForm } from '@/features/playbook/components/form/play-form';
 import CreatePlaySkeleton from '@/features/playbook/components/skeleton/create-play-skeleton';
-import { PlayForm } from '@/features/playbook/form/play-form';
 
 export const metadata = {
   title: 'Create Play',

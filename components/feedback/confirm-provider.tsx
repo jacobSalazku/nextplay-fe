@@ -60,10 +60,8 @@ export function useConfirm(): Confirm {
   return confirm;
 }
 
-/**
- * Wrap an action so it only runs after the user confirms.
- * `const remove = useConfirmedAction(deletePlayer, { title: '…' });`
- */
+// Wrap an action so it only runs after the user confirms.
+
 export function useConfirmedAction<Args extends unknown[]>(
   action: (...args: Args) => void,
   options: ConfirmOptions,

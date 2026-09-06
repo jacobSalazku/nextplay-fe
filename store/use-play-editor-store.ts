@@ -5,7 +5,7 @@ import type {
   PlayActionType,
   PlayDiagram,
   Point,
-} from '@/features/playbook/diagram/types';
+} from '@/features/playbook/utils/diagram/types';
 import { create } from 'zustand';
 
 export type EditorTool = 'select' | PlayActionType;

@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
+import { NewPlaySetup } from '@/features/playbook/components/editor/new-play-setup';
 import CreatePlaySkeleton from '@/features/playbook/components/skeleton/create-play-skeleton';
-import { NewPlaySetup } from '@/features/playbook/editor/setup/new-play-setup';
-import { getPlayEditorConfig } from '@/features/playbook/queries/get-play-editor-config';
+import { getPlayEditorConfig } from '@/features/playbook/queries/play/get-play-editor-config';
 
 type PageProps = {
   params: Promise<{ routeKey: string }>;

@@ -1,6 +1,6 @@
 import { usePlayEditorStore } from '../use-play-editor-store';
-import type { PlacedObject } from '@/features/playbook/diagram/types';
-import { seedDiagram } from '@/features/playbook/editor/seed-diagram';
+import type { PlacedObject } from '@/features/playbook/utils/diagram/types';
+import { seedDiagram } from '@/features/playbook/utils/editor/seed-diagram';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 const objects: PlacedObject[] = [

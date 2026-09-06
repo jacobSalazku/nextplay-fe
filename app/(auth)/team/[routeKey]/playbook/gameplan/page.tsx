@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import PlanViewSkeleton from '@/features/playbook/components/skeleton/plan-view-skeleton';
-import { getGameplanById } from '@/features/playbook/queries/get-gameplan-by-id';
+import { getGameplanById } from '@/features/playbook/queries/gameplan/get-gameplan-by-id';
 import { gameplanSearchParamsCache } from '@/utils/search-params';
 import { sanitizeRichText } from '@/lib/sanitize-rich-text';
 
