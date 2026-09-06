@@ -303,7 +303,7 @@ export function EditorStage({
             )}
             <circle
               role="button"
-              aria-label={`${drawing ? 'Draw from' : 'Move'} ${object.label}`}
+              aria-label={`${drawing ? 'Draw from' : 'Move'} ${object.kind === 'defense' ? 'defender' : 'player'} ${object.label}`}
               cx={object.x}
               cy={object.y * sy}
               r={TOKEN_HIT_R}

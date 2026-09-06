@@ -55,7 +55,7 @@ test.describe('play editor flow', () => {
   }) => {
     // Arrange
     await newPlay(page);
-    const token = () => page.getByRole('button', { name: 'Move 1' });
+    const token = () => page.getByRole('button', { name: 'Move player 1' });
     const before = await pos(token());
 
     // Act — drag the player, then save
@@ -74,23 +74,20 @@ test.describe('play editor flow', () => {
     // Arrange
     await newPlay(page);
     const overlayPaths = page.locator('[role="application"] > path');
-    const panel = page.getByRole('complementary', { name: 'Selection' });
-
     const tools = page.getByRole('toolbar', { name: 'Drawing tools' });
 
     // Act — Pass tool, drag from player 1 to player 2, then back to Select
     await tools.getByRole('button', { name: 'Pass' }).click();
     await drag(
       page,
-      page.getByRole('button', { name: 'Draw from 1' }),
-      await centre(page.getByRole('button', { name: 'Draw from 2' })),
+      page.getByRole('button', { name: 'Draw from player 1' }),
+      await centre(page.getByRole('button', { name: 'Draw from player 2' })),
     );
     await tools.getByRole('button', { name: 'Select' }).click();
 
     // Assert — one route on the canvas; select it
     await expect(overlayPaths).toHaveCount(1);
     await overlayPaths.first().click({ force: true });
-    await expect(panel.getByText('Pass')).toBeVisible();
 
     // Act — bend it, then save
     const bend = page.getByRole('button', { name: 'Bend route' });
@@ -105,9 +102,9 @@ test.describe('play editor flow', () => {
     await page.reload();
     await expect(overlayPaths).toHaveCount(1);
 
-    // Act — select and delete it
+    // Act — select and delete it from the on-canvas control
     await overlayPaths.first().click({ force: true });
-    await panel.getByRole('button', { name: /delete route/i }).click();
+    await page.getByRole('button', { name: 'Delete' }).click();
 
     // Assert — gone, and the delete persists
     await expect(overlayPaths).toHaveCount(0);
@@ -116,10 +113,50 @@ test.describe('play editor flow', () => {
     await expect(overlayPaths).toHaveCount(0);
   });
 
+  test('match man-to-man, give the ball, bench a player, and undo', async ({
+    page,
+  }) => {
+    // Arrange
+    await newPlay(page);
+    const tokens = page.locator('[role="application"] circle[role="button"]');
+    const roster = page.getByRole('complementary', { name: 'Roster' });
+
+    // Act — add five defenders
+    const before = await tokens.count();
+    await roster.getByRole('button', { name: /match man-to-man/i }).click();
+
+    // Assert — five defender grab targets appeared
+    await expect
+      .poll(async () => (await tokens.count()) - before)
+      .toBeGreaterThanOrEqual(5);
+
+    // Act — give player 1 the ball from its roster chip, then save
+    await roster.getByRole('button', { name: 'Give the ball to 1' }).click();
+    await page.getByRole('button', { name: /save/i }).click();
+    await page.reload();
+
+    // Assert — possession persisted
+    await expect(
+      roster.getByRole('button', { name: 'Take the ball from 1' }),
+    ).toBeVisible();
+
+    // Act — bench player 3, then undo
+    await roster.getByRole('button', { name: 'Player 3, on court' }).click();
+    await expect(
+      roster.getByRole('button', { name: 'Player 3, benched' }),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Undo' }).click();
+
+    // Assert — player 3 is back on the court
+    await expect(
+      roster.getByRole('button', { name: 'Player 3, on court' }),
+    ).toBeVisible();
+  });
+
   test('warns before leaving with unsaved changes', async ({ page }) => {
     // Arrange — a fresh play with one dragged (unsaved) player
     await newPlay(page);
-    await drag(page, page.getByRole('button', { name: 'Move 1' }), {
+    await drag(page, page.getByRole('button', { name: 'Move player 1' }), {
       x: 300,
       y: 250,
     });

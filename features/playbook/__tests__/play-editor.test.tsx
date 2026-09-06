@@ -73,7 +73,9 @@ describe('PlayEditor', () => {
     );
 
     // Assert — the token is still on the court, not reset away
-    expect(screen.getByRole('button', { name: 'Move 1' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Move player 1' }),
+    ).toBeInTheDocument();
   });
 
   it('shows the play name and a disabled Save until something changes', () => {
@@ -99,7 +101,7 @@ describe('PlayEditor', () => {
     renderEditor();
 
     // Act — drag the token, then save
-    const handle = screen.getByRole('button', { name: 'Move 1' });
+    const handle = screen.getByRole('button', { name: 'Move player 1' });
     await user.pointer([
       { target: handle, keys: '[MouseLeft>]', coords: { x: 50, y: 50 } },
       { target: handle, coords: { x: 100, y: 100 } },
@@ -128,7 +130,7 @@ describe('PlayEditor', () => {
     renderEditor();
 
     // Act — drag, then a save that fails
-    const handle = screen.getByRole('button', { name: 'Move 1' });
+    const handle = screen.getByRole('button', { name: 'Move player 1' });
     await user.pointer([
       { target: handle, keys: '[MouseLeft>]', coords: { x: 50, y: 50 } },
       { target: handle, coords: { x: 100, y: 100 } },
@@ -159,7 +161,7 @@ describe('PlayEditor', () => {
     pinBox();
     const user = userEvent.setup();
     renderEditor();
-    const handle = screen.getByRole('button', { name: 'Move 1' });
+    const handle = screen.getByRole('button', { name: 'Move player 1' });
     await user.pointer([
       { target: handle, keys: '[MouseLeft>]', coords: { x: 10, y: 10 } },
       { target: handle, coords: { x: 90, y: 90 } },
