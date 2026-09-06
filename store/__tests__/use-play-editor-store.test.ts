@@ -1,6 +1,6 @@
-import { seedDiagram } from '../seed-diagram';
-import { usePlayEditor } from '../store';
+import { usePlayEditorStore } from '../use-play-editor-store';
 import type { PlacedObject } from '@/features/playbook/diagram/types';
+import { seedDiagram } from '@/features/playbook/editor/seed-diagram';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 const objects: PlacedObject[] = [
@@ -9,22 +9,22 @@ const objects: PlacedObject[] = [
 ];
 
 const hydrate = () =>
-  usePlayEditor.getState().hydrate({
+  usePlayEditorStore.getState().hydrate({
     playId: 'play-1',
     routeKey: 'team-slug~abc',
     name: 'Horns',
     diagram: seedDiagram('half', objects),
   });
 
-beforeEach(() => usePlayEditor.getState().reset());
+beforeEach(() => usePlayEditorStore.getState().reset());
 
-describe('usePlayEditor', () => {
+describe('usePlayEditorStore', () => {
   it('loads a play into a clean, not-dirty state', () => {
     // Act
     hydrate();
 
     // Assert
-    const s = usePlayEditor.getState();
+    const s = usePlayEditorStore.getState();
     expect(s.hydrated).toBe(true);
     expect(s.name).toBe('Horns');
     expect(s.court).toBe('half');
@@ -37,10 +37,10 @@ describe('usePlayEditor', () => {
     hydrate();
 
     // Act
-    usePlayEditor.getState().moveObject('o1', 10, 90);
+    usePlayEditorStore.getState().moveObject('o1', 10, 90);
 
     // Assert
-    const { phase, isDirty } = usePlayEditor.getState();
+    const { phase, isDirty } = usePlayEditorStore.getState();
     expect(phase.objects.find((o) => o.id === 'o1')).toMatchObject({
       x: 10,
       y: 90,
@@ -54,23 +54,23 @@ describe('usePlayEditor', () => {
 
   it('tracks selection', () => {
     // Act
-    usePlayEditor.getState().select('o2');
+    usePlayEditorStore.getState().select('o2');
 
     // Assert
-    expect(usePlayEditor.getState().selectedId).toBe('o2');
+    expect(usePlayEditorStore.getState().selectedId).toBe('o2');
   });
 
   it('clears the dirty flag once saved', () => {
     // Arrange
     hydrate();
-    usePlayEditor.getState().moveObject('o1', 1, 1);
+    usePlayEditorStore.getState().moveObject('o1', 1, 1);
 
     // Act
-    usePlayEditor.getState().markSaving();
-    usePlayEditor.getState().markSaved();
+    usePlayEditorStore.getState().markSaving();
+    usePlayEditorStore.getState().markSaved();
 
     // Assert
-    const s = usePlayEditor.getState();
+    const s = usePlayEditorStore.getState();
     expect(s.status).toBe('idle');
     expect(s.isDirty).toBe(false);
   });
@@ -78,10 +78,10 @@ describe('usePlayEditor', () => {
   it('serialises the working phase back into a v1 diagram', () => {
     // Arrange
     hydrate();
-    usePlayEditor.getState().moveObject('o1', 33, 33);
+    usePlayEditorStore.getState().moveObject('o1', 33, 33);
 
     // Act
-    const diagram = usePlayEditor.getState().toDiagram();
+    const diagram = usePlayEditorStore.getState().toDiagram();
 
     // Assert
     expect(diagram.version).toBe(1);
@@ -93,13 +93,13 @@ describe('usePlayEditor', () => {
   it('reset returns to the initial state', () => {
     // Arrange
     hydrate();
-    usePlayEditor.getState().moveObject('o1', 5, 5);
+    usePlayEditorStore.getState().moveObject('o1', 5, 5);
 
     // Act
-    usePlayEditor.getState().reset();
+    usePlayEditorStore.getState().reset();
 
     // Assert
-    const s = usePlayEditor.getState();
+    const s = usePlayEditorStore.getState();
     expect(s.hydrated).toBe(false);
     expect(s.playId).toBe('');
     expect(s.isDirty).toBe(false);

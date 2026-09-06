@@ -50,7 +50,7 @@ const initialState = {
 
 // Editor state for one play. A singleton, so `<PlayEditor>` calls hydrate on
 // mount and reset on unmount. One phase for now — the phase strip comes later.
-export const usePlayEditor = create<PlayEditorState>((set, get) => ({
+export const usePlayEditorStore = create<PlayEditorState>((set, get) => ({
   ...initialState,
 
   hydrate: ({ playId, routeKey, name, diagram }) =>
