@@ -2,7 +2,7 @@ import { SkeletonBox } from '@/components/skeleton/skeleton-box';
 
 export default function PlayEditorSkeleton() {
   return (
-    <div className="flex h-screen flex-col bg-slate-950">
+    <div className="fixed inset-0 z-40 flex flex-col bg-slate-950">
       <header className="flex items-center justify-between border-b border-white/10 px-4 py-3">
         <div className="flex items-center gap-3">
           <SkeletonBox className="h-9 w-9 rounded-md" />

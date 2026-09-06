@@ -28,7 +28,7 @@ async function EditorContent({
   const diagram = asPlayDiagram(play.diagram);
   if (!diagram) {
     return (
-      <div className="flex h-screen w-full flex-col items-center justify-center gap-3 text-white">
+      <div className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-slate-950 text-white">
         <h1 className="text-xl font-semibold">This play has no diagram</h1>
         <Link
           href={`/team/${routeKey}/playbook`}

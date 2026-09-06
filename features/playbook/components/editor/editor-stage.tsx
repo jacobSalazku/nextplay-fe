@@ -218,6 +218,7 @@ export function EditorStage({
           width={w}
           height={h}
           fill="transparent"
+          style={{ pointerEvents: 'all' }}
           onPointerDown={() => !drawing && onSelect(null)}
         />
 
@@ -274,7 +275,10 @@ export function EditorStage({
             fill="transparent"
             stroke={selectedObjectId === object.id ? ACCENT : 'transparent'}
             strokeWidth={selectedObjectId === object.id ? 1 : 0}
-            style={{ cursor: drawing ? 'crosshair' : 'grab' }}
+            style={{
+              pointerEvents: 'all',
+              cursor: drawing ? 'crosshair' : 'grab',
+            }}
             onPointerDown={startToken(object)}
           />
         ))}
@@ -345,7 +349,7 @@ function ActionHandles({
         fill={ACCENT}
         stroke="white"
         strokeWidth={0.4}
-        style={{ cursor: 'grab' }}
+        style={{ pointerEvents: 'all', cursor: 'grab' }}
         onPointerDown={(event) => onBendPointerDown(event, chord)}
       />
       <DeleteControl
@@ -389,7 +393,7 @@ function RotationHandle({
         fill={ACCENT}
         stroke="white"
         strokeWidth={0.4}
-        style={{ cursor: 'grab' }}
+        style={{ pointerEvents: 'all', cursor: 'grab' }}
         onPointerDown={onPointerDown}
       />
     </>
@@ -410,7 +414,7 @@ function DeleteControl({
       role="button"
       aria-label="Delete"
       transform={`translate(${x} ${y})`}
-      style={{ cursor: 'pointer' }}
+      style={{ pointerEvents: 'all', cursor: 'pointer' }}
       onPointerDown={(event) => {
         event.stopPropagation();
         onDelete();

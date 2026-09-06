@@ -147,7 +147,7 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
       : 'Nothing selected';
 
   return (
-    <div className="flex h-screen flex-col bg-slate-950 text-white">
+    <div className="fixed inset-0 z-40 flex flex-col bg-slate-950 text-white">
       <header className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
         <div className="flex min-w-0 items-center gap-3">
           <Button variant="close" onClick={leave} aria-label="Back to playbook">
@@ -209,7 +209,10 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
           </div>
         </div>
 
-        <aside className="w-full shrink-0 space-y-3 rounded-xl border border-white/10 bg-slate-900/60 p-4 lg:w-72">
+        <aside
+          aria-label="Selection"
+          className="w-full shrink-0 space-y-3 rounded-xl border border-white/10 bg-slate-900/60 p-4 lg:w-72"
+        >
           <div>
             <p className="text-xs tracking-wide text-gray-400 uppercase">
               Court
