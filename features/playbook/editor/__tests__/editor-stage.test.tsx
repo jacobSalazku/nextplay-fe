@@ -38,7 +38,7 @@ function renderStage(
     <EditorStage
       court="half"
       phase={phase}
-      selectedId={null}
+      selection={null}
       onSelect={onSelect}
       onMove={onMove}
       {...overrides}
@@ -67,7 +67,7 @@ describe('EditorStage', () => {
     });
 
     // Assert
-    expect(onSelect).toHaveBeenCalledWith('o1');
+    expect(onSelect).toHaveBeenCalledWith({ kind: 'object', id: 'o1' });
   });
 
   it('moves the dragged token to the pointer, in court coordinates', () => {
@@ -110,7 +110,9 @@ describe('EditorStage', () => {
 
   it('clears the selection when the empty court is pressed', () => {
     // Arrange
-    const { onSelect } = renderStage({ selectedId: 'o1' });
+    const { onSelect } = renderStage({
+      selection: { kind: 'object', id: 'o1' },
+    });
 
     // Act — the aspect-locked box is the only non-button, non-svg element
     const box = document.querySelector('div[style*="aspect-ratio"]')!;

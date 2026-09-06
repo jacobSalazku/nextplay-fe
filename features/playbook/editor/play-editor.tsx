@@ -41,7 +41,7 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
 
   const court = usePlayEditorStore((s) => s.court);
   const phase = usePlayEditorStore((s) => s.phase);
-  const selectedId = usePlayEditorStore((s) => s.selectedId);
+  const selection = usePlayEditorStore((s) => s.selection);
   const isDirty = usePlayEditorStore((s) => s.isDirty);
   const select = usePlayEditorStore((s) => s.select);
   const moveObject = usePlayEditorStore((s) => s.moveObject);
@@ -81,7 +81,10 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
     router.push(toPlaybook);
   };
 
-  const selected = phase.objects.find((o) => o.id === selectedId) ?? null;
+  const selectedObject =
+    selection?.kind === 'object'
+      ? (phase.objects.find((o) => o.id === selection.id) ?? null)
+      : null;
 
   return (
     <div className="flex h-screen flex-col bg-slate-950 text-white">
@@ -109,7 +112,7 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
               court={court}
               phase={phase}
               ballHolderId={phase.ballHolderId}
-              selectedId={selectedId}
+              selection={selection}
               onSelect={select}
               onMove={moveObject}
             />
@@ -128,7 +131,9 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
               Selected
             </p>
             <p className="text-sm">
-              {selected ? `Player ${selected.label}` : 'Nothing selected'}
+              {selectedObject
+                ? `Player ${selectedObject.label}`
+                : 'Nothing selected'}
             </p>
           </div>
           <p className="text-xs text-gray-500">

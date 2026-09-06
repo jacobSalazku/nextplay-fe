@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { COURT_VIEWBOX } from '@/features/playbook/diagram/court';
 import { CourtDiagram } from '@/features/playbook/diagram/court-diagram';
 import type { CourtType, Phase } from '@/features/playbook/diagram/types';
+import type { Selection } from '@/store/use-play-editor-store';
 import { cn } from '@/utils/tw-merge';
 import { useCourtPointer } from './use-court-pointer';
 
@@ -11,8 +12,8 @@ type Props = {
   court: CourtType;
   phase: Phase;
   ballHolderId?: string;
-  selectedId: string | null;
-  onSelect: (id: string | null) => void;
+  selection: Selection;
+  onSelect: (selection: Selection) => void;
   onMove: (id: string, x: number, y: number) => void;
 };
 
@@ -29,13 +30,15 @@ export function EditorStage({
   court,
   phase,
   ballHolderId,
-  selectedId,
+  selection,
   onSelect,
   onMove,
 }: Props) {
   const boxRef = useRef<HTMLDivElement>(null);
   const toCourt = useCourtPointer(boxRef);
   const drag = useRef<DragState | null>(null);
+
+  const selectedObjectId = selection?.kind === 'object' ? selection.id : null;
 
   const { w, h } = COURT_VIEWBOX[court];
 
@@ -46,7 +49,7 @@ export function EditorStage({
 
   const startDrag = (id: string) => (event: React.PointerEvent) => {
     event.currentTarget.setPointerCapture?.(event.pointerId);
-    onSelect(id);
+    onSelect({ kind: 'object', id });
     drag.current = {
       id,
       frame: 0,
@@ -106,7 +109,7 @@ export function EditorStage({
             'rounded-full outline-none',
             'cursor-grab active:cursor-grabbing',
             'focus-visible:ring-2 focus-visible:ring-orange-400',
-            selectedId === object.id && 'ring-2 ring-orange-400',
+            selectedObjectId === object.id && 'ring-2 ring-orange-400',
           )}
         />
       ))}
