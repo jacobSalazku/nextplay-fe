@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { encode } from 'next-auth/jwt';
 
@@ -15,6 +15,10 @@ const COACH_EMAIL = 'coach.cavs@nextplay.test';
 // storageState with a forged next-auth session cookie. If the backend is not
 // reachable the file is not written; backend-dependent specs skip themselves.
 export default async function globalSetup() {
+  // Clear any auth state from a previous run so the flow spec's skip check
+  // reflects this run's backend, not a stale file.
+  await rm(AUTH_FILE, { force: true });
+
   const payload = await devLogin();
   if (!payload) {
     console.warn(`[e2e] no backend at ${BACKEND} — skipping auth setup`);
