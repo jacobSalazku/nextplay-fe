@@ -8,22 +8,25 @@ const clamp = (n: number, min: number, max: number) =>
 const round = (n: number) => Math.round(n * 100) / 100;
 
 // Maps a pointer event to court coordinates (0..100 on both axes), or null if
-// the element has no box yet. `aspect` is the court viewBox ratio (w / h): the
-// court is drawn with preserveAspectRatio="xMidYMid meet", so when the box
-// isn't exactly that ratio the court is letterboxed inside it — map against the
-// rendered court, not the raw box, or the drop lands offset.
+// the element has no box yet.
+//
+// `aspect` is the court's on-screen width / height ratio, or `null` when the
+// court is stretched to fill the box (preserveAspectRatio="none"). With a ratio
+// the court is letterboxed inside the box, so the bars are subtracted before
+// mapping — pass `null` and the box maps straight onto court space.
 export function useCourtPointer(
   ref: RefObject<HTMLElement | null>,
-  aspect = 1,
+  aspect: number | null,
 ) {
   return useCallback(
     (event: { clientX: number; clientY: number }): Point | null => {
       const rect = ref.current?.getBoundingClientRect();
       if (!rect || rect.width === 0 || rect.height === 0) return null;
 
-      const wide = rect.width / rect.height > aspect;
+      const wide = aspect != null && rect.width / rect.height > aspect;
+      const tall = aspect != null && rect.width / rect.height < aspect;
       const width = wide ? rect.height * aspect : rect.width;
-      const height = wide ? rect.height : rect.width / aspect;
+      const height = tall ? rect.width / aspect : rect.height;
       const left = rect.left + (rect.width - width) / 2;
       const top = rect.top + (rect.height - height) / 2;
 

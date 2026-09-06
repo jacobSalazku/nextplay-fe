@@ -189,22 +189,26 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
         </Button>
       </header>
 
-      <div className="relative flex flex-1 flex-col gap-3 overflow-hidden p-3 lg:flex-row">
-        <div className="flex min-h-0 flex-1 items-center justify-center pb-16">
-          <EditorStage
-            className="max-h-full"
-            court={court}
-            phase={phase}
-            ballHolderId={phase.ballHolderId}
-            tool={tool}
-            selection={selection}
-            onSelect={select}
-            onDraw={draw}
-            onMove={moveObject}
-            onBend={(id, bend) => updateAction(id, { bend })}
-            onRotate={rotateObject}
-            onDelete={deleteSelection}
-          />
+      <div className="flex flex-1 flex-col gap-3 overflow-hidden p-3 lg:flex-row">
+        <div className="flex min-h-0 flex-1 flex-col gap-3">
+          <div className="min-h-0 flex-1">
+            <EditorStage
+              court={court}
+              phase={phase}
+              ballHolderId={phase.ballHolderId}
+              tool={tool}
+              selection={selection}
+              onSelect={select}
+              onDraw={draw}
+              onMove={moveObject}
+              onBend={(id, bend) => updateAction(id, { bend })}
+              onRotate={rotateObject}
+              onDelete={deleteSelection}
+            />
+          </div>
+          <div className="flex shrink-0 justify-center">
+            <ToolDock tool={tool} onToolChange={setTool} />
+          </div>
         </div>
 
         <aside
@@ -239,12 +243,6 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
             delete.
           </p>
         </aside>
-
-        <ToolDock
-          tool={tool}
-          onToolChange={setTool}
-          className="absolute bottom-5 left-1/2 -translate-x-1/2"
-        />
       </div>
     </div>
   );

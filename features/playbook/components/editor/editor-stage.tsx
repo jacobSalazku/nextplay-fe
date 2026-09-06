@@ -29,13 +29,11 @@ import {
   nearestToken,
 } from '@/features/playbook/utils/editor/draw-geometry';
 import type { EditorTool, Selection } from '@/store/use-play-editor-store';
-import { cn } from '@/utils/tw-merge';
 
 type DrawEnd = { toId: string } | { toPoint: Point };
 type Chord = { from: Point; to: Point };
 
 type Props = {
-  className?: string;
   court: CourtType;
   phase: Phase;
   ballHolderId?: string;
@@ -66,7 +64,6 @@ const clamp = (n: number) => Math.min(100, Math.max(0, n));
 const rad = (deg: number) => (deg * Math.PI) / 180;
 
 export function EditorStage({
-  className,
   court,
   phase,
   ballHolderId,
@@ -80,9 +77,10 @@ export function EditorStage({
   onDelete,
 }: Props) {
   const boxRef = useRef<HTMLDivElement>(null);
-  const { w, h } = COURT_VIEWBOX[court];
-  const toCourt = useCourtPointer(boxRef, w / h);
+  // the court stretches to fill the stage, so the box maps straight to court space
+  const toCourt = useCourtPointer(boxRef, null);
   const interaction = useRef<Interaction>(null);
+  const { w, h } = COURT_VIEWBOX[court];
   const [preview, setPreview] = useState<{ from: Point; to: Point } | null>(
     null,
   );
@@ -201,24 +199,18 @@ export function EditorStage({
   };
 
   return (
-    <div
-      ref={boxRef}
-      className={cn(
-        'relative h-full max-w-full touch-none select-none',
-        className,
-      )}
-      style={{ aspectRatio: `${w} / ${h}` }}
-    >
+    <div ref={boxRef} className="relative h-full w-full touch-none select-none">
       <CourtDiagram
         court={court}
         phase={phase}
         ballHolderId={ballHolderId}
+        stretch
         className="pointer-events-none absolute inset-0 h-full w-full"
       />
 
       <svg
         viewBox={`0 0 ${w} ${h}`}
-        preserveAspectRatio="xMidYMid meet"
+        preserveAspectRatio="none"
         className="absolute inset-0 h-full w-full"
         role="application"
         aria-label="Play editor canvas"
@@ -252,7 +244,7 @@ export function EditorStage({
                 fill="none"
                 stroke={active ? ACCENT : 'transparent'}
                 strokeOpacity={active ? 0.6 : 1}
-                strokeWidth={active ? 2 : 6}
+                strokeWidth={active ? 1.4 : 6}
                 strokeLinecap="round"
                 style={{ pointerEvents: 'all', cursor: 'pointer' }}
                 onPointerDown={(event) => {
@@ -273,8 +265,8 @@ export function EditorStage({
             )}
             fill="none"
             stroke={ACCENT}
-            strokeWidth={1}
-            strokeDasharray="2 2"
+            strokeWidth={0.7}
+            strokeDasharray="1.6 1.6"
             strokeLinecap="round"
             markerEnd={
               ARROW_ACTIONS.has(tool) ? 'url(#route-arrow)' : undefined

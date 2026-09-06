@@ -35,13 +35,9 @@ function pinBox(size = 200) {
 
 afterEach(() => vi.restoreAllMocks());
 
-// pinBox pins a 200x200 box; the half-court viewBox (100x94) renders inside it
-// with preserveAspectRatio="meet" — scale 2, with 6px letterbox bars top and
-// bottom. This maps court coords to the client pixel they land on.
-const at = (x: number, y: number) => ({
-  clientX: x * 2,
-  clientY: y * 1.88 + 6,
-});
+// pinBox pins a 200x200 box; the court stretches to fill it, so court coords
+// map to client pixels at a flat 2x on both axes.
+const at = (x: number, y: number) => ({ clientX: x * 2, clientY: y * 2 });
 
 function renderStage(
   overrides: Partial<Parameters<typeof EditorStage>[0]> = {},

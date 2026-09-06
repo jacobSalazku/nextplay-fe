@@ -46,11 +46,9 @@ const SHORTCUTS = new Map<string, EditorTool>([
 export function ToolDock({
   tool,
   onToolChange,
-  className,
 }: {
   tool: EditorTool;
   onToolChange: (tool: EditorTool) => void;
-  className?: string;
 }) {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -72,10 +70,7 @@ export function ToolDock({
     <div
       role="toolbar"
       aria-label="Drawing tools"
-      className={cn(
-        'flex max-w-[calc(100vw-2rem)] gap-1 overflow-x-auto rounded-2xl border border-white/10 bg-slate-900/90 p-1.5 shadow-xl shadow-black/40 backdrop-blur',
-        className,
-      )}
+      className="flex max-w-full gap-1 overflow-x-auto rounded-2xl border border-white/10 bg-slate-900/90 p-1.5 shadow-xl shadow-black/40 backdrop-blur"
     >
       {TOOLS.map(({ tool: value, label, icon: Icon, shortcut }, index) => (
         <div key={value} className="flex items-center">

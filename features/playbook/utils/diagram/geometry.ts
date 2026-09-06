@@ -51,11 +51,11 @@ export function routePath(
 
   if (type === 'dribble') {
     const len = Math.hypot(b.x - a.x, b.y - a.y) || 1;
-    // a regular squiggle: ~6 court-units per full wave, tapering onto the
-    // straight line at the end so the arrowhead sits flush
-    const waves = Math.max(2, Math.round(len / 6));
+    // a tight regular squiggle: ~3.5 court-units per full wave, tapering onto
+    // the straight line at the end so the arrowhead sits flush
+    const waves = Math.max(3, Math.round(len / 3.5));
     const steps = waves * 10;
-    const amplitude = 1.5;
+    const amplitude = 1.1;
     let d = `M${fmt(a.x)} ${fmt(a.y)}`;
     for (let i = 1; i <= steps; i++) {
       const t = i / steps;
@@ -71,14 +71,14 @@ export function routePath(
   if (type === 'screen') {
     const end = bezierPoint(a, b, ctrl, 1);
     const pr = perpAt(a, b, ctrl, 1);
-    const bar = 4;
+    const bar = 3;
     return `${main} M${fmt(end.x + pr.x * bar)} ${fmt(end.y + pr.y * bar)} L${fmt(end.x - pr.x * bar)} ${fmt(end.y - pr.y * bar)}`;
   }
 
   if (type === 'handoff') {
     const mid = bezierPoint(a, b, ctrl, 0.66);
     const pr = perpAt(a, b, ctrl, 0.66);
-    const tick = 2.8;
+    const tick = 2.2;
     return `${main} M${fmt(mid.x + pr.x * tick)} ${fmt(mid.y + pr.y * tick)} L${fmt(mid.x - pr.x * tick)} ${fmt(mid.y - pr.y * tick)}`;
   }
 

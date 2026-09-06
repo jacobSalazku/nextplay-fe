@@ -11,8 +11,8 @@ import type {
 const INK = '#1E1B16';
 
 const DASH: Partial<Record<Action['type'], string>> = {
-  pass: '3 2',
-  shot: '0.5 2.2',
+  pass: '2 1.6',
+  shot: '0.4 1.8',
 };
 
 export function Route({
@@ -32,7 +32,7 @@ export function Route({
       d={d}
       fill="none"
       stroke={INK}
-      strokeWidth={0.9}
+      strokeWidth={0.6}
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeDasharray={DASH[action.type]}
@@ -50,8 +50,8 @@ export function RouteArrowMarker() {
       viewBox="0 0 8 8"
       refX="6"
       refY="4"
-      markerWidth="4"
-      markerHeight="4"
+      markerWidth="3"
+      markerHeight="3"
       orient="auto-start-reverse"
     >
       <path d="M0 0 L8 4 L0 8 Z" fill={INK} />
