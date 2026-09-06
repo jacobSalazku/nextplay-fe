@@ -56,7 +56,7 @@ const ROTATE_ARM = 9; // court units — rotation handle distance from the token
 const ACCENT = 'rgb(251 146 60)';
 
 type Interaction =
-  | { kind: 'move'; id: string; frame: number; last: Point }
+  | { kind: 'move'; id: string; grab: Point; frame: number; last: Point }
   | { kind: 'bend'; id: string; chord: Chord; frame: number; last: Point }
   | { kind: 'rotate'; id: string; center: Point; frame: number; last: Point }
   | { kind: 'draw'; fromId: string; from: Point }
@@ -80,13 +80,13 @@ export function EditorStage({
   onDelete,
 }: Props) {
   const boxRef = useRef<HTMLDivElement>(null);
-  const toCourt = useCourtPointer(boxRef);
+  const { w, h } = COURT_VIEWBOX[court];
+  const toCourt = useCourtPointer(boxRef, w / h);
   const interaction = useRef<Interaction>(null);
   const [preview, setPreview] = useState<{ from: Point; to: Point } | null>(
     null,
   );
 
-  const { w, h } = COURT_VIEWBOX[court];
   const sy = courtScaleY(court);
   const projected = projectPhase(phase, court);
 
@@ -103,7 +103,12 @@ export function EditorStage({
     selectedObject?.kind === 'defense' ? selectedObject : null;
 
   const commit = (current: NonNullable<Interaction>, point: Point) => {
-    if (current.kind === 'move') onMove(current.id, point.x, point.y);
+    if (current.kind === 'move')
+      onMove(
+        current.id,
+        clamp(point.x - current.grab.x),
+        clamp(point.y - current.grab.y),
+      );
     else if (current.kind === 'bend')
       onBend(current.id, bendOffset(current.chord, point) ?? undefined);
     else if (current.kind === 'rotate')
@@ -122,15 +127,22 @@ export function EditorStage({
   const startToken = (object: PlacedObject) => (event: React.PointerEvent) => {
     event.currentTarget.setPointerCapture?.(event.pointerId);
     const from = { x: object.x, y: object.y };
+    const point = toCourt(event);
 
     if (drawing) {
       interaction.current = { kind: 'draw', fromId: object.id, from };
-      setPreview({ from, to: toCourt(event) ?? from });
+      setPreview({ from, to: point ?? from });
     } else {
       onSelect({ kind: 'object', id: object.id });
+      // keep the point you grabbed under the cursor instead of snapping the
+      // token's centre to it
+      const grab = point
+        ? { x: point.x - object.x, y: point.y - object.y }
+        : { x: 0, y: 0 };
       interaction.current = {
         kind: 'move',
         id: object.id,
+        grab,
         frame: 0,
         last: from,
       };
@@ -271,22 +283,32 @@ export function EditorStage({
         )}
 
         {phase.objects.map((object) => (
-          <circle
-            key={object.id}
-            role="button"
-            aria-label={`${drawing ? 'Draw from' : 'Move'} ${object.label}`}
-            cx={object.x}
-            cy={object.y * sy}
-            r={TOKEN_HIT_R}
-            fill="transparent"
-            stroke={selectedObjectId === object.id ? ACCENT : 'transparent'}
-            strokeWidth={selectedObjectId === object.id ? 1 : 0}
-            style={{
-              pointerEvents: 'all',
-              cursor: drawing ? 'crosshair' : 'grab',
-            }}
-            onPointerDown={startToken(object)}
-          />
+          <g key={object.id}>
+            {selectedObjectId === object.id && (
+              <circle
+                cx={object.x}
+                cy={object.y * sy}
+                r={4.2}
+                fill="none"
+                stroke={ACCENT}
+                strokeWidth={0.5}
+                style={{ pointerEvents: 'none' }}
+              />
+            )}
+            <circle
+              role="button"
+              aria-label={`${drawing ? 'Draw from' : 'Move'} ${object.label}`}
+              cx={object.x}
+              cy={object.y * sy}
+              r={TOKEN_HIT_R}
+              fill="transparent"
+              style={{
+                pointerEvents: 'all',
+                cursor: drawing ? 'crosshair' : 'grab',
+              }}
+              onPointerDown={startToken(object)}
+            />
+          </g>
         ))}
 
         {selectedAction && (

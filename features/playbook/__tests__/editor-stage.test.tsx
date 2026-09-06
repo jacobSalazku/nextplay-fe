@@ -35,6 +35,14 @@ function pinBox(size = 200) {
 
 afterEach(() => vi.restoreAllMocks());
 
+// pinBox pins a 200x200 box; the half-court viewBox (100x94) renders inside it
+// with preserveAspectRatio="meet" — scale 2, with 6px letterbox bars top and
+// bottom. This maps court coords to the client pixel they land on.
+const at = (x: number, y: number) => ({
+  clientX: x * 2,
+  clientY: y * 1.88 + 6,
+});
+
 function renderStage(
   overrides: Partial<Parameters<typeof EditorStage>[0]> = {},
 ) {
@@ -84,11 +92,11 @@ describe('EditorStage — select tool', () => {
     // Arrange
     pinBox();
     const { onMove } = renderStage();
-    const token = screen.getByRole('button', { name: 'Move 2' });
+    const token = screen.getByRole('button', { name: 'Move 2' }); // o2 at (75,75)
 
-    // Act
-    fireEvent.pointerDown(token, { pointerId: 1, clientX: 0, clientY: 0 });
-    fireEvent.pointerMove(token, { pointerId: 1, clientX: 400, clientY: -80 });
+    // Act — grab o2 at its centre, drag past the top-right corner
+    fireEvent.pointerDown(token, { pointerId: 1, ...at(75, 75) });
+    fireEvent.pointerMove(token, { pointerId: 1, ...at(140, -30) });
 
     // Assert
     expect(onMove).toHaveBeenLastCalledWith('o2', 100, 0);
@@ -134,10 +142,10 @@ describe('EditorStage — drawing an action', () => {
     const { onDraw } = renderStage({ tool: 'pass' });
     const from = screen.getByRole('button', { name: 'Draw from 1' });
 
-    // Act — press on o1 (25,25 => 50px), release on o2 (75,75 => 150px)
-    fireEvent.pointerDown(from, { pointerId: 1, clientX: 50, clientY: 50 });
-    fireEvent.pointerMove(from, { pointerId: 1, clientX: 150, clientY: 150 });
-    fireEvent.pointerUp(from, { pointerId: 1, clientX: 150, clientY: 150 });
+    // Act — press on o1 (25,25), release on o2 (75,75)
+    fireEvent.pointerDown(from, { pointerId: 1, ...at(25, 25) });
+    fireEvent.pointerMove(from, { pointerId: 1, ...at(75, 75) });
+    fireEvent.pointerUp(from, { pointerId: 1, ...at(75, 75) });
 
     // Assert
     expect(onDraw).toHaveBeenCalledWith('o1', { toId: 'o2' });
@@ -149,9 +157,9 @@ describe('EditorStage — drawing an action', () => {
     const { onDraw } = renderStage({ tool: 'cut' });
     const from = screen.getByRole('button', { name: 'Draw from 1' });
 
-    // Act — release at 90px => court 45,45 (nothing nearby)
-    fireEvent.pointerDown(from, { pointerId: 1, clientX: 50, clientY: 50 });
-    fireEvent.pointerUp(from, { pointerId: 1, clientX: 90, clientY: 90 });
+    // Act — release on empty court at (45,45), nothing nearby
+    fireEvent.pointerDown(from, { pointerId: 1, ...at(25, 25) });
+    fireEvent.pointerUp(from, { pointerId: 1, ...at(45, 45) });
 
     // Assert
     expect(onDraw).toHaveBeenCalledWith('o1', { toPoint: { x: 45, y: 45 } });
@@ -164,8 +172,8 @@ describe('EditorStage — drawing an action', () => {
     const from = screen.getByRole('button', { name: 'Draw from 1' });
 
     // Act — barely moved
-    fireEvent.pointerDown(from, { pointerId: 1, clientX: 50, clientY: 50 });
-    fireEvent.pointerUp(from, { pointerId: 1, clientX: 52, clientY: 52 });
+    fireEvent.pointerDown(from, { pointerId: 1, ...at(25, 25) });
+    fireEvent.pointerUp(from, { pointerId: 1, ...at(27, 27) });
 
     // Assert
     expect(onDraw).not.toHaveBeenCalled();
@@ -193,9 +201,9 @@ describe('EditorStage — editing a selection', () => {
     });
     const handle = screen.getByRole('button', { name: 'Bend route' });
 
-    // Act — drag it to court (50, 70) => clientY 140
-    fireEvent.pointerDown(handle, { pointerId: 1, clientX: 100, clientY: 100 });
-    fireEvent.pointerMove(handle, { pointerId: 1, clientX: 100, clientY: 140 });
+    // Act — drag it from the midpoint (50,50) down to (50,70)
+    fireEvent.pointerDown(handle, { pointerId: 1, ...at(50, 50) });
+    fireEvent.pointerMove(handle, { pointerId: 1, ...at(50, 70) });
 
     // Assert
     expect(onBend).toHaveBeenLastCalledWith('a1', { x: 0, y: 20 });
@@ -211,8 +219,8 @@ describe('EditorStage — editing a selection', () => {
     const handle = screen.getByRole('button', { name: 'Bend route' });
 
     // Act — barely off the midpoint
-    fireEvent.pointerDown(handle, { pointerId: 1, clientX: 100, clientY: 100 });
-    fireEvent.pointerMove(handle, { pointerId: 1, clientX: 102, clientY: 102 });
+    fireEvent.pointerDown(handle, { pointerId: 1, ...at(50, 50) });
+    fireEvent.pointerMove(handle, { pointerId: 1, ...at(51, 51) });
 
     // Assert
     expect(onBend).toHaveBeenLastCalledWith('a1', undefined);
@@ -241,9 +249,10 @@ describe('EditorStage — editing a selection', () => {
     });
     const handle = screen.getByRole('button', { name: 'Rotate defender' });
 
-    // Act — drag to straight below the token (50, 60)
-    fireEvent.pointerDown(handle, { pointerId: 1, clientX: 118, clientY: 100 });
-    fireEvent.pointerMove(handle, { pointerId: 1, clientX: 100, clientY: 120 });
+    // Act — grab the handle (arm points right from x1 at 50,50), drag straight
+    // below the token to (50, 60)
+    fireEvent.pointerDown(handle, { pointerId: 1, ...at(59, 50) });
+    fireEvent.pointerMove(handle, { pointerId: 1, ...at(50, 60) });
 
     // Assert — 90deg (down, in screen coords)
     expect(onRotate).toHaveBeenLastCalledWith('x1', 90);

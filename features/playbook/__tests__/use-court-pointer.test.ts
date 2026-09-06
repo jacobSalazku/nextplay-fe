@@ -43,6 +43,21 @@ describe('useCourtPointer', () => {
     });
   });
 
+  it('maps against the letterboxed court when the box is wider than the court', () => {
+    // Arrange — 300x100 box, court aspect 2 -> court renders 200x100, centred
+    const { result } = renderHook(() =>
+      useCourtPointer(refTo({ left: 0, top: 0, width: 300, height: 100 }), 2),
+    );
+
+    // Act
+    const centre = result.current({ clientX: 150, clientY: 50 });
+    const leftEdge = result.current({ clientX: 50, clientY: 50 });
+
+    // Assert — the 50px letterbox bars are excluded from the mapping
+    expect(centre).toEqual({ x: 50, y: 50 });
+    expect(leftEdge).toEqual({ x: 0, y: 50 });
+  });
+
   it('returns null when the element has no box yet', () => {
     // Arrange
     const { result } = renderHook(() => useCourtPointer({ current: null }));
