@@ -1,5 +1,5 @@
-query GetPlay($input: GetPlayInput!) {
-  getPlay(input: $input) {
+mutation UpdatePlay($input: UpdatePlayInput!) {
+  updatePlay(input: $input) {
     id
     routeKey
     name
@@ -7,7 +7,6 @@ query GetPlay($input: GetPlayInput!) {
     description
     canvas
     diagram
-    createdAt
     updatedAt
   }
 }

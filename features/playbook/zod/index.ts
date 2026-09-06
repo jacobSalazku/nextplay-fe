@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Category } from '@/graphql/graphql';
 
 export const playSchema = z.object({
   name: z.string().min(1, 'Play name is required'),
@@ -8,6 +9,16 @@ export const playSchema = z.object({
 });
 
 export type Play = z.infer<typeof playSchema>;
+
+export const newPlaySchema = z.object({
+  name: z.string().min(1, 'Give the play a name'),
+  category: z.nativeEnum(Category, { message: 'Pick a category' }),
+  court: z.enum(['half', 'full']),
+  // '' means "empty court" — no preset
+  formationId: z.string(),
+});
+
+export type NewPlayData = z.infer<typeof newPlaySchema>;
 
 export const gamePlanSchema = z.object({
   name: z.string().min(1, 'title is required').max(35),
