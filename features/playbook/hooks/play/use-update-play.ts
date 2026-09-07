@@ -4,7 +4,7 @@ import { toastStyling } from '@/features/toast-notification/styling';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { gqlRequest } from '@/lib/graphql/client-request';
-import { UpdatePlayDocument } from '@/graphql/graphql';
+import { UpdatePlayDocument, type Category } from '@/graphql/graphql';
 
 export const useUpdatePlay = (routeKey: string, id: string) => {
   const router = useRouter();
@@ -24,9 +24,16 @@ export const useUpdatePlay = (routeKey: string, id: string) => {
     onSuccess: () => router.refresh(),
   });
 
+  const categorise = useMutation({
+    mutationFn: (category: Category) =>
+      gqlRequest(UpdatePlayDocument, { input: { id, routeKey, category } }),
+    onSuccess: () => router.refresh(),
+  });
+
   return {
     savePlay: save.mutateAsync,
     isSaving: save.isPending,
     renamePlay: rename.mutateAsync,
+    setPlayCategory: categorise.mutateAsync,
   };
 };

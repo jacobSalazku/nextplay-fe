@@ -72,6 +72,7 @@ type PlayEditorState = {
   deletePhase: (index: number) => void;
   setActivePhase: (index: number) => void;
   reorderPhase: (from: number, to: number) => void;
+  setPhaseNote: (index: number, note: string) => void;
   moveObject: (id: string, x: number, y: number) => void;
   rotateObject: (id: string, facing: number) => void;
   benchObject: (id: string) => void;
@@ -154,9 +155,9 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
       ),
     }));
 
-  // A drag edit on the active phase; the snapshot was armed by beginEdit(), so
-  // the whole drag collapses to one undo step.
-  const editPhase = (fn: (phase: Phase) => Phase) =>
+  // An edit on one phase whose snapshot was armed by beginEdit(), so a whole
+  // drag / typing session collapses to a single undo step.
+  const editPhaseAt = (index: number, fn: (phase: Phase) => Phase) =>
     set((state) => {
       const armed = pendingSnapshot;
       pendingSnapshot = null;
@@ -165,11 +166,12 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
         ...(armed
           ? { history: clip([...state.history, armed]), future: [] }
           : {}),
-        phases: state.phases.map((p, i) =>
-          i === state.activePhaseIndex ? fn(p) : p,
-        ),
+        phases: state.phases.map((p, i) => (i === index ? fn(p) : p)),
       };
     });
+
+  const editPhase = (fn: (phase: Phase) => Phase) =>
+    editPhaseAt(get().activePhaseIndex, fn);
 
   // A discrete edit applied to every phase — roster membership is play-wide.
   const editAllPhases = (fn: (phase: Phase) => Phase) =>
@@ -273,6 +275,13 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
         next.findIndex((p) => p.id === activeId),
       );
     },
+
+    setPhaseNote: (index, note) =>
+      editPhaseAt(index, (phase) => {
+        const next: Phase = { ...phase, note };
+        if (!next.note) delete next.note;
+        return next;
+      }),
 
     moveObject: (id, x, y) => {
       set((state) => ({ homes: { ...state.homes, [id]: { x, y } } }));

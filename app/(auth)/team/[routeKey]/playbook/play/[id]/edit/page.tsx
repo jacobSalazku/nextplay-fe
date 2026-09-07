@@ -46,6 +46,7 @@ async function EditorContent({
       playId={play.id}
       routeKey={routeKey}
       name={play.name}
+      category={play.category}
       diagram={diagram}
     />
   );
