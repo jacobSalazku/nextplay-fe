@@ -15,8 +15,8 @@ import type {
 } from '@/features/playbook/utils/diagram/types';
 import { isTypingTarget } from '@/features/playbook/utils/editor/keyboard';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { ActionTimeline } from './action-timeline';
 import { AnimationStage } from './animation-stage';
-import { SequenceGroups } from './sequence-groups';
 import { TransportBar } from './transport-bar';
 
 type Props = {
@@ -24,6 +24,7 @@ type Props = {
   phases: Phase[];
   onStepsChange: (index: number, steps: Step[]) => void;
   onEditStart: () => void;
+  onRemoveAction: (index: number, id: string) => void;
 };
 
 export function AnimateView({
@@ -31,9 +32,11 @@ export function AnimateView({
   phases,
   onStepsChange,
   onEditStart,
+  onRemoveAction,
 }: Props) {
   const [speed, setSpeed] = useState(1);
   const [loop, setLoop] = useState(false);
+  const [titlePhases, setTitlePhases] = useState<Record<string, boolean>>({});
   const reduce = useReducedMotion();
 
   const durationMs = animationDurationMs(phases) / speed;
@@ -65,6 +68,7 @@ export function AnimateView({
 
   const frame = interpolateFrame(phases, progress, reduce);
   const from = phases[frame.fromIndex];
+  const showTitle = titlePhases[from.id] ?? false;
 
   return (
     <div className="flex flex-1 gap-3 overflow-hidden p-3">
@@ -78,7 +82,12 @@ export function AnimateView({
 
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <div className="flex min-h-0 flex-1 items-center justify-center">
-          <AnimationStage court={court} phases={phases} frame={frame} />
+          <AnimationStage
+            court={court}
+            phases={phases}
+            frame={frame}
+            title={showTitle ? `Phase ${frame.fromIndex + 1}` : undefined}
+          />
         </div>
 
         <TransportBar
@@ -95,15 +104,21 @@ export function AnimateView({
         />
       </div>
 
-      <SequenceGroups
-        transitionLabel={`Phase ${frame.fromIndex + 1} → ${frame.toIndex + 1}`}
+      <ActionTimeline
+        phaseNumber={frame.fromIndex + 1}
         actions={from.actions}
         objects={from.objects}
         steps={from.steps}
+        showTitle={showTitle}
+        onShowTitleChange={(value) =>
+          setTitlePhases((prev) => ({ ...prev, [from.id]: value }))
+        }
         onChange={(steps) => {
           onEditStart();
           onStepsChange(frame.fromIndex, steps);
         }}
+        onRemoveAction={(id) => onRemoveAction(frame.fromIndex, id)}
+        onPlay={restart}
       />
     </div>
   );

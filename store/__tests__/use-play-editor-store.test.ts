@@ -167,6 +167,21 @@ describe('usePlayEditorStore', () => {
     expect(store().selection).toBeNull();
   });
 
+  it('deletes an action from a phase that is not the active one', () => {
+    // Arrange — an action on phase 1, then move to phase 2
+    hydrate();
+    store().addAction({ type: 'cut', fromId: 'o1', toId: 'o2' });
+    const { id } = phase().actions[0];
+    store().addPhase(); // active = 1
+
+    // Act
+    store().deleteActionAt(0, id);
+
+    // Assert
+    expect(store().phases[0].actions).toHaveLength(0);
+    expect(store().isDirty).toBe(true);
+  });
+
   it('clears the dirty flag once saved', () => {
     // Arrange
     hydrate();

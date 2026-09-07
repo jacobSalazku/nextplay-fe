@@ -30,11 +30,12 @@ type Props = {
   court: CourtType;
   phases: Phase[];
   frame: AnimationFrame;
+  title?: string;
 };
 
 // Read-only playback surface. Each route inks itself in as its beat runs, and
 // the tokens move along it at the same time.
-export function AnimationStage({ court, phases, frame }: Props) {
+export function AnimationStage({ court, phases, frame, title }: Props) {
   const { w, h } = COURT_VIEWBOX[court];
   const sy = courtScaleY(court);
 
@@ -62,6 +63,11 @@ export function AnimationStage({ court, phases, frame }: Props) {
       className="relative h-full max-w-full"
       style={{ aspectRatio: `${w} / ${h}` }}
     >
+      {title && (
+        <p className="absolute top-3 left-3 z-10 rounded-md bg-black/55 px-2.5 py-1 text-sm font-semibold text-white">
+          {title}
+        </p>
+      )}
       <svg
         viewBox={`0 0 ${w} ${h}`}
         preserveAspectRatio="xMidYMid meet"

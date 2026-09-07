@@ -23,6 +23,7 @@ const props = {
   court: 'half' as const,
   onStepsChange: vi.fn(),
   onEditStart: vi.fn(),
+  onRemoveAction: vi.fn(),
 };
 
 // keep the rAF playback loop from firing setState after a test unmounts
@@ -43,7 +44,7 @@ describe('AnimateView', () => {
     expect(screen.queryByRole('img', { name: /animation/i })).toBeNull();
   });
 
-  it('renders the rail, stage, transport and sequence panel', () => {
+  it('renders the rail, stage, transport and the action timeline', () => {
     render(<AnimateView {...props} phases={twoPhases()} />);
 
     expect(
@@ -56,7 +57,7 @@ describe('AnimateView', () => {
       screen.getByRole('slider', { name: 'Timeline' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('region', { name: 'Sequence' }),
+      screen.getByRole('region', { name: 'Action timeline' }),
     ).toBeInTheDocument();
   });
 
@@ -69,7 +70,7 @@ describe('AnimateView', () => {
     expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
   });
 
-  it('sequences the current transition when a move is dragged to a new group', () => {
+  it('sequences the current transition when a move is split into a step', () => {
     const onStepsChange = vi.fn();
     render(
       <AnimateView
@@ -78,18 +79,38 @@ describe('AnimateView', () => {
         phases={twoPhases({
           actions: [
             { id: 'a1', type: 'cut', fromId: 'o1', toId: 'o2' },
-            { id: 'a2', type: 'pass', fromId: 'o2', toId: 'o1' },
+            { id: 'a2', type: 'pass', fromId: 'o1', toId: 'o2' },
           ],
         })}
       />,
     );
 
-    fireEvent.dragStart(screen.getByText('2 passes to 1'));
-    fireEvent.drop(screen.getByLabelText('New group'));
+    fireEvent.dragStart(screen.getByText('Pass by Player 1'));
+    const gaps = document.querySelectorAll('[data-drop-gap]');
+    fireEvent.drop(gaps[gaps.length - 1]);
 
     expect(onStepsChange).toHaveBeenCalledWith(0, [
       { id: 'g0', actionIds: ['a1'], durationMs: 700 },
       { id: 'g1', actionIds: ['a2'], durationMs: 700 },
     ]);
+  });
+
+  it('removes an action from the current phase', async () => {
+    const user = userEvent.setup();
+    const onRemoveAction = vi.fn();
+    render(
+      <AnimateView
+        {...props}
+        onRemoveAction={onRemoveAction}
+        phases={twoPhases({
+          actions: [{ id: 'a1', type: 'cut', fromId: 'o1', toId: 'o2' }],
+        })}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Timing options' }));
+    await user.click(screen.getByRole('button', { name: 'Remove action' }));
+
+    expect(onRemoveAction).toHaveBeenCalledWith(0, 'a1');
   });
 });

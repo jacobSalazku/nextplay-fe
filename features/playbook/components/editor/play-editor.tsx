@@ -96,6 +96,7 @@ export function PlayEditor({
   const addAction = usePlayEditorStore((s) => s.addAction);
   const updateAction = usePlayEditorStore((s) => s.updateAction);
   const deleteAction = usePlayEditorStore((s) => s.deleteAction);
+  const deleteActionAt = usePlayEditorStore((s) => s.deleteActionAt);
   const setPhaseNote = usePlayEditorStore((s) => s.setPhaseNote);
   const setPhaseSteps = usePlayEditorStore((s) => s.setPhaseSteps);
   const undo = usePlayEditorStore((s) => s.undo);
@@ -280,6 +281,7 @@ export function PlayEditor({
           phases={phases}
           onStepsChange={setPhaseSteps}
           onEditStart={beginEdit}
+          onRemoveAction={deleteActionAt}
         />
       ) : (
         <div className="flex flex-1 flex-col gap-2 overflow-hidden p-2 lg:flex-row">

@@ -85,6 +85,7 @@ type PlayEditorState = {
   addAction: (action: Omit<Action, 'id'>) => boolean;
   updateAction: (id: string, patch: { bend?: Point }) => void;
   deleteAction: (id: string) => void;
+  deleteActionAt: (index: number, id: string) => void;
   undo: () => void;
   redo: () => void;
   markSaved: () => void;
@@ -462,21 +463,28 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
         }),
       })),
 
-    deleteAction: (id) => {
-      commitPhase((phase) =>
-        pruneSteps(
-          {
-            ...phase,
-            actions: phase.actions.filter((action) => action.id !== id),
-          },
-          (actionId) => actionId === id,
+    deleteAction: (id) => get().deleteActionAt(get().activePhaseIndex, id),
+
+    deleteActionAt: (index, id) => {
+      set((state) => ({
+        isDirty: true,
+        history: clip([...state.history, snapshotOf(state)]),
+        future: [],
+        phases: state.phases.map((phase, i) =>
+          i === index
+            ? pruneSteps(
+                {
+                  ...phase,
+                  actions: phase.actions.filter((a) => a.id !== id),
+                },
+                (actionId) => actionId === id,
+              )
+            : phase,
         ),
-      );
-      set((state) =>
-        state.selection?.kind === 'action' && state.selection.id === id
+        ...(state.selection?.kind === 'action' && state.selection.id === id
           ? { selection: null }
-          : {},
-      );
+          : {}),
+      }));
     },
 
     undo: () => {
