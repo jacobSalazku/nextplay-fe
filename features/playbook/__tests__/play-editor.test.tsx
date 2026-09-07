@@ -9,6 +9,7 @@ import { renderWithClient } from '@/test/utils';
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { Category } from '@/graphql/graphql';
 
 const { push } = vi.hoisted(() => ({ push: vi.fn() }));
 vi.mock('next/navigation', () => ({
@@ -47,6 +48,7 @@ function renderEditor() {
       playId="play-1"
       routeKey="team~1"
       name="Horns"
+      category={Category.Offensive}
       diagram={seedDiagram('half', objects)}
     />,
   );
@@ -67,6 +69,7 @@ describe('PlayEditor', () => {
           playId="play-1"
           routeKey="team~1"
           name="Horns"
+          category={Category.Offensive}
           diagram={seedDiagram('half', objects)}
         />
       </StrictMode>,

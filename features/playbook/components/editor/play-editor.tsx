@@ -7,6 +7,7 @@ import { useUpdatePlay } from '@/features/playbook/hooks/play/use-update-play';
 import type { PlayDiagram } from '@/features/playbook/utils/diagram/types';
 import { isTypingTarget } from '@/features/playbook/utils/editor/keyboard';
 import { usePlayEditorStore } from '@/store/use-play-editor-store';
+import type { Category } from '@/graphql/graphql';
 import { ArrowLeft, Pencil, Redo2, Save, Undo2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useConfirm } from '@/components/feedback/confirm-provider';
@@ -20,6 +21,7 @@ type Props = {
   playId: string;
   routeKey: string;
   name: string;
+  category: Category;
   diagram: PlayDiagram;
 };
 
