@@ -9,14 +9,12 @@ const CATEGORIES: { value: Category; label: string }[] = [
   { value: Category.Special, label: 'Special' },
 ];
 
-// Compact play-category toggle for the Breakdown header.
-export function CategoryPicker({
-  value,
-  onChange,
-}: {
+type CategoryPickerProps = {
   value: Category;
   onChange: (category: Category) => void;
-}) {
+};
+
+export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
   return (
     <div
       role="group"

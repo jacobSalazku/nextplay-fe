@@ -11,7 +11,6 @@ type PhaseRailProps = {
   onSelect: (index: number) => void;
 };
 
-// The vertical phase navigator on the Breakdown screen.
 export function PhaseRail({
   phases,
   court,
@@ -19,11 +18,8 @@ export function PhaseRail({
   onSelect,
 }: PhaseRailProps) {
   return (
-    <nav
-      aria-label="Phases"
-      className="flex w-40 shrink-0 flex-col gap-3 overflow-y-auto"
-    >
-      <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+    <nav aria-label="Phases" className="flex w-28 shrink-0 flex-col gap-2">
+      <p className="px-0.5 text-[0.7rem] font-semibold tracking-wide text-slate-400 uppercase">
         Phase {activeIndex + 1} / {phases.length}
       </p>
 
@@ -35,10 +31,10 @@ export function PhaseRail({
           aria-current={index === activeIndex}
           onClick={() => onSelect(index)}
           className={cn(
-            'block w-full cursor-pointer overflow-hidden rounded-lg border-2 transition',
+            'block w-full cursor-pointer overflow-hidden rounded-md border-2 transition',
             index === activeIndex
               ? 'border-orange-400'
-              : 'border-transparent hover:border-black/15',
+              : 'border-transparent hover:border-white/25',
           )}
         >
           <CourtDiagram

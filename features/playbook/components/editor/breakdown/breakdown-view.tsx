@@ -18,8 +18,6 @@ type BreakdownProps = {
   onEditEnd: () => void;
 };
 
-// The Breakdown tab: a phase rail on the left, the selected phase's step notes
-// on the right.
 export function BreakdownView({
   category,
   court,
@@ -34,32 +32,34 @@ export function BreakdownView({
   const phase = phases[activeIndex];
 
   return (
-    <div className="flex min-h-0 flex-1 gap-4 overflow-hidden p-3">
-      <PhaseRail
-        phases={phases}
-        court={court}
-        activeIndex={activeIndex}
-        onSelect={onSelectPhase}
-      />
-
-      <div className="flex min-h-0 flex-1 flex-col rounded-2xl bg-[#faf6ec] p-6 text-slate-900">
-        <div className="mb-4 flex items-start justify-between gap-4">
-          <h2 className="text-2xl font-bold">
-            Phase {activeIndex + 1}
-            <span className="ml-2 align-middle text-sm font-normal text-slate-500">
-              Step notes
-            </span>
-          </h2>
-          <CategoryPicker value={category} onChange={onCategoryChange} />
-        </div>
-
-        <PhaseNotesEditor
-          phaseId={phase.id}
-          content={phase.note ?? ''}
-          onChange={(html) => onNoteChange(activeIndex, html)}
-          onEditStart={onEditStart}
-          onEditEnd={onEditEnd}
+    <div className="flex min-h-0 flex-1 justify-center overflow-y-auto p-6">
+      <div className="flex w-full max-w-screen-xl items-start gap-5">
+        <PhaseRail
+          phases={phases}
+          court={court}
+          activeIndex={activeIndex}
+          onSelect={onSelectPhase}
         />
+
+        <div className="flex flex-1 flex-col rounded-2xl bg-[#faf6ec] p-5 text-slate-900">
+          <div className="mb-3 flex items-start justify-between gap-4">
+            <h2 className="text-xl font-bold">
+              Phase {activeIndex + 1}
+              <span className="ml-2 align-middle text-sm font-normal text-slate-500">
+                Step notes
+              </span>
+            </h2>
+            <CategoryPicker value={category} onChange={onCategoryChange} />
+          </div>
+
+          <PhaseNotesEditor
+            phaseId={phase.id}
+            content={phase.note ?? ''}
+            onChange={(html) => onNoteChange(activeIndex, html)}
+            onEditStart={onEditStart}
+            onEditEnd={onEditEnd}
+          />
+        </div>
       </div>
     </div>
   );
