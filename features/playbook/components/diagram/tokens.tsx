@@ -17,7 +17,10 @@ function OffenseToken({
   hasBall: boolean;
 }) {
   return (
-    <g transform={`translate(${object.x} ${object.y})`}>
+    <g
+      data-object-id={object.id}
+      transform={`translate(${object.x} ${object.y})`}
+    >
       {hasBall && (
         <circle r={R + 1} fill="none" stroke={BALL} strokeWidth={0.7} />
       )}
@@ -38,7 +41,10 @@ function OffenseToken({
 function DefenseToken({ object }: { object: PlacedObject }) {
   const facing = object.facing ?? 0;
   return (
-    <g transform={`translate(${object.x} ${object.y})`}>
+    <g
+      data-object-id={object.id}
+      transform={`translate(${object.x} ${object.y})`}
+    >
       <g
         transform={`rotate(${facing})`}
         fill="none"

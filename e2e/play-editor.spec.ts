@@ -216,6 +216,39 @@ test.describe('play editor flow', () => {
     expect(await pos(token())).toEqual(p2Pos);
   });
 
+  test('animate: playing moves a token, scrubbing is deterministic', async ({
+    page,
+  }) => {
+    // Arrange — two phases with player 1 in a different spot in each
+    await newPlay(page);
+    const token = () => page.getByRole('button', { name: 'Move player 1' });
+    await page.getByRole('button', { name: 'Add phase' }).click();
+    await drag(page, token(), { x: 520, y: 260 });
+
+    await page.getByRole('tab', { name: 'Animate' }).click();
+    const anim = page.locator(
+      'svg[aria-label^="Play animation"] [data-object-id="o1"]',
+    );
+    await expect(anim).toBeVisible();
+    const at0 = await anim.getAttribute('transform');
+    const slider = page.getByRole('slider', { name: 'Timeline' });
+
+    // Act — play
+    await page.getByRole('button', { name: 'Play' }).click();
+
+    // Assert — the token moves and the timeline advances
+    await expect.poll(() => anim.getAttribute('transform')).not.toBe(at0);
+    await expect.poll(() => Number(slider.inputValue())).toBeGreaterThan(0);
+
+    // Act — scrub to the end, then back to the start
+    await page.getByRole('button', { name: 'Pause' }).click();
+    await slider.fill('1');
+    await expect.poll(() => anim.getAttribute('transform')).not.toBe(at0);
+
+    await slider.fill('0');
+    await expect.poll(() => anim.getAttribute('transform')).toBe(at0);
+  });
+
   test('warns before leaving with unsaved changes', async ({ page }) => {
     // Arrange — a fresh play with one dragged (unsaved) player
     await newPlay(page);
