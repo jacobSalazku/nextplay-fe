@@ -56,16 +56,6 @@ export function AnimateView({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [toggle]);
 
-  if (phases.length < 2) {
-    return (
-      <div className="flex flex-1 items-center justify-center p-6">
-        <p className="max-w-xs text-center text-sm text-gray-400">
-          Add a second phase in Draw mode to animate the play.
-        </p>
-      </div>
-    );
-  }
-
   const frame = interpolateFrame(phases, progress, reduce);
   const from = phases[frame.fromIndex];
   const showTitle = titlePhases[from.id] ?? false;
@@ -77,7 +67,7 @@ export function AnimateView({
         court={court}
         activeIndex={frame.fromIndex}
         onSelect={(index) => seek(phaseStartProgress(phases, index))}
-        className="w-32"
+        className="w-40"
       />
 
       <div className="flex min-w-0 flex-1 flex-col gap-3">

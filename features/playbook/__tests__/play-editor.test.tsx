@@ -260,7 +260,9 @@ describe('PlayEditor — breakdown', () => {
     await user.click(screen.getByRole('tab', { name: 'Breakdown' }));
 
     // Assert — the notes panel for the current phase, with its toolbar
-    expect(screen.getByRole('heading', { name: /Phase 1/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /Phase 1/ }),
+    ).toBeInTheDocument();
     expect(
       await screen.findByRole('toolbar', { name: 'Formatting' }),
     ).toBeInTheDocument();
@@ -292,7 +294,7 @@ describe('PlayEditor — breakdown', () => {
 });
 
 describe('PlayEditor — animate', () => {
-  it('opens the Animate tab and prompts for a second phase', async () => {
+  it('opens the Animate tab with the timeline and player', async () => {
     // Arrange
     const user = userEvent.setup();
     renderEditor();
@@ -300,8 +302,13 @@ describe('PlayEditor — animate', () => {
     // Act
     await user.click(screen.getByRole('tab', { name: 'Animate' }));
 
-    // Assert — the seed play has one phase, so there is nothing to animate yet
-    expect(screen.getByText(/add a second phase/i)).toBeInTheDocument();
+    // Assert — the one-phase seed play still animates
+    expect(
+      screen.getByRole('region', { name: 'Action timeline' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('img', { name: /play animation/i }),
+    ).toBeInTheDocument();
   });
 });
 

@@ -68,14 +68,50 @@ const segmentMs = (from: Phase) =>
     ? beatLayout(from.steps).total
     : DEFAULT_SEGMENT_MS;
 
+// The end state of a single phase's own actions: every mover sits at its
+// drawn endpoint, the ball with whoever it was passed to. Lets a one-phase
+// play still animate — there is always something to run.
+function synthEndPhase(phase: Phase): Phase {
+  const objects = phase.objects.map((obj) => {
+    const move = phase.actions.find(
+      (a) => a.fromId === obj.id && MOVE_ACTIONS.has(a.type),
+    );
+    const ends = move && actionEndpoints(move, phase.objects);
+    return ends ? { ...obj, x: ends.b.x, y: ends.b.y } : obj;
+  });
+
+  const pass =
+    phase.ballHolderId != null
+      ? phase.actions.find(
+          (a) =>
+            a.fromId === phase.ballHolderId &&
+            a.toId != null &&
+            BALL_ACTIONS.has(a.type),
+        )
+      : undefined;
+
+  return {
+    ...phase,
+    id: `${phase.id}~end`,
+    objects,
+    actions: [],
+    ...(pass?.toId ? { ballHolderId: pass.toId } : {}),
+  };
+}
+
+const playbackPhases = (phases: Phase[]): Phase[] =>
+  phases.length >= 2 ? phases : [phases[0], synthEndPhase(phases[0])];
+
 export const animationDurationMs = (phases: Phase[]) =>
-  phases.slice(0, -1).reduce((sum, from) => sum + segmentMs(from), 0);
+  playbackPhases(phases)
+    .slice(0, -1)
+    .reduce((sum, from) => sum + segmentMs(from), 0);
 
 // The 0..1 progress at which the transition leaving phase `index` begins — the
 // last phase maps to the very end.
 export function phaseStartProgress(phases: Phase[], index: number): number {
-  if (phases.length < 2 || index <= 0) return 0;
-  const durations = phases.slice(0, -1).map(segmentMs);
+  if (index <= 0) return 0;
+  const durations = playbackPhases(phases).slice(0, -1).map(segmentMs);
   const total = durations.reduce((sum, d) => sum + d, 0);
   if (total === 0) return 0;
   const before = durations.slice(0, index).reduce((sum, d) => sum + d, 0);
@@ -88,9 +124,8 @@ export type FrameSlice = { fromIndex: number; toIndex: number; t: number };
 // linear 0..1 position within it. Segments are weighted by their duration, so a
 // long multi-step transition gets a proportionally wider slice of the scrubber.
 export function resolveFrame(phases: Phase[], progress: number): FrameSlice {
-  if (phases.length < 2) return { fromIndex: 0, toIndex: 0, t: 0 };
-
-  const durations = phases.slice(0, -1).map(segmentMs);
+  const seq = playbackPhases(phases);
+  const durations = seq.slice(0, -1).map(segmentMs);
   const total = durations.reduce((sum, d) => sum + d, 0);
   const target = clamp01(progress) * total;
 
@@ -187,9 +222,10 @@ export function interpolateFrame(
   progress: number,
   reduce = false,
 ): AnimationFrame {
-  const { fromIndex, toIndex, t } = resolveFrame(phases, progress);
-  const from = phases[fromIndex];
-  const to = phases[toIndex];
+  const seq = playbackPhases(phases);
+  const { fromIndex, toIndex, t } = resolveFrame(seq, progress);
+  const from = seq[fromIndex];
+  const to = seq[toIndex];
 
   const totalMs = segmentMs(from);
   const activeMs = clamp01(t) * totalMs;

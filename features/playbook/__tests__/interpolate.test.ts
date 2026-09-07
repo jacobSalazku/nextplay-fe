@@ -27,12 +27,29 @@ const obj = (id: string, x: number, y = 0): PlacedObject => ({
 });
 
 describe('resolveFrame', () => {
-  it('parks on the only phase when there is nothing to move between', () => {
-    expect(resolveFrame([phase('p1')], 0.5)).toEqual({
-      fromIndex: 0,
-      toIndex: 0,
-      t: 0,
-    });
+  it('animates a single phase against its own end state', () => {
+    const one = [
+      phase('p1', {
+        objects: [obj('o1', 0)],
+        actions: [
+          { id: 'a1', type: 'cut', fromId: 'o1', toPoint: { x: 40, y: 0 } },
+        ],
+      }),
+    ];
+
+    expect(resolveFrame(one, 0.5)).toMatchObject({ fromIndex: 0, toIndex: 1 });
+
+    // the mover ends on its drawn endpoint
+    const end = interpolateFrame(one, 1).objects.find((o) => o.id === 'o1');
+    expect(end).toMatchObject({ x: 40, y: 0 });
+  });
+
+  it('a one-phase play with no moves just holds still', () => {
+    const one = [phase('p1', { objects: [obj('o1', 25)] })];
+    const start = interpolateFrame(one, 0).objects.find((o) => o.id === 'o1');
+    const later = interpolateFrame(one, 1).objects.find((o) => o.id === 'o1');
+    expect(start).toMatchObject({ x: 25 });
+    expect(later).toMatchObject({ x: 25 });
   });
 
   it('walks the segments as progress advances', () => {
@@ -75,8 +92,9 @@ describe('resolveFrame', () => {
 });
 
 describe('animationDurationMs', () => {
-  it('is zero for one phase and scales with the segment count', () => {
-    expect(animationDurationMs([phase('p1')])).toBe(0);
+  it('runs a single phase and scales with the segment count', () => {
+    // one phase still animates against its own end state
+    expect(animationDurationMs([phase('p1')])).toBeGreaterThan(0);
 
     const one = animationDurationMs([phase('p1'), phase('p2')]);
     const two = animationDurationMs([phase('p1'), phase('p2'), phase('p3')]);

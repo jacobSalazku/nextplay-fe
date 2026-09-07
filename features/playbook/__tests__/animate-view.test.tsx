@@ -37,11 +37,15 @@ afterEach(() => {
 });
 
 describe('AnimateView', () => {
-  it('asks for a second phase when there is only one', () => {
+  it('animates a single phase — no second phase required', () => {
     render(<AnimateView {...props} phases={[phase('p1', 10)]} />);
 
-    expect(screen.getByText(/add a second phase/i)).toBeInTheDocument();
-    expect(screen.queryByRole('img', { name: /animation/i })).toBeNull();
+    expect(
+      screen.getByRole('img', { name: /play animation/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: 'Action timeline' }),
+    ).toBeInTheDocument();
   });
 
   it('renders the rail, stage, transport and the action timeline', () => {
