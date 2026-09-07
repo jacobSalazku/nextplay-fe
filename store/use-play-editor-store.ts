@@ -7,6 +7,7 @@ import type {
   PlayDiagram,
   PlayObjectKind,
   Point,
+  Step,
 } from '@/features/playbook/utils/diagram/types';
 import {
   makeSlotObject,
@@ -73,6 +74,7 @@ type PlayEditorState = {
   setActivePhase: (index: number) => void;
   reorderPhase: (from: number, to: number) => void;
   setPhaseNote: (index: number, note: string) => void;
+  setPhaseSteps: (index: number, steps: Step[]) => void;
   moveObject: (id: string, x: number, y: number) => void;
   rotateObject: (id: string, facing: number) => void;
   benchObject: (id: string) => void;
@@ -124,6 +126,21 @@ const patchById = <T extends { id: string }>(
 const withoutBall = (phase: Phase): Phase => {
   const next = { ...phase };
   delete next.ballHolderId;
+  return next;
+};
+
+// Drop gone action ids from the phase's step timeline; a step left empty goes,
+// and an empty timeline is removed entirely.
+const pruneSteps = (
+  phase: Phase,
+  gone: (actionId: string) => boolean,
+): Phase => {
+  if (!phase.steps) return phase;
+  const steps = phase.steps
+    .map((s) => ({ ...s, actionIds: s.actionIds.filter((id) => !gone(id)) }))
+    .filter((s) => s.actionIds.length > 0);
+  const next: Phase = { ...phase, steps };
+  if (steps.length === 0) delete next.steps;
   return next;
 };
 
@@ -283,6 +300,13 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
         return next;
       }),
 
+    setPhaseSteps: (index, steps) =>
+      editPhaseAt(index, (phase) => {
+        const next: Phase = { ...phase, steps };
+        if (steps.length === 0) delete next.steps;
+        return next;
+      }),
+
     moveObject: (id, x, y) => {
       set((state) => ({ homes: { ...state.homes, [id]: { x, y } } }));
       editPhase((phase) => ({
@@ -300,13 +324,19 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
     benchObject: (id) => {
       if (!activePhase(get()).objects.some((o) => o.id === id)) return;
       editAllPhases((phase) => {
-        const next: Phase = {
-          ...phase,
-          objects: phase.objects.filter((o) => o.id !== id),
-          actions: phase.actions.filter(
-            (a) => a.fromId !== id && a.toId !== id,
-          ),
-        };
+        const gone = new Set(
+          phase.actions
+            .filter((a) => a.fromId === id || a.toId === id)
+            .map((a) => a.id),
+        );
+        const next = pruneSteps(
+          {
+            ...phase,
+            objects: phase.objects.filter((o) => o.id !== id),
+            actions: phase.actions.filter((a) => !gone.has(a.id)),
+          },
+          (actionId) => gone.has(actionId),
+        );
         return phase.ballHolderId === id ? withoutBall(next) : next;
       });
       set((state) =>
@@ -405,10 +435,15 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
       })),
 
     deleteAction: (id) => {
-      commitPhase((phase) => ({
-        ...phase,
-        actions: phase.actions.filter((action) => action.id !== id),
-      }));
+      commitPhase((phase) =>
+        pruneSteps(
+          {
+            ...phase,
+            actions: phase.actions.filter((action) => action.id !== id),
+          },
+          (actionId) => actionId === id,
+        ),
+      );
       set((state) =>
         state.selection?.kind === 'action' && state.selection.id === id
           ? { selection: null }

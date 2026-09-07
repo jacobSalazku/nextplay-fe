@@ -427,6 +427,66 @@ describe('usePlayEditorStore', () => {
     expect('note' in store().phases[0]).toBe(false);
   });
 
+  it('sets a step timeline on a phase and clears it back to none', () => {
+    // Arrange — a phase with one action to sequence
+    hydrate();
+    store().addAction({ type: 'cut', fromId: 'o1', toId: 'o2' });
+    const actionId = phase().actions[0].id;
+
+    // Act
+    store().setPhaseSteps(0, [
+      { id: 's1', actionIds: [actionId], durationMs: 700 },
+    ]);
+
+    // Assert
+    expect(store().phases[0].steps).toEqual([
+      { id: 's1', actionIds: [actionId], durationMs: 700 },
+    ]);
+
+    // Act — clear
+    store().setPhaseSteps(0, []);
+
+    // Assert — the key is gone, not left as []
+    expect('steps' in store().phases[0]).toBe(false);
+  });
+
+  it('drops a deleted action from the step timeline', () => {
+    // Arrange — two actions, both sequenced
+    hydrate();
+    store().addAction({ type: 'cut', fromId: 'o1', toId: 'o2' });
+    store().addAction({ type: 'pass', fromId: 'o2', toId: 'o1' });
+    const [a1, a2] = phase().actions.map((a) => a.id);
+    store().setPhaseSteps(0, [
+      { id: 's1', actionIds: [a1], durationMs: 500 },
+      { id: 's2', actionIds: [a2], durationMs: 500 },
+    ]);
+
+    // Act — delete the first action
+    store().deleteAction(a1);
+
+    // Assert — its step is gone, the other survives
+    expect(phase().steps).toEqual([
+      { id: 's2', actionIds: [a2], durationMs: 500 },
+    ]);
+  });
+
+  it('strips a benched player from the step timeline', () => {
+    // Arrange — o1 both screens (stays sequenced) and is passed to
+    hydrate();
+    store().addAction({ type: 'screen', fromId: 'o1', toId: 'o2' });
+    store().addAction({ type: 'cut', fromId: 'o2', toId: 'o1' });
+    const [screen, cut] = phase().actions.map((a) => a.id);
+    store().setPhaseSteps(0, [
+      { id: 's1', actionIds: [screen, cut], durationMs: 800 },
+    ]);
+
+    // Act — bench o1: both actions reference it, so both go
+    store().benchObject('o1');
+
+    // Assert — the emptied step, and the timeline, are gone
+    expect('steps' in store().phases[0]).toBe(false);
+  });
+
   it('reorders phases and follows the active one', () => {
     // Arrange
     hydrate();

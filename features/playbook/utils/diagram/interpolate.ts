@@ -4,10 +4,9 @@ import type { Action, Phase, PlacedObject, Point } from './types';
 // Every transition opens with a short hold on the 'from' pose so the eye
 // registers the keyframe, then the move plays out.
 const HOLD_MS = 280;
-// The move time for a transition with no explicit step timeline.
+
 const DEFAULT_MOVE_MS = 820;
 
-// Being the subject of one of these in a step puts a player on that step's beat.
 const MOVE_ACTIONS: ReadonlySet<Action['type']> = new Set([
   'cut',
   'dribble',
@@ -29,7 +28,6 @@ export const lerpPoint = (a: Point, b: Point, t: number): Point => ({
   y: lerp(a.y, b.y, t),
 });
 
-// shortest way round the circle, in degrees
 export const lerpAngle = (a: number, b: number, t: number) => {
   const d = ((((b - a) % 360) + 540) % 360) - 180;
   return a + d * t;
