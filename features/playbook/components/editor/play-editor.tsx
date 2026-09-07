@@ -97,6 +97,7 @@ export function PlayEditor({
   const updateAction = usePlayEditorStore((s) => s.updateAction);
   const deleteAction = usePlayEditorStore((s) => s.deleteAction);
   const setPhaseNote = usePlayEditorStore((s) => s.setPhaseNote);
+  const setPhaseSteps = usePlayEditorStore((s) => s.setPhaseSteps);
   const undo = usePlayEditorStore((s) => s.undo);
   const redo = usePlayEditorStore((s) => s.redo);
   const markSaved = usePlayEditorStore((s) => s.markSaved);
@@ -274,7 +275,12 @@ export function PlayEditor({
           onEditEnd={endEdit}
         />
       ) : mode === 'animate' ? (
-        <AnimateView court={court} phases={phases} />
+        <AnimateView
+          court={court}
+          phases={phases}
+          onStepsChange={setPhaseSteps}
+          onEditStart={beginEdit}
+        />
       ) : (
         <div className="flex flex-1 flex-col gap-2 overflow-hidden p-2 lg:flex-row">
           <div className="flex min-h-0 flex-1 flex-col gap-2">

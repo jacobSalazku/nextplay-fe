@@ -45,6 +45,17 @@ const segmentDurationMs = (from: Phase) => HOLD_MS + segmentMoveMs(from);
 export const animationDurationMs = (phases: Phase[]) =>
   phases.slice(0, -1).reduce((sum, from) => sum + segmentDurationMs(from), 0);
 
+// The 0..1 progress at which the transition leaving phase `index` begins — the
+// last phase maps to the very end.
+export function phaseStartProgress(phases: Phase[], index: number): number {
+  if (phases.length < 2 || index <= 0) return 0;
+  const durations = phases.slice(0, -1).map(segmentDurationMs);
+  const total = durations.reduce((sum, d) => sum + d, 0);
+  if (total === 0) return 0;
+  const before = durations.slice(0, index).reduce((sum, d) => sum + d, 0);
+  return Math.min(1, before / total);
+}
+
 export type FrameSlice = { fromIndex: number; toIndex: number; t: number };
 
 // A normalised 0..1 progress across the whole play maps to a segment and a

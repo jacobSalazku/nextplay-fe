@@ -3,6 +3,7 @@ import {
   easeInOutCubic,
   interpolateFrame,
   lerpAngle,
+  phaseStartProgress,
   resolveFrame,
 } from '@/features/playbook/utils/diagram/interpolate';
 import type {
@@ -47,6 +48,14 @@ describe('resolveFrame', () => {
 
     expect(resolveFrame(ph, 1)).toEqual({ fromIndex: 2, toIndex: 3, t: 1 });
     expect(resolveFrame(ph, 2)).toEqual({ fromIndex: 2, toIndex: 3, t: 1 });
+  });
+
+  it('reports where each phase starts on the scrubber', () => {
+    const ph = [phase('p1'), phase('p2'), phase('p3')];
+
+    expect(phaseStartProgress(ph, 0)).toBe(0);
+    expect(phaseStartProgress(ph, 1)).toBeCloseTo(0.5);
+    expect(phaseStartProgress(ph, 2)).toBe(1); // last phase → the end
   });
 
   it('gives a long multi-step transition a wider slice of the scrubber', () => {
