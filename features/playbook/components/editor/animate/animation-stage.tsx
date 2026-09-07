@@ -13,10 +13,18 @@ import {
 } from '@/features/playbook/utils/diagram/geometry';
 import type { AnimationFrame } from '@/features/playbook/utils/diagram/interpolate';
 import { courtScaleY } from '@/features/playbook/utils/diagram/project';
-import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
+import type {
+  CourtType,
+  Phase,
+  Point,
+} from '@/features/playbook/utils/diagram/types';
 import { BALL } from '@/features/playbook/utils/editor/colors';
 
 const INK = '#1E1B16';
+
+// ball actions connect two players, so they track their live positions; a cut /
+// dribble / screen is a path and stays where it was drawn
+const LIVE_ROUTES: ReadonlySet<string> = new Set(['pass', 'handoff', 'shot']);
 
 type Props = {
   court: CourtType;
@@ -31,8 +39,23 @@ export function AnimationStage({ court, phases, frame }: Props) {
   const sy = courtScaleY(court);
 
   const from = phases[frame.fromIndex];
-  const routeObjects = from.objects.map((o) => ({ ...o, y: o.y * sy }));
+  const drawnObjects = from.objects.map((o) => ({ ...o, y: o.y * sy }));
+  const liveObjects = frame.objects.map((o) => ({ ...o, y: o.y * sy }));
   const inkOpacity = 1 - 0.5 * frame.t;
+
+  // routes are drawn in the viewBox's y-scaled space, so free endpoints and the
+  // bend offset scale with it (objects are scaled above)
+  const scaleY = <T extends { toPoint?: Point; bend?: Point }>(
+    action: T,
+  ): T => ({
+    ...action,
+    ...(action.toPoint
+      ? { toPoint: { x: action.toPoint.x, y: action.toPoint.y * sy } }
+      : null),
+    ...(action.bend
+      ? { bend: { x: action.bend.x, y: action.bend.y * sy } }
+      : null),
+  });
 
   return (
     <div
@@ -53,7 +76,10 @@ export function AnimationStage({ court, phases, frame }: Props) {
         <Court court={court} />
 
         {from.actions.map((action) => {
-          const ends = actionEndpoints(action, routeObjects);
+          const ends = actionEndpoints(
+            scaleY(action),
+            LIVE_ROUTES.has(action.type) ? liveObjects : drawnObjects,
+          );
           if (!ends) return null;
           const d = routePath(action.type, ends.a, ends.b, ends.ctrl);
           const p = frame.routes.find((r) => r.id === action.id)?.progress ?? 0;
