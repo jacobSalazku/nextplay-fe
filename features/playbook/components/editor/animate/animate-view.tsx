@@ -67,15 +67,16 @@ export function AnimateView({
   const from = phases[frame.fromIndex];
 
   return (
-    <div className="flex flex-1 gap-2 overflow-hidden p-2">
+    <div className="flex flex-1 gap-3 overflow-hidden p-3">
       <PhaseRail
         phases={phases}
         court={court}
         activeIndex={frame.fromIndex}
         onSelect={(index) => seek(phaseStartProgress(phases, index))}
+        className="w-32"
       />
 
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
+      <div className="flex min-w-0 flex-1 flex-col gap-3">
         <div className="flex min-h-0 flex-1 items-center justify-center">
           <AnimationStage court={court} phases={phases} frame={frame} />
         </div>

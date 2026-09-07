@@ -76,7 +76,7 @@ describe('SequenceGroups', () => {
   it('shows one "Together" group for an unsequenced phase', () => {
     render(<SequenceGroups {...base} />);
 
-    expect(screen.getByText(/all at once/i)).toBeInTheDocument();
+    expect(screen.getByText(/all moves at once/i)).toBeInTheDocument();
     expect(screen.getByText('1 passes to 2')).toBeInTheDocument();
     expect(screen.getByText('2 cuts 1')).toBeInTheDocument();
   });
