@@ -456,7 +456,7 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
 
     toDiagram: () => {
       const { court, phases } = get();
-      return { version: 1, court, phases, timeline: [] };
+      return { version: 1, court, phases };
     },
   };
 });

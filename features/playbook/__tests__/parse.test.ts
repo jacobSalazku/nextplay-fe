@@ -5,7 +5,6 @@ const valid = {
   version: 1,
   court: 'half',
   phases: [{ id: 'p1', objects: [], actions: [] }],
-  timeline: [],
 };
 
 describe('asPlayDiagram', () => {

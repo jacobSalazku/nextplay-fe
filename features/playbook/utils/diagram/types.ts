@@ -30,23 +30,25 @@ export type Action = {
   bend?: Point;
 };
 
-export type Phase = {
-  id: string;
-  note?: string;
-  ballHolderId?: string;
-  objects: PlacedObject[];
-  actions: Action[];
-};
-
+// One beat of a phase transition: the actions in it fire together, and steps
+// play in order. No `steps` ⇒ the whole transition plays at once.
 export type Step = {
   id: string;
   actionIds: string[];
   durationMs: number;
 };
 
+export type Phase = {
+  id: string;
+  note?: string;
+  ballHolderId?: string;
+  objects: PlacedObject[];
+  actions: Action[];
+  steps?: Step[];
+};
+
 export type PlayDiagram = {
   version: 1;
   court: CourtType;
   phases: Phase[];
-  timeline: Step[];
 };
