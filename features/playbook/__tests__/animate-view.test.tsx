@@ -74,7 +74,7 @@ describe('AnimateView', () => {
     expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
   });
 
-  it('sequences the current transition when a move is split into a step', () => {
+  it('groups two moves of the current transition on a drop', () => {
     const onStepsChange = vi.fn();
     render(
       <AnimateView
@@ -89,13 +89,12 @@ describe('AnimateView', () => {
       />,
     );
 
+    // separate steps by default; drop the pass onto the cut to run them together
     fireEvent.dragStart(screen.getByText('Pass by Player 1'));
-    const gaps = document.querySelectorAll('[data-drop-gap]');
-    fireEvent.drop(gaps[gaps.length - 1]);
+    fireEvent.drop(screen.getByText('Cut by Player 1'));
 
     expect(onStepsChange).toHaveBeenCalledWith(0, [
-      { id: 'g0', actionIds: ['a1'], durationMs: 700 },
-      { id: 'g1', actionIds: ['a2'], durationMs: 700 },
+      { id: 'g0', actionIds: ['a1', 'a2'], durationMs: 700 },
     ]);
   });
 

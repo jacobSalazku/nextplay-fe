@@ -339,6 +339,36 @@ describe('PlayEditor — rename', () => {
     );
   });
 
+  it('keeps unsaved edits when the play props change (e.g. a rename refresh)', () => {
+    // Arrange — an in-progress edit in the store
+    const store = usePlayEditorStore.getState;
+    const { rerender } = renderWithClient(
+      <PlayEditor
+        playId="play-1"
+        routeKey="team~1"
+        name="Horns"
+        category={Category.Offensive}
+        diagram={seedDiagram('half', objects)}
+      />,
+    );
+    act(() => store().addAction({ type: 'cut', fromId: 'o1', toId: 'o2' }));
+    const actionId = store().phases[0].actions[0].id;
+
+    // Act — an RSC refresh after a rename: new name + new diagram identity
+    rerender(
+      <PlayEditor
+        playId="play-1"
+        routeKey="team~1"
+        name="Horns flare"
+        category={Category.Offensive}
+        diagram={seedDiagram('half', objects)}
+      />,
+    );
+
+    // Assert — the drawn action is still there
+    expect(store().phases[0].actions[0].id).toBe(actionId);
+  });
+
   it('does not call the backend when the name is unchanged', async () => {
     // Arrange
     const user = userEvent.setup();

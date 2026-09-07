@@ -38,31 +38,29 @@ describe('actionLabel', () => {
 });
 
 describe('groupsFromSteps / stepsFromGroups', () => {
-  it('treats no timeline as one all-at-once step', () => {
+  it('defaults to one move per step, in draw order', () => {
     expect(groupsFromSteps(actions)).toEqual([
-      { actionIds: ['a1', 'a2'], durationMs: 700 },
+      { actionIds: ['a1'], durationMs: 700 },
+      { actionIds: ['a2'], durationMs: 700 },
     ]);
   });
 
-  it('collapses one step holding everything back to no timeline', () => {
-    expect(
-      stepsFromGroups([{ actionIds: ['a1', 'a2'], durationMs: 700 }], 2),
-    ).toEqual([]);
-  });
-
-  it('numbers the steps it keeps', () => {
+  it('stores nothing when the arrangement is the default', () => {
     expect(
       stepsFromGroups(
         [
-          { actionIds: ['a1'], durationMs: 400 },
+          { actionIds: ['a1'], durationMs: 700 },
           { actionIds: ['a2'], durationMs: 700 },
         ],
-        2,
+        actions,
       ),
-    ).toEqual([
-      { id: 'g0', actionIds: ['a1'], durationMs: 400 },
-      { id: 'g1', actionIds: ['a2'], durationMs: 700 },
-    ]);
+    ).toEqual([]);
+  });
+
+  it('stores the steps once moves are grouped or retimed', () => {
+    expect(
+      stepsFromGroups([{ actionIds: ['a1', 'a2'], durationMs: 700 }], actions),
+    ).toEqual([{ id: 'g0', actionIds: ['a1', 'a2'], durationMs: 700 }]);
   });
 });
 
@@ -88,57 +86,63 @@ describe('ActionTimeline', () => {
     expect(onShowTitleChange).toHaveBeenCalledWith(true);
   });
 
-  it('splits an action into its own step on a drop between steps', () => {
+  it('groups two moves together with "Run with step above"', async () => {
+    const user = userEvent.setup();
     const onChange = vi.fn();
     render(<ActionTimeline {...base} onChange={onChange} />);
 
-    fireEvent.dragStart(screen.getByText('Pass by Player 1'));
-    // the gap after the last (only) step
-    const gaps = document.querySelectorAll('[data-drop-gap]');
-    fireEvent.drop(gaps[gaps.length - 1]);
+    // the pass is step 2 by default; merge it up into step 1
+    await user.click(
+      screen.getAllByRole('button', { name: 'Timing options' })[1],
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Run with step above' }),
+    );
 
     expect(onChange).toHaveBeenCalledWith([
-      { id: 'g0', actionIds: ['a1'], durationMs: 700 },
-      { id: 'g1', actionIds: ['a2'], durationMs: 700 },
+      { id: 'g0', actionIds: ['a1', 'a2'], durationMs: 700 },
     ]);
   });
 
-  it('merges an action into another step on a drop onto its card', () => {
-    const onChange = vi.fn();
-    render(
-      <ActionTimeline
-        {...base}
-        steps={[
-          { id: 'g0', actionIds: ['a1'], durationMs: 700 },
-          { id: 'g1', actionIds: ['a2'], durationMs: 700 },
-        ]}
-        onChange={onChange}
-      />,
-    );
-
-    fireEvent.dragStart(screen.getByText('Pass by Player 1'));
-    fireEvent.drop(screen.getByText('Dribble by Player 1'));
-
-    // both together in one step => no timeline
-    expect(onChange).toHaveBeenCalledWith([]);
-  });
-
-  it('changes a step duration from the kebab menu', async () => {
+  it('splits a grouped move back out with "Run on its own"', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     render(
       <ActionTimeline
         {...base}
-        steps={[
-          { id: 'g0', actionIds: ['a1'], durationMs: 700 },
-          { id: 'g1', actionIds: ['a2'], durationMs: 700 },
-        ]}
+        steps={[{ id: 'g0', actionIds: ['a1', 'a2'], durationMs: 700 }]}
         onChange={onChange}
       />,
     );
 
-    const cards = screen.getAllByRole('button', { name: 'Timing options' });
-    await user.click(cards[0]);
+    await user.click(
+      screen.getAllByRole('button', { name: 'Timing options' })[1],
+    );
+    await user.click(screen.getByRole('button', { name: 'Run on its own' }));
+
+    expect(onChange).toHaveBeenCalledWith([]);
+  });
+
+  it('merges a move on a drop onto another card', () => {
+    const onChange = vi.fn();
+    render(<ActionTimeline {...base} onChange={onChange} />);
+
+    fireEvent.dragStart(screen.getByText('Pass by Player 1'));
+    fireEvent.drop(screen.getByText('Dribble by Player 1'));
+
+    expect(onChange).toHaveBeenCalledWith([
+      { id: 'g0', actionIds: ['a1', 'a2'], durationMs: 700 },
+    ]);
+  });
+
+  it('changes a step duration from the kebab menu', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<ActionTimeline {...base} onChange={onChange} />);
+
+    await user.click(
+      screen.getAllByRole('button', { name: 'Timing options' })[0],
+    );
     await user.click(screen.getByRole('button', { name: /Fast/ }));
 
     expect(onChange).toHaveBeenCalledWith([

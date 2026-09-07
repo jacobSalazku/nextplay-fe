@@ -65,8 +65,12 @@ export function PlayEditor({
     if (!store.hydrated || store.playId !== playId) {
       store.hydrate({ playId, routeKey, name, diagram });
     }
-    return store.reset;
   }, [playId, routeKey, name, diagram]);
+
+  // Reset only when the editor actually unmounts — not on every prop change. A
+  // rename or a category change triggers an RSC refresh (new `name` / `diagram`
+  // identity); resetting there would wipe the animation the coach is building.
+  useEffect(() => usePlayEditorStore.getState().reset, []);
 
   const court = usePlayEditorStore((s) => s.court);
   const phases = usePlayEditorStore((s) => s.phases);

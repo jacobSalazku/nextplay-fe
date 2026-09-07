@@ -1,8 +1,10 @@
 import { actionEndpoints, bezierPoint } from './geometry';
 import type { Action, Phase, PlacedObject, Point } from './types';
 
-// The move time for a transition with no explicit step timeline.
+// The move time for a transition with no moves to time.
 const DEFAULT_SEGMENT_MS = 900;
+// Per-move beat when a phase has no explicit step timeline.
+const DEFAULT_BEAT_MS = 700;
 
 // Being the subject of one of these in a step puts a player on that step's beat.
 const MOVE_ACTIONS: ReadonlySet<Action['type']> = new Set([
@@ -61,12 +63,25 @@ function beatLayout(steps: { durationMs: number }[]): {
   };
 }
 
-// How long the transition leaving `from` runs — its overlapped step timeline,
-// or the default when it has none. No pause between steps or phases.
-const segmentMs = (from: Phase) =>
+type Beat = { actionIds: string[]; durationMs: number };
+
+// The step timeline the phase actually plays: its own `steps` if set, otherwise
+// each move on its own beat in draw order — one after another is the default,
+// grouping moves into a step runs them together.
+const effectiveSteps = (from: Phase): Beat[] =>
   from.steps && from.steps.length > 0
-    ? beatLayout(from.steps).total
-    : DEFAULT_SEGMENT_MS;
+    ? from.steps
+    : from.actions.map((a) => ({
+        actionIds: [a.id],
+        durationMs: DEFAULT_BEAT_MS,
+      }));
+
+// How long the transition leaving `from` runs — its overlapped beats, or the
+// default when there are no moves. No pause between beats or phases.
+const segmentMs = (from: Phase) => {
+  const beats = effectiveSteps(from);
+  return beats.length > 0 ? beatLayout(beats).total : DEFAULT_SEGMENT_MS;
+};
 
 // The end state of a single phase's own actions: every mover sits at its
 // drawn endpoint, the ball with whoever it was passed to. Lets a one-phase
@@ -188,7 +203,7 @@ function stepWindow(
   matches: (action: Action) => boolean,
   totalMs: number,
 ): { pre: number; d: number } {
-  const steps = from.steps ?? [];
+  const steps = effectiveSteps(from);
   if (steps.length === 0) return { pre: 0, d: totalMs };
 
   const { starts } = beatLayout(steps);

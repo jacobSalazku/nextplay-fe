@@ -35,12 +35,13 @@ const seconds = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
 
 export type Group = { actionIds: string[]; durationMs: number };
 
-// No timeline yet ⇒ one step, everything at once. Otherwise each step is a
-// group, with any newly-drawn move appended so it stays visible.
+// No timeline yet ⇒ each move on its own step, in draw order (they play one
+// after another). Otherwise each step is a group, with any newly-drawn move
+// appended on its own step so it stays visible.
 export function groupsFromSteps(actions: Action[], steps?: Step[]): Group[] {
   const ids = actions.map((a) => a.id);
   if (!steps || steps.length === 0) {
-    return ids.length ? [{ actionIds: ids, durationMs: DEFAULT_MS }] : [];
+    return ids.map((id) => ({ actionIds: [id], durationMs: DEFAULT_MS }));
   }
 
   const groups = steps
@@ -51,18 +52,28 @@ export function groupsFromSteps(actions: Action[], steps?: Step[]): Group[] {
     .filter((g) => g.actionIds.length > 0);
 
   const placed = new Set(groups.flatMap((g) => g.actionIds));
-  const extra = ids.filter((id) => !placed.has(id));
-  if (extra.length) groups.push({ actionIds: extra, durationMs: DEFAULT_MS });
+  for (const id of ids) {
+    if (!placed.has(id))
+      groups.push({ actionIds: [id], durationMs: DEFAULT_MS });
+  }
 
   return groups;
 }
 
-// One step holding every move is "all at once" — store no timeline at all.
-export function stepsFromGroups(groups: Group[], actionCount: number): Step[] {
+// The default — one move per step, in the drawn order — is stored as nothing.
+export function stepsFromGroups(groups: Group[], actions: Action[]): Step[] {
   const clean = groups.filter((g) => g.actionIds.length > 0);
-  if (clean.length <= 1 && (clean[0]?.actionIds.length ?? 0) === actionCount) {
-    return [];
-  }
+
+  const isDefault =
+    clean.length === actions.length &&
+    clean.every(
+      (g, i) =>
+        g.actionIds.length === 1 &&
+        g.actionIds[0] === actions[i]?.id &&
+        g.durationMs === DEFAULT_MS,
+    );
+  if (isDefault) return [];
+
   return clean.map((g, i) => ({
     id: `g${i}`,
     actionIds: g.actionIds,
@@ -74,10 +85,14 @@ function KebabMenu({
   durationMs,
   onDuration,
   onRemove,
+  onMergeUp,
+  onSplitOut,
 }: {
   durationMs: number;
   onDuration: (ms: number) => void;
   onRemove: () => void;
+  onMergeUp?: () => void;
+  onSplitOut?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -124,6 +139,35 @@ function KebabMenu({
               </span>
             </button>
           ))}
+
+          {(onMergeUp || onSplitOut) && (
+            <div className="my-1 border-t border-[#e6dcc4]" />
+          )}
+          {onMergeUp && (
+            <button
+              type="button"
+              onClick={() => {
+                onMergeUp();
+                setOpen(false);
+              }}
+              className="w-full cursor-pointer px-3 py-1.5 text-left hover:bg-black/5"
+            >
+              Run with step above
+            </button>
+          )}
+          {onSplitOut && (
+            <button
+              type="button"
+              onClick={() => {
+                onSplitOut();
+                setOpen(false);
+              }}
+              className="w-full cursor-pointer px-3 py-1.5 text-left hover:bg-black/5"
+            >
+              Run on its own
+            </button>
+          )}
+
           <div className="my-1 border-t border-[#e6dcc4]" />
           <button
             type="button"
@@ -167,8 +211,7 @@ export function ActionTimeline({
   const dragId = useRef<string | null>(null);
   const groups = groupsFromSteps(actions, steps);
 
-  const commit = (next: Group[]) =>
-    onChange(stepsFromGroups(next, actions.length));
+  const commit = (next: Group[]) => onChange(stepsFromGroups(next, actions));
 
   const stripped = (actionId: string) =>
     groups.map((g) => ({
@@ -299,6 +342,16 @@ export function ActionTimeline({
                             durationMs={group.durationMs}
                             onDuration={(ms) => setDuration(gi, ms)}
                             onRemove={() => onRemoveAction(id)}
+                            onMergeUp={
+                              gi > 0
+                                ? () => mergeIntoStep(id, gi - 1)
+                                : undefined
+                            }
+                            onSplitOut={
+                              together
+                                ? () => insertStepAt(id, gi + 1)
+                                : undefined
+                            }
                           />
                         </div>
                       );
