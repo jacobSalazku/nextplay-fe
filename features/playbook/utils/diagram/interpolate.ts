@@ -39,7 +39,13 @@ export type FrameSlice = { fromIndex: number; toIndex: number; t: number };
 
 // A normalised 0..1 progress across the whole play maps to a segment plus an
 // eased position within it (0 during that segment's hold, then eased 0..1).
-export function resolveFrame(phaseCount: number, progress: number): FrameSlice {
+// `reduce` snaps that to 0 or 1 — a slideshow of keyframes for viewers who
+// asked the OS to minimise motion.
+export function resolveFrame(
+  phaseCount: number,
+  progress: number,
+  reduce = false,
+): FrameSlice {
   if (phaseCount < 2) return { fromIndex: 0, toIndex: 0, t: 0 };
 
   const segments = phaseCount - 1;
@@ -52,7 +58,7 @@ export function resolveFrame(phaseCount: number, progress: number): FrameSlice {
   return {
     fromIndex: seg,
     toIndex: seg + 1,
-    t: easeInOutCubic(clamp01(moved)),
+    t: reduce ? (moved < 0.5 ? 0 : 1) : easeInOutCubic(clamp01(moved)),
   };
 }
 
@@ -95,8 +101,13 @@ function lerpFacing(a?: number, b?: number, t = 0): number | undefined {
 export function interpolateFrame(
   phases: Phase[],
   progress: number,
+  reduce = false,
 ): AnimationFrame {
-  const { fromIndex, toIndex, t } = resolveFrame(phases.length, progress);
+  const { fromIndex, toIndex, t } = resolveFrame(
+    phases.length,
+    progress,
+    reduce,
+  );
   const from = phases[fromIndex];
   const to = phases[toIndex];
 

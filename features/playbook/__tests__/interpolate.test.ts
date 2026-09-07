@@ -37,6 +37,16 @@ describe('resolveFrame', () => {
     expect(resolveFrame(4, 1)).toEqual({ fromIndex: 2, toIndex: 3, t: 1 });
     expect(resolveFrame(4, 2)).toEqual({ fromIndex: 2, toIndex: 3, t: 1 });
   });
+
+  it('snaps t to 0 or 1 when motion is reduced', () => {
+    // 3 phases => 2 segments; progress 0.45 is deep into the first move
+    expect(resolveFrame(3, 0.1, true).t).toBe(0);
+    expect(resolveFrame(3, 0.45, true).t).toBe(1);
+
+    const eased = resolveFrame(3, 0.45, false).t;
+    expect(eased).toBeGreaterThan(0);
+    expect(eased).toBeLessThan(1);
+  });
 });
 
 describe('animationDurationMs', () => {

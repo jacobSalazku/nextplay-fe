@@ -8,6 +8,7 @@ import {
 } from '@/features/playbook/utils/diagram/interpolate';
 import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
 import { isTypingTarget } from '@/features/playbook/utils/editor/keyboard';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { AnimationStage } from './animation-stage';
 import { TransportBar } from './transport-bar';
 
@@ -19,6 +20,7 @@ type Props = {
 export function AnimateView({ court, phases }: Props) {
   const [speed, setSpeed] = useState(1);
   const [loop, setLoop] = useState(false);
+  const reduce = useReducedMotion();
 
   const durationMs = animationDurationMs(phases.length) / speed;
   const { progress, playing, toggle, seek, restart } = useAnimationClock({
@@ -53,7 +55,7 @@ export function AnimateView({ court, phases }: Props) {
         <AnimationStage
           court={court}
           phases={phases}
-          frame={interpolateFrame(phases, progress)}
+          frame={interpolateFrame(phases, progress, reduce)}
         />
       </div>
 
