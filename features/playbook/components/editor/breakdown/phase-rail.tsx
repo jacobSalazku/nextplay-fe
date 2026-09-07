@@ -18,8 +18,8 @@ export function PhaseRail({
   onSelect,
 }: PhaseRailProps) {
   return (
-    <nav aria-label="Phases" className="flex w-28 shrink-0 flex-col gap-2">
-      <p className="px-0.5 text-[0.7rem] font-semibold tracking-wide text-slate-400 uppercase">
+    <nav aria-label="Phases" className="flex w-44 shrink-0 flex-col gap-2.5">
+      <p className="px-0.5 text-xs font-semibold tracking-wide text-slate-400 uppercase">
         Phase {activeIndex + 1} / {phases.length}
       </p>
 

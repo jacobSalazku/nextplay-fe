@@ -33,7 +33,7 @@ export function BreakdownView({
 
   return (
     <div className="flex min-h-0 flex-1 justify-center overflow-y-auto p-6">
-      <div className="flex w-full max-w-screen-xl items-start gap-5">
+      <div className="flex w-full max-w-5xl items-start gap-5">
         <PhaseRail
           phases={phases}
           court={court}
