@@ -5,13 +5,13 @@ import { isTypingTarget } from '@/features/playbook/utils/editor/keyboard';
 import type { EditorTool } from '@/store/use-play-editor-store';
 import { cn } from '@/utils/tw-merge';
 import {
-  ArrowLeftRight,
+  ArrowRight,
   ArrowUpRight,
+  CircleDashed,
   MousePointer2,
-  MoveRight,
+  Plus,
+  Redo2,
   Spline,
-  Split,
-  Target,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -22,14 +22,13 @@ type ToolDef = {
   shortcut: string;
 };
 
-const TOOLS: ToolDef[] = [
-  { tool: 'select', label: 'Select', icon: MousePointer2, shortcut: 'V' },
-  { tool: 'pass', label: 'Pass', icon: MoveRight, shortcut: '1' },
+const DRAW_TOOLS: ToolDef[] = [
   { tool: 'dribble', label: 'Dribble', icon: Spline, shortcut: '2' },
+  { tool: 'pass', label: 'Pass', icon: ArrowRight, shortcut: '1' },
   { tool: 'cut', label: 'Cut', icon: ArrowUpRight, shortcut: '3' },
-  { tool: 'screen', label: 'Screen', icon: Split, shortcut: '4' },
-  { tool: 'shot', label: 'Shot', icon: Target, shortcut: '5' },
-  { tool: 'handoff', label: 'Handoff', icon: ArrowLeftRight, shortcut: '6' },
+  { tool: 'screen', label: 'Screen', icon: Plus, shortcut: '4' },
+  { tool: 'shot', label: 'Shot', icon: CircleDashed, shortcut: '5' },
+  { tool: 'handoff', label: 'Handoff', icon: Redo2, shortcut: '6' },
 ];
 
 const SHORTCUTS = new Map<string, EditorTool>([
@@ -70,29 +69,48 @@ export function ToolDock({
     <div
       role="toolbar"
       aria-label="Drawing tools"
-      className="flex max-w-full gap-1 overflow-x-auto rounded-2xl border border-white/10 bg-slate-900/90 p-1.5 shadow-xl shadow-black/40 backdrop-blur"
+      className="flex items-center"
     >
-      {TOOLS.map(({ tool: value, label, icon: Icon, shortcut }, index) => (
-        <div key={value} className="flex items-center">
-          {index === 1 && <div className="mx-1 h-8 w-px bg-white/10" />}
+      <button
+        type="button"
+        aria-pressed={tool === 'select'}
+        aria-keyshortcuts="V"
+        title="Select (V)"
+        onClick={() => onToolChange('select')}
+        className={cn(
+          'flex shrink-0 cursor-pointer flex-col items-center gap-1 rounded-xl px-4 py-2 text-xs font-semibold transition',
+          tool === 'select'
+            ? 'bg-[#1f2d4d] text-white'
+            : 'text-[#1f2d4d] hover:bg-black/5',
+        )}
+      >
+        <MousePointer2 className="h-4 w-4" fill="currentColor" />
+        Select
+      </button>
+
+      <div className="mx-2 h-9 w-px bg-[#e0d5bb]" />
+
+      <div className="flex items-center gap-0.5">
+        {DRAW_TOOLS.map(({ tool: value, label, icon: Icon, shortcut }) => (
           <button
+            key={value}
             type="button"
             aria-pressed={tool === value}
             aria-keyshortcuts={shortcut}
             title={`${label} (${shortcut})`}
             onClick={() => onToolChange(value)}
             className={cn(
-              'flex shrink-0 flex-col items-center gap-1 rounded-xl px-3 py-1.5 text-xs transition',
+              'flex shrink-0 cursor-pointer flex-col items-center gap-1 rounded-xl px-3 py-2 text-xs transition',
               tool === value
-                ? 'bg-orange-500/20 text-orange-200'
-                : 'text-gray-400 hover:bg-white/5 hover:text-white',
+                ? 'bg-[#1f2d4d]/10 font-semibold text-[#1f2d4d]'
+                : 'text-[#a89372] hover:bg-black/5',
             )}
           >
-            <Icon className="h-4 w-4" />
+            <Icon className="h-4 w-4 text-[#1f2d4d]" />
             {label}
           </button>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

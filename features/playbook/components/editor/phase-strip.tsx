@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { CourtDiagram } from '@/features/playbook/components/diagram/court-diagram';
+import { PhaseThumbnail } from '@/features/playbook/components/diagram/phase-thumbnail';
 import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
 import {
   MAX_PHASES,
@@ -71,7 +71,7 @@ export function PhaseStrip({
       ref={rowRef}
       role="tablist"
       aria-label="Phases"
-      className="flex items-center gap-2 overflow-x-auto px-1 py-1"
+      className="flex items-center gap-2 overflow-x-auto"
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={() => setDrag(null)}
@@ -80,7 +80,7 @@ export function PhaseStrip({
         <div
           key={phase.id}
           data-thumb
-          className="relative shrink-0"
+          className="group relative shrink-0"
           style={
             drag?.from === index
               ? { transform: `translateX(${drag.dx}px)`, zIndex: 10 }
@@ -94,18 +94,18 @@ export function PhaseStrip({
             aria-label={`Phase ${index + 1}${index === activeIndex ? ', current' : ''}`}
             onPointerDown={onPointerDown(index)}
             className={cn(
-              'block w-20 touch-none overflow-hidden rounded-md border bg-slate-800 cursor-pointer',
+              'relative block w-24 cursor-pointer touch-none overflow-hidden rounded-lg border-2 transition',
               index === activeIndex
-                ? 'border-orange-400 ring-1 ring-orange-400'
-                : 'border-white/10 hover:border-white/25',
+                ? 'border-[#1f2d4d]'
+                : 'border-[#cdb894] hover:border-[#1f2d4d]/40',
             )}
           >
-            <CourtDiagram
+            <PhaseThumbnail
               court={court}
               phase={phase}
               className="pointer-events-none block w-full"
             />
-            <span className="block bg-slate-900/80 py-0.5 text-center text-[11px] font-semibold">
+            <span className="absolute bottom-0.5 left-1.5 text-[11px] font-semibold text-[#8a7355]">
               {index + 1}
             </span>
           </button>
@@ -116,7 +116,7 @@ export function PhaseStrip({
               aria-label={`Delete phase ${index + 1}`}
               onPointerDown={(event) => event.stopPropagation()}
               onClick={() => onDelete(index)}
-              className="absolute top-1 right-1 flex h-4 w-4 cursor-pointer items-center justify-center rounded-full bg-slate-900/80 text-gray-200 hover:bg-red-600 hover:text-white"
+              className="absolute top-1 right-1 flex h-4 w-4 cursor-pointer items-center justify-center rounded-full bg-[#1f2d4d]/80 text-white opacity-0 transition group-hover:opacity-100 hover:bg-red-600"
             >
               <X className="h-2.5 w-2.5" />
             </button>
@@ -129,9 +129,9 @@ export function PhaseStrip({
           type="button"
           aria-label="Add phase"
           onClick={onAdd}
-          className="flex aspect-square w-20 shrink-0 cursor-pointer items-center justify-center rounded-md border border-dashed border-white/15 text-gray-500 hover:border-white/30 hover:text-gray-300"
+          className="flex aspect-square w-24 shrink-0 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-[#cdb894] text-[#a89372] transition hover:border-[#1f2d4d]/40 hover:text-[#1f2d4d]"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-5 w-5" />
         </button>
       )}
     </div>

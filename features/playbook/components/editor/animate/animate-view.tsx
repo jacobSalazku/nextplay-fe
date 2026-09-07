@@ -7,6 +7,7 @@ import {
   animationDurationMs,
   interpolateFrame,
   phaseStartProgress,
+  resolveFrame,
 } from '@/features/playbook/utils/diagram/interpolate';
 import type {
   CourtType,
@@ -37,6 +38,10 @@ export function AnimateView({
   const [speed, setSpeed] = useState(1);
   const [loop, setLoop] = useState(false);
   const [titlePhases, setTitlePhases] = useState<Record<string, boolean>>({});
+  // which phase's timeline is being edited — a direct selection, not derived
+  // from the scrubber (a progress round-trip lands on the wrong side of a
+  // segment boundary half the time)
+  const [selected, setSelected] = useState(0);
   const reduce = useReducedMotion();
 
   const durationMs = animationDurationMs(phases) / speed;
@@ -57,16 +62,32 @@ export function AnimateView({
   }, [toggle]);
 
   const frame = interpolateFrame(phases, progress, reduce);
-  const from = phases[frame.fromIndex];
-  const showTitle = titlePhases[from.id] ?? false;
+
+  // during playback the panel follows what is on screen; when paused it follows
+  // the last phase the coach clicked or scrubbed to
+  const activeIndex = playing
+    ? frame.fromIndex
+    : Math.min(selected, phases.length - 1);
+  const active = phases[activeIndex];
+  const showTitle = titlePhases[active.id] ?? false;
+
+  const selectPhase = (index: number) => {
+    setSelected(index);
+    seek(phaseStartProgress(phases, index));
+  };
+
+  const scrubTo = (next: number) => {
+    seek(next);
+    setSelected(resolveFrame(phases, next).fromIndex);
+  };
 
   return (
     <div className="flex flex-1 gap-3 overflow-hidden p-3">
       <PhaseRail
         phases={phases}
         court={court}
-        activeIndex={frame.fromIndex}
-        onSelect={(index) => seek(phaseStartProgress(phases, index))}
+        activeIndex={activeIndex}
+        onSelect={selectPhase}
         className="w-40"
       />
 
@@ -76,7 +97,7 @@ export function AnimateView({
             court={court}
             phases={phases}
             frame={frame}
-            title={showTitle ? `Phase ${frame.fromIndex + 1}` : undefined}
+            title={showTitle ? `Phase ${activeIndex + 1}` : undefined}
           />
         </div>
 
@@ -88,26 +109,26 @@ export function AnimateView({
           loop={loop}
           onToggle={toggle}
           onRestart={restart}
-          onSeek={seek}
+          onSeek={scrubTo}
           onSpeed={setSpeed}
           onLoop={setLoop}
         />
       </div>
 
       <ActionTimeline
-        phaseNumber={frame.fromIndex + 1}
-        actions={from.actions}
-        objects={from.objects}
-        steps={from.steps}
+        phaseNumber={activeIndex + 1}
+        actions={active.actions}
+        objects={active.objects}
+        steps={active.steps}
         showTitle={showTitle}
         onShowTitleChange={(value) =>
-          setTitlePhases((prev) => ({ ...prev, [from.id]: value }))
+          setTitlePhases((prev) => ({ ...prev, [active.id]: value }))
         }
         onChange={(steps) => {
           onEditStart();
-          onStepsChange(frame.fromIndex, steps);
+          onStepsChange(activeIndex, steps);
         }}
-        onRemoveAction={(id) => onRemoveAction(frame.fromIndex, id)}
+        onRemoveAction={(id) => onRemoveAction(activeIndex, id)}
         onPlay={restart}
       />
     </div>
