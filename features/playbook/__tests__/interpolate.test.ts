@@ -97,6 +97,25 @@ describe('animationDurationMs', () => {
 
     expect(scripted).toBeGreaterThan(plain + 4000);
   });
+
+  it('overlaps consecutive steps, so the total is under their raw sum', () => {
+    const overlapped = animationDurationMs([
+      phase('p1', {
+        actions: [
+          { id: 'a1', type: 'cut', fromId: 'o1', toPoint: { x: 1, y: 1 } },
+          { id: 'a2', type: 'cut', fromId: 'o2', toPoint: { x: 9, y: 9 } },
+        ],
+        steps: [
+          { id: 's1', actionIds: ['a1'], durationMs: 1000 },
+          { id: 's2', actionIds: ['a2'], durationMs: 1000 },
+        ],
+      }),
+      phase('p2'),
+    ]);
+
+    expect(overlapped).toBeGreaterThan(1000);
+    expect(overlapped).toBeLessThan(2000);
+  });
 });
 
 describe('lerpAngle', () => {
@@ -115,10 +134,11 @@ describe('interpolateFrame', () => {
       (o) => o.id === 'o1',
     )!;
 
-  it('runs at a steady linear pace and lands exactly at the end', () => {
+  it('eases in and out and lands exactly at the end', () => {
     expect(o1At(0).x).toBe(0);
-    expect(o1At(0.25).x).toBeCloseTo(10);
-    expect(o1At(0.5).x).toBeCloseTo(20);
+    expect(o1At(0.25).x).toBeLessThan(10); // slow off the mark
+    expect(o1At(0.5).x).toBeCloseTo(20); // halfway at the midpoint
+    expect(o1At(0.75).x).toBeGreaterThan(30); // fast through the middle
     expect(o1At(1)).toMatchObject({ x: 40, y: 0 });
   });
 
@@ -225,5 +245,28 @@ describe('interpolateFrame', () => {
 
   it('has no ball when nobody holds it', () => {
     expect(interpolateFrame([from, to], 0.5).ball).toBeNull();
+  });
+
+  it('draws each route in step with its beat', () => {
+    const a = phase('p1', {
+      objects: [obj('o1', 0), obj('o2', 0, 50)],
+      actions: [
+        { id: 'a1', type: 'cut', fromId: 'o1', toPoint: { x: 40, y: 0 } },
+        { id: 'a2', type: 'cut', fromId: 'o2', toPoint: { x: 40, y: 50 } },
+      ],
+      steps: [
+        { id: 's1', actionIds: ['a1'], durationMs: 1000 },
+        { id: 's2', actionIds: ['a2'], durationMs: 1000 },
+      ],
+    });
+    const b = phase('p2', { objects: [obj('o1', 40), obj('o2', 40, 50)] });
+
+    const early = interpolateFrame([a, b], 0.2).routes;
+    expect(early.find((r) => r.id === 'a1')!.progress).toBeGreaterThan(0);
+    expect(early.find((r) => r.id === 'a2')!.progress).toBe(0);
+
+    const done = interpolateFrame([a, b], 1).routes;
+    expect(done.find((r) => r.id === 'a1')!.progress).toBe(1);
+    expect(done.find((r) => r.id === 'a2')!.progress).toBe(1);
   });
 });

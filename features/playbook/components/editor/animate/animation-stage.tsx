@@ -4,15 +4,19 @@ import {
   Court,
   COURT_VIEWBOX,
 } from '@/features/playbook/components/diagram/court';
-import {
-  Route,
-  RouteArrowMarker,
-} from '@/features/playbook/components/diagram/route';
+import { RouteArrowMarker } from '@/features/playbook/components/diagram/route';
 import { Token } from '@/features/playbook/components/diagram/tokens';
+import {
+  actionEndpoints,
+  ARROW_ACTIONS,
+  routePath,
+} from '@/features/playbook/utils/diagram/geometry';
 import type { AnimationFrame } from '@/features/playbook/utils/diagram/interpolate';
 import { courtScaleY } from '@/features/playbook/utils/diagram/project';
 import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
 import { BALL } from '@/features/playbook/utils/editor/colors';
+
+const INK = '#1E1B16';
 
 type Props = {
   court: CourtType;
@@ -20,15 +24,15 @@ type Props = {
   frame: AnimationFrame;
 };
 
-// Read-only playback surface: the drawn routes of the phase being left, drawn
-// against their static start positions, with the tokens moving over them.
+// Read-only playback surface. Each route inks itself in as its beat runs, and
+// the tokens move along it at the same time.
 export function AnimationStage({ court, phases, frame }: Props) {
   const { w, h } = COURT_VIEWBOX[court];
   const sy = courtScaleY(court);
 
   const from = phases[frame.fromIndex];
   const routeObjects = from.objects.map((o) => ({ ...o, y: o.y * sy }));
-  const routeOpacity = 1 - 0.7 * frame.t;
+  const inkOpacity = 1 - 0.5 * frame.t;
 
   return (
     <div
@@ -48,11 +52,40 @@ export function AnimationStage({ court, phases, frame }: Props) {
 
         <Court court={court} />
 
-        <g opacity={routeOpacity}>
-          {from.actions.map((action) => (
-            <Route key={action.id} action={action} objects={routeObjects} />
-          ))}
-        </g>
+        {from.actions.map((action) => {
+          const ends = actionEndpoints(action, routeObjects);
+          if (!ends) return null;
+          const d = routePath(action.type, ends.a, ends.b, ends.ctrl);
+          const p = frame.routes.find((r) => r.id === action.id)?.progress ?? 0;
+          return (
+            <g key={action.id}>
+              <path
+                d={d}
+                fill="none"
+                stroke={INK}
+                strokeWidth={0.45}
+                opacity={0.1}
+              />
+              <path
+                d={d}
+                fill="none"
+                stroke={INK}
+                strokeWidth={0.5}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                pathLength={1}
+                strokeDasharray={1}
+                strokeDashoffset={1 - p}
+                opacity={inkOpacity}
+                markerEnd={
+                  p > 0.98 && ARROW_ACTIONS.has(action.type)
+                    ? 'url(#route-arrow)'
+                    : undefined
+                }
+              />
+            </g>
+          );
+        })}
 
         {frame.objects.map((object) => (
           <g key={object.id} opacity={object.opacity}>

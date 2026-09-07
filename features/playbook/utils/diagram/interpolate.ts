@@ -14,7 +14,16 @@ const MOVE_ACTIONS: ReadonlySet<Action['type']> = new Set([
 const PATH_ACTIONS: ReadonlySet<Action['type']> = new Set(['cut', 'dribble']);
 const BALL_ACTIONS: ReadonlySet<Action['type']> = new Set(['pass', 'handoff']);
 
+// Consecutive steps overlap by this fraction of the shorter one, so the play
+// flows from one beat into the next instead of stopping between them.
+const BEAT_OVERLAP = 0.4;
+
 const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
+
+// eased in and out, so a mover accelerates off the mark and settles onto its
+// spot rather than snapping to a constant speed
+const easeInOut = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
@@ -29,12 +38,34 @@ export const lerpAngle = (a: number, b: number, t: number) => {
   return a + d * t;
 };
 
-// How long the transition leaving `from` runs — the sum of its step durations,
-// or the default when it has no timeline. There is no pause between steps or
-// phases: playback runs at a steady pace start to finish.
+// Where each step's beat starts, and how long the whole transition runs. Beats
+// overlap, so `total` is less than the naive sum of durations.
+function beatLayout(steps: { durationMs: number }[]): {
+  starts: number[];
+  total: number;
+} {
+  const starts: number[] = [];
+  let cursor = 0;
+  for (let i = 0; i < steps.length; i++) {
+    starts.push(cursor);
+    const next = steps[i + 1];
+    const overlap = next
+      ? BEAT_OVERLAP * Math.min(steps[i].durationMs, next.durationMs)
+      : 0;
+    cursor += steps[i].durationMs - overlap;
+  }
+  const last = steps.length - 1;
+  return {
+    starts,
+    total: last >= 0 ? starts[last] + steps[last].durationMs : 0,
+  };
+}
+
+// How long the transition leaving `from` runs — its overlapped step timeline,
+// or the default when it has none. No pause between steps or phases.
 const segmentMs = (from: Phase) =>
   from.steps && from.steps.length > 0
-    ? from.steps.reduce((sum, s) => sum + s.durationMs, 0)
+    ? beatLayout(from.steps).total
     : DEFAULT_SEGMENT_MS;
 
 export const animationDurationMs = (phases: Phase[]) =>
@@ -83,6 +114,9 @@ export type AnimationFrame = {
   t: number;
   objects: FrameObject[];
   ball: Point | null;
+  // from-phase routes with how far each is drawn (0..1), keyed by action id —
+  // a line draws itself as its beat runs
+  routes: { id: string; progress: number }[];
 };
 
 type Ends = { a: Point; b: Point; ctrl: Point | null };
@@ -119,22 +153,24 @@ function stepWindow(
   matches: (action: Action) => boolean,
   totalMs: number,
 ): { pre: number; d: number } {
-  let pre = 0;
+  const steps = from.steps ?? [];
+  if (steps.length === 0) return { pre: 0, d: totalMs };
+
+  const { starts } = beatLayout(steps);
   let found: { pre: number; d: number } | null = null;
 
-  for (const step of from.steps ?? []) {
+  steps.forEach((step, i) => {
     const hit = step.actionIds.some((id) => {
       const action = from.actions.find((x) => x.id === id);
       return action != null && matches(action);
     });
-    if (hit) found = { pre, d: step.durationMs };
-    pre += step.durationMs;
-  }
+    if (hit) found = { pre: starts[i], d: step.durationMs };
+  });
 
   return found ?? { pre: 0, d: totalMs };
 }
 
-// Linear 0..1 for a mover, given how many ms into the transition we are and
+// Eased 0..1 for a mover, given how many ms into the transition we are and
 // which slice of it is that mover's beat. `reduce` snaps it for minimised
 // motion.
 function beatProgress(
@@ -143,7 +179,7 @@ function beatProgress(
   reduce: boolean,
 ): number {
   const local = window.d > 0 ? clamp01((activeMs - window.pre) / window.d) : 1;
-  return reduce ? (local < 0.5 ? 0 : 1) : local;
+  return reduce ? (local < 0.5 ? 0 : 1) : easeInOut(local);
 }
 
 export function interpolateFrame(
@@ -194,12 +230,22 @@ export function interpolateFrame(
     }
   }
 
+  const routes = from.actions.map((action) => ({
+    id: action.id,
+    progress: beatProgress(
+      activeMs,
+      stepWindow(from, (x) => x.id === action.id, totalMs),
+      reduce,
+    ),
+  }));
+
   return {
     fromIndex,
     toIndex,
     t,
     objects,
     ball: ball(from, to, activeMs, totalMs, reduce, objects),
+    routes,
   };
 }
 
