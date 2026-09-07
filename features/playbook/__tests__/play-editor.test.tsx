@@ -6,9 +6,10 @@ import { usePlayEditorStore } from '@/store/use-play-editor-store';
 import { api, gqlData, gqlError } from '@/test/msw/handlers';
 import { server } from '@/test/msw/server';
 import { renderWithClient } from '@/test/utils';
-import { act, screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { Category } from '@/graphql/graphql';
 
 const { push } = vi.hoisted(() => ({ push: vi.fn() }));
 vi.mock('next/navigation', () => ({
@@ -47,6 +48,7 @@ function renderEditor() {
       playId="play-1"
       routeKey="team~1"
       name="Horns"
+      category={Category.Offensive}
       diagram={seedDiagram('half', objects)}
     />,
   );
@@ -67,6 +69,7 @@ describe('PlayEditor', () => {
           playId="play-1"
           routeKey="team~1"
           name="Horns"
+          category={Category.Offensive}
           diagram={seedDiagram('half', objects)}
         />
       </StrictMode>,
@@ -230,18 +233,61 @@ describe('PlayEditor — phases', () => {
     const user = userEvent.setup();
     renderEditor();
 
+    const strip = screen.getByRole('tablist', { name: 'Phases' });
+
     // Act — add a phase
     await user.click(screen.getByRole('button', { name: 'Add phase' }));
 
     // Assert — two thumbnails, the new one current
-    expect(screen.getAllByRole('tab')).toHaveLength(2);
+    expect(within(strip).getAllByRole('tab')).toHaveLength(2);
     expect(store().activePhaseIndex).toBe(1);
 
     // Act — go back to phase 1
-    await user.click(screen.getByRole('tab', { name: 'Phase 1' }));
+    await user.click(within(strip).getByRole('tab', { name: 'Phase 1' }));
 
     // Assert
     expect(store().activePhaseIndex).toBe(0);
+  });
+});
+
+describe('PlayEditor — breakdown', () => {
+  const store = () => usePlayEditorStore.getState();
+
+  it('switches to Breakdown and edits a phase note', async () => {
+    // Arrange
+    const user = userEvent.setup();
+    renderEditor();
+
+    // Act — open Breakdown, type a note
+    await user.click(screen.getByRole('tab', { name: 'Breakdown' }));
+    await user.type(screen.getByLabelText('Phase 1 note'), 'Iso');
+
+    // Assert
+    expect(store().phases[0].note).toBe('Iso');
+  });
+
+  it('changes the category immediately via updatePlay', async () => {
+    // Arrange
+    const user = userEvent.setup();
+    const seen = vi.fn();
+    server.use(
+      api.mutation('UpdatePlay', ({ variables }) => {
+        seen(variables.input);
+        return gqlData({ updatePlay: { id: 'play-1' } });
+      }),
+    );
+    renderEditor();
+
+    // Act
+    await user.click(screen.getByRole('tab', { name: 'Breakdown' }));
+    await user.click(screen.getByRole('button', { name: 'Defense' }));
+
+    // Assert
+    await waitFor(() =>
+      expect(seen).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'play-1', category: 'DEFENSIVE' }),
+      ),
+    );
   });
 });
 

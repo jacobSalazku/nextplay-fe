@@ -391,6 +391,42 @@ describe('usePlayEditorStore', () => {
     expect(store().phases).toHaveLength(1);
   });
 
+  it('sets and clears a note on any phase, not just the active one', () => {
+    // Arrange
+    hydrate();
+    store().addPhase(); // active = 1
+
+    // Act — note the first (inactive) phase
+    store().setPhaseNote(0, '  Iso for the 1  ');
+
+    // Assert
+    expect(store().phases[0].note).toBe('  Iso for the 1  ');
+    expect('note' in store().phases[1]).toBe(false);
+
+    // Act — clear it
+    store().setPhaseNote(0, '');
+
+    // Assert — the key is gone, not left as ''
+    expect('note' in store().phases[0]).toBe(false);
+  });
+
+  it('collapses a note-editing session into one undo step', () => {
+    // Arrange
+    hydrate();
+
+    // Act — arm once, type several times, blur
+    store().beginEdit();
+    store().setPhaseNote(0, 'H');
+    store().setPhaseNote(0, 'Ho');
+    store().setPhaseNote(0, 'Horns');
+    store().endEdit();
+
+    store().undo();
+
+    // Assert — back to no note in one step
+    expect('note' in store().phases[0]).toBe(false);
+  });
+
   it('reorders phases and follows the active one', () => {
     // Arrange
     hydrate();
