@@ -2,52 +2,65 @@
 
 import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
 import type { Category } from '@/graphql/graphql';
-import { PhaseNoteCard } from './phase-note-card';
-import { PlayMeta } from './play-meta';
+import { CategoryPicker } from './category-picker';
+import { PhaseNotesEditor } from './phase-notes-editor';
+import { PhaseRail } from './phase-rail';
 
 type BreakdownProps = {
-  name: string;
   category: Category;
   court: CourtType;
   phases: Phase[];
-  onRename: (name: string) => void;
+  activeIndex: number;
+  onSelectPhase: (index: number) => void;
   onCategoryChange: (category: Category) => void;
   onNoteChange: (index: number, note: string) => void;
   onEditStart: () => void;
   onEditEnd: () => void;
 };
 
+// The Breakdown tab: a phase rail on the left, the selected phase's step notes
+// on the right.
 export function BreakdownView({
-  name,
   category,
   court,
   phases,
-  onRename,
+  activeIndex,
+  onSelectPhase,
   onCategoryChange,
   onNoteChange,
   onEditStart,
   onEditEnd,
 }: BreakdownProps) {
+  const phase = phases[activeIndex];
+
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 overflow-y-auto p-4">
-      <PlayMeta
-        name={name}
-        category={category}
-        onRename={onRename}
-        onCategoryChange={onCategoryChange}
+    <div className="flex min-h-0 flex-1 gap-4 overflow-hidden p-3">
+      <PhaseRail
+        phases={phases}
+        court={court}
+        activeIndex={activeIndex}
+        onSelect={onSelectPhase}
       />
 
-      {phases.map((phase, index) => (
-        <PhaseNoteCard
-          key={phase.id}
-          index={index}
-          phase={phase}
-          court={court}
-          onNoteChange={onNoteChange}
+      <div className="flex min-h-0 flex-1 flex-col rounded-2xl bg-[#faf6ec] p-6 text-slate-900">
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <h2 className="text-2xl font-bold">
+            Phase {activeIndex + 1}
+            <span className="ml-2 align-middle text-sm font-normal text-slate-500">
+              Step notes
+            </span>
+          </h2>
+          <CategoryPicker value={category} onChange={onCategoryChange} />
+        </div>
+
+        <PhaseNotesEditor
+          phaseId={phase.id}
+          content={phase.note ?? ''}
+          onChange={(html) => onNoteChange(activeIndex, html)}
           onEditStart={onEditStart}
           onEditEnd={onEditEnd}
         />
-      ))}
+      </div>
     </div>
   );
 }

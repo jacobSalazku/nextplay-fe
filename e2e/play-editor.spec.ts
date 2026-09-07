@@ -120,22 +120,28 @@ test.describe('play editor flow', () => {
     await newPlay(page);
     await page.getByRole('tab', { name: 'Breakdown' }).click();
 
-    // Act — pick a category and write a note
+    // Act — pick a category, write a note, make part of it bold
     await page.getByRole('button', { name: 'Defense' }).click();
-    await page.getByLabel('Phase 1 note').fill('Punch it inside to the 5.');
+    const note = page.locator('.ProseMirror');
+    await note.click();
+    await note.pressSequentially('Punch it inside to the 5.');
+    await note.press('ControlOrMeta+a');
+    await page.getByRole('button', { name: 'Bold' }).click();
+
     await page.getByRole('button', { name: /save/i }).click();
     await expect(page.getByRole('button', { name: /save/i })).toBeDisabled();
 
-    // Assert — both survive a reload
+    // Assert — both survive a reload, formatting included
     await page.reload();
     await page.getByRole('tab', { name: 'Breakdown' }).click();
     await expect(page.getByRole('button', { name: 'Defense' })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
-    await expect(page.getByLabel('Phase 1 note')).toHaveValue(
+    await expect(page.locator('.ProseMirror')).toContainText(
       'Punch it inside to the 5.',
     );
+    await expect(page.locator('.ProseMirror strong')).toBeVisible();
   });
 
   test('match man-to-man, give the ball, bench a player, and undo', async ({

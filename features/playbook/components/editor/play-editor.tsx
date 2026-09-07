@@ -262,11 +262,11 @@ export function PlayEditor({
 
       {mode === 'breakdown' ? (
         <BreakdownView
-          name={name}
           category={category}
           court={court}
           phases={phases}
-          onRename={(next) => renamePlay(next).catch(() => {})}
+          activeIndex={activePhaseIndex}
+          onSelectPhase={setActivePhase}
           onCategoryChange={changeCategory}
           onNoteChange={setPhaseNote}
           onEditStart={beginEdit}

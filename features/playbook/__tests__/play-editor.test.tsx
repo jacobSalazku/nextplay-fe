@@ -251,19 +251,19 @@ describe('PlayEditor — phases', () => {
 });
 
 describe('PlayEditor — breakdown', () => {
-  const store = () => usePlayEditorStore.getState();
-
-  it('switches to Breakdown and edits a phase note', async () => {
+  it('switches to Breakdown and shows the phase notes editor', async () => {
     // Arrange
     const user = userEvent.setup();
     renderEditor();
 
-    // Act — open Breakdown, type a note
+    // Act
     await user.click(screen.getByRole('tab', { name: 'Breakdown' }));
-    await user.type(screen.getByLabelText('Phase 1 note'), 'Iso');
 
-    // Assert
-    expect(store().phases[0].note).toBe('Iso');
+    // Assert — the notes panel for the current phase, with its toolbar
+    expect(screen.getByRole('heading', { name: /Phase 1/ })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('toolbar', { name: 'Formatting' }),
+    ).toBeInTheDocument();
   });
 
   it('changes the category immediately via updatePlay', async () => {

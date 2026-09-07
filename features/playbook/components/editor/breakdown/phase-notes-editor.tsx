@@ -116,11 +116,11 @@ export function PhaseNotesEditor({
   ];
 
   return (
-    <div className="flex flex-1 flex-col rounded-xl bg-[#faf6ec] text-slate-900">
+    <div className="flex min-h-0 flex-1 flex-col">
       <div
         role="toolbar"
         aria-label="Formatting"
-        className="flex items-center gap-0.5 border-b border-black/10 px-2 py-1.5"
+        className="flex items-center gap-0.5 border-b border-black/10 pb-1.5"
       >
         {items.map((item, i) =>
           item === 'sep' ? (
@@ -145,7 +145,7 @@ export function PhaseNotesEditor({
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3">
+      <div className="min-h-0 flex-1 overflow-y-auto">
         <EditorContent editor={editor} />
       </div>
     </div>
