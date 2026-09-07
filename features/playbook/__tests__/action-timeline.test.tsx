@@ -1,9 +1,4 @@
-import {
-  actionLabel,
-  ActionTimeline,
-  groupsFromSteps,
-  stepsFromGroups,
-} from '../components/editor/animate/action-timeline';
+import { ActionTimeline } from '../components/editor/animate/timeline/action-timeline';
 import type { Action, PlacedObject } from '../utils/diagram/types';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -30,39 +25,8 @@ const base = {
   onPlay: vi.fn(),
 };
 
-describe('actionLabel', () => {
-  it('names the move and the player', () => {
-    expect(actionLabel(actions[0], objects)).toBe('Dribble by Player 1');
-    expect(actionLabel(actions[1], objects)).toBe('Pass by Player 1');
-  });
-});
-
-describe('groupsFromSteps / stepsFromGroups', () => {
-  it('defaults to one move per step, in draw order', () => {
-    expect(groupsFromSteps(actions)).toEqual([
-      { actionIds: ['a1'], durationMs: 700 },
-      { actionIds: ['a2'], durationMs: 700 },
-    ]);
-  });
-
-  it('stores nothing when the arrangement is the default', () => {
-    expect(
-      stepsFromGroups(
-        [
-          { actionIds: ['a1'], durationMs: 700 },
-          { actionIds: ['a2'], durationMs: 700 },
-        ],
-        actions,
-      ),
-    ).toEqual([]);
-  });
-
-  it('stores the steps once moves are grouped or retimed', () => {
-    expect(
-      stepsFromGroups([{ actionIds: ['a1', 'a2'], durationMs: 700 }], actions),
-    ).toEqual([{ id: 'g0', actionIds: ['a1', 'a2'], durationMs: 700 }]);
-  });
-});
+const kebab = (i: number) =>
+  screen.getAllByRole('button', { name: 'Timing options' })[i];
 
 describe('ActionTimeline', () => {
   it('shows the phase header, the timeline label and the play button', () => {
@@ -75,6 +39,8 @@ describe('ActionTimeline', () => {
     expect(
       screen.getByRole('button', { name: /play full animation/i }),
     ).toBeInTheDocument();
+    expect(screen.getByText('Dribble by Player 1')).toBeInTheDocument();
+    expect(screen.getByText('Pass by Player 1')).toBeInTheDocument();
   });
 
   it('toggles the show-title checkbox', async () => {
@@ -86,15 +52,12 @@ describe('ActionTimeline', () => {
     expect(onShowTitleChange).toHaveBeenCalledWith(true);
   });
 
-  it('groups two moves together with "Run with step above"', async () => {
+  it('groups two moves with "Run with step above"', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     render(<ActionTimeline {...base} onChange={onChange} />);
 
-    // the pass is step 2 by default; merge it up into step 1
-    await user.click(
-      screen.getAllByRole('button', { name: 'Timing options' })[1],
-    );
+    await user.click(kebab(1));
     await user.click(
       screen.getByRole('button', { name: 'Run with step above' }),
     );
@@ -115,9 +78,7 @@ describe('ActionTimeline', () => {
       />,
     );
 
-    await user.click(
-      screen.getAllByRole('button', { name: 'Timing options' })[1],
-    );
+    await user.click(kebab(1));
     await user.click(screen.getByRole('button', { name: 'Run on its own' }));
 
     expect(onChange).toHaveBeenCalledWith([]);
@@ -140,9 +101,7 @@ describe('ActionTimeline', () => {
     const onChange = vi.fn();
     render(<ActionTimeline {...base} onChange={onChange} />);
 
-    await user.click(
-      screen.getAllByRole('button', { name: 'Timing options' })[0],
-    );
+    await user.click(kebab(0));
     await user.click(screen.getByRole('button', { name: /Fast/ }));
 
     expect(onChange).toHaveBeenCalledWith([
@@ -156,9 +115,7 @@ describe('ActionTimeline', () => {
     const onRemoveAction = vi.fn();
     render(<ActionTimeline {...base} onRemoveAction={onRemoveAction} />);
 
-    await user.click(
-      screen.getAllByRole('button', { name: 'Timing options' })[0],
-    );
+    await user.click(kebab(0));
     await user.click(screen.getByRole('button', { name: 'Remove action' }));
 
     expect(onRemoveAction).toHaveBeenCalledWith('a1');

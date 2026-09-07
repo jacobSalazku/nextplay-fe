@@ -15,8 +15,8 @@ import type {
 } from '@/features/playbook/utils/diagram/types';
 import { isTypingTarget } from '@/features/playbook/utils/editor/keyboard';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
-import { ActionTimeline } from './action-timeline';
 import { AnimationStage } from './animation-stage';
+import { ActionTimeline } from './timeline/action-timeline';
 import { TransportBar } from './transport-bar';
 
 type Props = {
