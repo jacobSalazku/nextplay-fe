@@ -197,13 +197,13 @@ describe('PlayEditor — selection', () => {
     act(() => {
       store().addAction({ type: 'pass', fromId: 'o1', toId: 'o2' });
     });
-    const { id } = store().phase.actions[0];
+    const { id } = store().phases[store().activePhaseIndex].actions[0];
 
     // Act
     await user.keyboard('{Delete}');
 
     // Assert
-    expect(store().phase.actions).toHaveLength(0);
+    expect(store().phases[store().activePhaseIndex].actions).toHaveLength(0);
     expect(store().selection).toBeNull();
     expect(id).toBeDefined();
   });
@@ -219,6 +219,29 @@ describe('PlayEditor — selection', () => {
     expect(
       screen.getByRole('button', { name: 'Opponent 1, on court' }),
     ).toHaveClass('ring-2');
+  });
+});
+
+describe('PlayEditor — phases', () => {
+  const store = () => usePlayEditorStore.getState();
+
+  it('adds a phase and switches to it from the strip', async () => {
+    // Arrange
+    const user = userEvent.setup();
+    renderEditor();
+
+    // Act — add a phase
+    await user.click(screen.getByRole('button', { name: 'Add phase' }));
+
+    // Assert — two thumbnails, the new one current
+    expect(screen.getAllByRole('tab')).toHaveLength(2);
+    expect(store().activePhaseIndex).toBe(1);
+
+    // Act — go back to phase 1
+    await user.click(screen.getByRole('tab', { name: 'Phase 1' }));
+
+    // Assert
+    expect(store().activePhaseIndex).toBe(0);
   });
 });
 

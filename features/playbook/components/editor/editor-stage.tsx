@@ -15,23 +15,23 @@ import {
   projectPhase,
 } from '@/features/playbook/utils/diagram/project';
 import type {
-  Action,
   CourtType,
   Phase,
   PlacedObject,
   Point,
 } from '@/features/playbook/utils/diagram/types';
+import { ACCENT, BALL } from '@/features/playbook/utils/editor/colors';
 import {
-  actionChord,
   angleTo,
-  bendHandle,
   bendOffset,
   nearestToken,
+  type Chord,
 } from '@/features/playbook/utils/editor/draw-geometry';
 import type { EditorTool, Selection } from '@/store/use-play-editor-store';
+import { ActionHandles } from './handles/action-handles';
+import { RotationHandle } from './handles/rotation-handle';
 
 type DrawEnd = { toId: string } | { toPoint: Point };
-type Chord = { from: Point; to: Point };
 
 type Props = {
   court: CourtType;
@@ -40,6 +40,7 @@ type Props = {
   tool: EditorTool;
   selection: Selection;
   onSelect: (selection: Selection) => void;
+  onPickSelect: () => void;
   onBeginEdit: () => void;
   onEndEdit: () => void;
   onMove: (id: string, x: number, y: number) => void;
@@ -53,9 +54,6 @@ type Props = {
 const SNAP_RADIUS = 6; // court units — drop an endpoint onto a nearby token
 const MIN_DRAW_LEN = 4; // court units — discard shorter drags
 const TOKEN_HIT_R = 5; // court units — the invisible grab circle
-const ROTATE_ARM = 9; // court units — rotation handle distance from the token
-const ACCENT = 'rgb(251 146 60)';
-const BALL = '#F97316';
 
 type Interaction =
   | { kind: 'move'; id: string; grab: Point; frame: number; last: Point }
@@ -65,7 +63,6 @@ type Interaction =
   | null;
 
 const clamp = (n: number) => Math.min(100, Math.max(0, n));
-const rad = (deg: number) => (deg * Math.PI) / 180;
 
 export function EditorStage({
   court,
@@ -74,6 +71,7 @@ export function EditorStage({
   tool,
   selection,
   onSelect,
+  onPickSelect,
   onBeginEdit,
   onEndEdit,
   onMove,
@@ -188,7 +186,13 @@ export function EditorStage({
         point.x - current.from.x,
         point.y - current.from.y,
       );
-      if (length < MIN_DRAW_LEN) return;
+      // a click (not a drag) on a token while a draw tool is active =
+      // select that player and drop back to the select tool
+      if (length < MIN_DRAW_LEN) {
+        onSelect({ kind: 'object', id: current.fromId });
+        onPickSelect();
+        return;
+      }
 
       const hit = nearestToken(
         point,
@@ -310,7 +314,7 @@ export function EditorStage({
               fill="transparent"
               style={{
                 pointerEvents: 'all',
-                cursor: drawing ? 'crosshair' : 'grab',
+                cursor: 'pointer',
               }}
               onPointerDown={startToken(object)}
             />
@@ -373,126 +377,5 @@ export function EditorStage({
         )}
       </svg>
     </div>
-  );
-}
-
-function ActionHandles({
-  action,
-  objects,
-  sy,
-  onBendPointerDown,
-  onDelete,
-}: {
-  action: Action;
-  objects: PlacedObject[];
-  sy: number;
-  onBendPointerDown: (event: React.PointerEvent, chord: Chord) => void;
-  onDelete: () => void;
-}) {
-  const chord = actionChord(action, objects);
-  const handle = bendHandle(action, objects);
-  if (!chord || !handle) return null;
-
-  return (
-    <>
-      <g
-        role="button"
-        aria-label="Bend route"
-        style={{ pointerEvents: 'all', cursor: 'grab' }}
-        onPointerDown={(event) => onBendPointerDown(event, chord)}
-      >
-        <circle cx={handle.x} cy={handle.y * sy} r={3} fill="transparent" />
-        <circle
-          cx={handle.x}
-          cy={handle.y * sy}
-          r={1}
-          fill={ACCENT}
-          stroke="white"
-          strokeWidth={0.3}
-          style={{ pointerEvents: 'none' }}
-        />
-      </g>
-      <DeleteControl
-        x={handle.x + 3}
-        y={handle.y * sy - 3}
-        onDelete={onDelete}
-      />
-    </>
-  );
-}
-
-function RotationHandle({
-  object,
-  sy,
-  onPointerDown,
-}: {
-  object: PlacedObject;
-  sy: number;
-  onPointerDown: (event: React.PointerEvent) => void;
-}) {
-  const facing = object.facing ?? 0;
-  const hx = object.x + Math.cos(rad(facing)) * ROTATE_ARM;
-  const hy = object.y + Math.sin(rad(facing)) * ROTATE_ARM;
-
-  return (
-    <>
-      <line
-        x1={object.x}
-        y1={object.y * sy}
-        x2={hx}
-        y2={hy * sy}
-        stroke={ACCENT}
-        strokeWidth={0.4}
-      />
-      <g
-        role="button"
-        aria-label="Rotate defender"
-        style={{ pointerEvents: 'all', cursor: 'grab' }}
-        onPointerDown={onPointerDown}
-      >
-        <circle cx={hx} cy={hy * sy} r={2.6} fill="transparent" />
-        <circle
-          cx={hx}
-          cy={hy * sy}
-          r={1.2}
-          fill={ACCENT}
-          stroke="white"
-          strokeWidth={0.3}
-          style={{ pointerEvents: 'none' }}
-        />
-      </g>
-    </>
-  );
-}
-
-function DeleteControl({
-  x,
-  y,
-  onDelete,
-}: {
-  x: number;
-  y: number;
-  onDelete: () => void;
-}) {
-  return (
-    <g
-      role="button"
-      aria-label="Delete"
-      transform={`translate(${x} ${y})`}
-      style={{ pointerEvents: 'all', cursor: 'pointer' }}
-      onPointerDown={(event) => {
-        event.stopPropagation();
-        onDelete();
-      }}
-    >
-      <circle r={3} fill="transparent" />
-      <circle r={1.1} fill="rgb(220 38 38)" />
-      <path
-        d="M-0.5 -0.5 L0.5 0.5 M-0.5 0.5 L0.5 -0.5"
-        stroke="white"
-        strokeWidth={0.4}
-        strokeLinecap="round"
-      />
-    </g>
   );
 }

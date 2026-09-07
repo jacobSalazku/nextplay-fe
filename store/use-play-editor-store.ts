@@ -23,13 +23,17 @@ export type EditorTool = 'select' | PlayActionType;
 export type Selection = { kind: 'object' | 'action'; id: string } | null;
 
 const MAX_ACTIONS = 30;
+const MAX_PHASES = 15;
 const HISTORY_CAP = 50;
 
 const newActionId = () => `a${Math.random().toString(36).slice(2, 9)}`;
+const newPhaseId = () => `p${Math.random().toString(36).slice(2, 9)}`;
+
+type Snapshot = { phases: Phase[]; activePhaseIndex: number };
 
 // Armed by beginEdit() on pointer-down and consumed by the first drag mutation,
 // so a whole drag is a single undo step. Module-level: the store is a singleton.
-let pendingSnapshot: Phase | null = null;
+let pendingSnapshot: Snapshot | null = null;
 
 type RosterCount = Record<PlayObjectKind, number>;
 
@@ -46,7 +50,8 @@ type PlayEditorState = {
   routeKey: string;
   name: string;
   court: CourtType;
-  phase: Phase;
+  phases: Phase[];
+  activePhaseIndex: number;
   rosterCount: RosterCount;
   // last known court spot per slot id — seeded from the formation, updated on
   // move, used to put a benched player back where they belong
@@ -54,8 +59,8 @@ type PlayEditorState = {
   tool: EditorTool;
   selection: Selection;
   isDirty: boolean;
-  history: Phase[];
-  future: Phase[];
+  history: Snapshot[];
+  future: Snapshot[];
 
   hydrate: (input: HydrateInput) => void;
   reset: () => void;
@@ -63,6 +68,10 @@ type PlayEditorState = {
   select: (selection: Selection) => void;
   beginEdit: () => void;
   endEdit: () => void;
+  addPhase: () => void;
+  deletePhase: (index: number) => void;
+  setActivePhase: (index: number) => void;
+  reorderPhase: (from: number, to: number) => void;
   moveObject: (id: string, x: number, y: number) => void;
   rotateObject: (id: string, facing: number) => void;
   benchObject: (id: string) => void;
@@ -87,15 +96,23 @@ const initialState = {
   routeKey: '',
   name: '',
   court: 'half' as CourtType,
-  phase: EMPTY_PHASE,
+  phases: [EMPTY_PHASE] as Phase[],
+  activePhaseIndex: 0,
   rosterCount: { offense: ROSTER_SIZE, defense: ROSTER_SIZE } as RosterCount,
   homes: {} as Record<string, Point>,
   tool: 'select' as EditorTool,
   selection: null as Selection,
   isDirty: false,
-  history: [] as Phase[],
-  future: [] as Phase[],
+  history: [] as Snapshot[],
+  future: [] as Snapshot[],
 };
+
+const activePhase = (s: Pick<PlayEditorState, 'phases' | 'activePhaseIndex'>) =>
+  s.phases[s.activePhaseIndex];
+
+const snapshotOf = (
+  s: Pick<PlayEditorState, 'phases' | 'activePhaseIndex'>,
+): Snapshot => ({ phases: s.phases, activePhaseIndex: s.activePhaseIndex });
 
 const patchById = <T extends { id: string }>(
   list: T[],
@@ -122,21 +139,23 @@ const rosterCountFor = (objects: PlacedObject[]): RosterCount => ({
 
 // Editor state for one play. A singleton, so `<PlayEditor>` hydrates it for the
 // current play and resets on unmount. In-flight save state lives with the
-// mutation hook, not here. One phase for now — the phase strip comes later.
+// mutation hook, not here. Multiple phases — the active one is being edited.
 export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
-  const clipHistory = (list: Phase[]) => list.slice(-HISTORY_CAP);
+  const clip = (list: Snapshot[]) => list.slice(-HISTORY_CAP);
 
-  // A discrete edit: snapshot the current phase, then apply.
+  // A discrete phase-content edit on the active phase.
   const commitPhase = (fn: (phase: Phase) => Phase) =>
     set((state) => ({
       isDirty: true,
-      history: clipHistory([...state.history, state.phase]),
+      history: clip([...state.history, snapshotOf(state)]),
       future: [],
-      phase: fn(state.phase),
+      phases: state.phases.map((p, i) =>
+        i === state.activePhaseIndex ? fn(p) : p,
+      ),
     }));
 
-  // A drag edit: the snapshot was armed by beginEdit(); commit it on the first
-  // mutation so the whole drag collapses to one undo step.
+  // A drag edit on the active phase; the snapshot was armed by beginEdit(), so
+  // the whole drag collapses to one undo step.
   const editPhase = (fn: (phase: Phase) => Phase) =>
     set((state) => {
       const armed = pendingSnapshot;
@@ -144,17 +163,40 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
       return {
         isDirty: true,
         ...(armed
-          ? { history: clipHistory([...state.history, armed]), future: [] }
+          ? { history: clip([...state.history, armed]), future: [] }
           : {}),
-        phase: fn(state.phase),
+        phases: state.phases.map((p, i) =>
+          i === state.activePhaseIndex ? fn(p) : p,
+        ),
       };
     });
+
+  // A discrete edit applied to every phase — roster membership is play-wide.
+  const editAllPhases = (fn: (phase: Phase) => Phase) =>
+    set((state) => ({
+      isDirty: true,
+      history: clip([...state.history, snapshotOf(state)]),
+      future: [],
+      phases: state.phases.map(fn),
+    }));
+
+  // A discrete edit to the phase list itself (add / delete / reorder).
+  const commitPhases = (nextPhases: Phase[], nextActive: number) =>
+    set((state) => ({
+      isDirty: true,
+      history: clip([...state.history, snapshotOf(state)]),
+      future: [],
+      phases: nextPhases,
+      activePhaseIndex: nextActive,
+      selection: null,
+    }));
 
   return {
     ...initialState,
 
     hydrate: ({ playId, routeKey, name, diagram }) => {
       pendingSnapshot = null;
+      const objects = diagram.phases[0].objects;
       set({
         ...initialState,
         hydrated: true,
@@ -162,10 +204,11 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
         routeKey,
         name,
         court: diagram.court,
-        phase: diagram.phases[0],
-        rosterCount: rosterCountFor(diagram.phases[0].objects),
+        phases: diagram.phases,
+        activePhaseIndex: 0,
+        rosterCount: rosterCountFor(objects),
         homes: Object.fromEntries(
-          diagram.phases[0].objects.map((o) => [o.id, { x: o.x, y: o.y }]),
+          objects.map((o) => [o.id, { x: o.x, y: o.y }]),
         ),
       });
     },
@@ -180,11 +223,55 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
     select: (selection) => set({ selection }),
 
     beginEdit: () => {
-      pendingSnapshot = get().phase;
+      pendingSnapshot = snapshotOf(get());
     },
 
     endEdit: () => {
       pendingSnapshot = null;
+    },
+
+    addPhase: () => {
+      const { phases } = get();
+      if (phases.length >= MAX_PHASES) return;
+      const prev = phases[phases.length - 1];
+      const next: Phase = {
+        id: newPhaseId(),
+        objects: prev.objects.map((o) => ({ ...o })),
+        actions: [],
+        ...(prev.ballHolderId ? { ballHolderId: prev.ballHolderId } : {}),
+      };
+      commitPhases([...phases, next], phases.length);
+    },
+
+    deletePhase: (index) => {
+      const { phases, activePhaseIndex } = get();
+      if (phases.length <= 1 || index < 0 || index >= phases.length) return;
+      const nextPhases = phases.filter((_, i) => i !== index);
+      const nextActive =
+        activePhaseIndex > index
+          ? activePhaseIndex - 1
+          : Math.min(activePhaseIndex, nextPhases.length - 1);
+      commitPhases(nextPhases, nextActive);
+    },
+
+    setActivePhase: (index) =>
+      set((state) => ({
+        activePhaseIndex: Math.max(0, Math.min(index, state.phases.length - 1)),
+        selection: null,
+      })),
+
+    reorderPhase: (from, to) => {
+      const { phases, activePhaseIndex } = get();
+      const last = phases.length - 1;
+      if (from === to || from < 0 || to < 0 || from > last || to > last) return;
+      const activeId = phases[activePhaseIndex].id;
+      const next = [...phases];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      commitPhases(
+        next,
+        next.findIndex((p) => p.id === activeId),
+      );
     },
 
     moveObject: (id, x, y) => {
@@ -202,8 +289,8 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
       })),
 
     benchObject: (id) => {
-      if (!get().phase.objects.some((o) => o.id === id)) return;
-      commitPhase((phase) => {
+      if (!activePhase(get()).objects.some((o) => o.id === id)) return;
+      editAllPhases((phase) => {
         const next: Phase = {
           ...phase,
           objects: phase.objects.filter((o) => o.id !== id),
@@ -221,13 +308,15 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
     },
 
     unbenchObject: (id) => {
-      if (get().phase.objects.some((o) => o.id === id)) return;
+      if (activePhase(get()).objects.some((o) => o.id === id)) return;
       const at = get().homes[id] ?? roleHome(id);
-      const object = makeSlotObject(slotKind(id), slotNumber(id), at);
       set((state) => ({ homes: { ...state.homes, [id]: at } }));
-      commitPhase((phase) => ({
+      editAllPhases((phase) => ({
         ...phase,
-        objects: [...phase.objects, object],
+        objects: [
+          ...phase.objects,
+          makeSlotObject(slotKind(id), slotNumber(id), at),
+        ],
       }));
     },
 
@@ -239,7 +328,7 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
     },
 
     matchManToMan: () => {
-      const { phase } = get();
+      const phase = activePhase(get());
       const offense = phase.objects.filter((o) => o.kind === 'offense');
       const onCourt = new Set(
         phase.objects.filter((o) => o.kind === 'defense').map((o) => o.id),
@@ -269,11 +358,14 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
           ...Object.fromEntries(added.map((d) => [d.id, { x: d.x, y: d.y }])),
         },
       }));
-      commitPhase((p) => ({ ...p, objects: [...p.objects, ...added] }));
+      editAllPhases((p) => ({
+        ...p,
+        objects: [...p.objects, ...added.map((d) => ({ ...d }))],
+      }));
     },
 
     setBallHolder: (id) => {
-      if (!get().phase.objects.some((o) => o.id === id)) return;
+      if (!activePhase(get()).objects.some((o) => o.id === id)) return;
       commitPhase((phase) =>
         phase.ballHolderId === id
           ? withoutBall(phase)
@@ -282,7 +374,7 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
     },
 
     addAction: (input) => {
-      if (get().phase.actions.length >= MAX_ACTIONS) return false;
+      if (activePhase(get()).actions.length >= MAX_ACTIONS) return false;
 
       const action: Action = { ...input, id: newActionId() };
       commitPhase((phase) => ({
@@ -316,24 +408,34 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
     },
 
     undo: () => {
-      const { history, phase, future } = get();
-      if (!history.length) return;
+      const state = get();
+      if (!state.history.length) return;
+      const prev = state.history[state.history.length - 1];
       set({
-        phase: history[history.length - 1],
-        history: history.slice(0, -1),
-        future: [phase, ...future].slice(0, HISTORY_CAP),
+        phases: prev.phases,
+        activePhaseIndex: Math.min(
+          prev.activePhaseIndex,
+          prev.phases.length - 1,
+        ),
+        history: state.history.slice(0, -1),
+        future: [snapshotOf(state), ...state.future].slice(0, HISTORY_CAP),
         isDirty: true,
         selection: null,
       });
     },
 
     redo: () => {
-      const { history, phase, future } = get();
-      if (!future.length) return;
+      const state = get();
+      if (!state.future.length) return;
+      const next = state.future[0];
       set({
-        phase: future[0],
-        history: clipHistory([...history, phase]),
-        future: future.slice(1),
+        phases: next.phases,
+        activePhaseIndex: Math.min(
+          next.activePhaseIndex,
+          next.phases.length - 1,
+        ),
+        history: clip([...state.history, snapshotOf(state)]),
+        future: state.future.slice(1),
         isDirty: true,
         selection: null,
       });
@@ -344,8 +446,8 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
     markSaved: () => set({ isDirty: false, history: [], future: [] }),
 
     toDiagram: () => {
-      const { court, phase } = get();
-      return { version: 1, court, phases: [phase], timeline: [] };
+      const { court, phases } = get();
+      return { version: 1, court, phases, timeline: [] };
     },
   };
 });
