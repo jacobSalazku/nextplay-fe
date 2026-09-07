@@ -1,6 +1,5 @@
 import {
   animationDurationMs,
-  easeInOutCubic,
   interpolateFrame,
   lerpAngle,
   phaseStartProgress,
@@ -107,14 +106,6 @@ describe('lerpAngle', () => {
   });
 });
 
-describe('easeInOutCubic', () => {
-  it('is pinned at the ends and passes through the middle', () => {
-    expect(easeInOutCubic(0)).toBe(0);
-    expect(easeInOutCubic(1)).toBe(1);
-    expect(easeInOutCubic(0.5)).toBeCloseTo(0.5);
-  });
-});
-
 describe('interpolateFrame', () => {
   const from = phase('p1', { objects: [obj('o1', 0), obj('o2', 100)] });
   const to = phase('p2', { objects: [obj('o1', 40), obj('o2', 100)] });
@@ -124,13 +115,10 @@ describe('interpolateFrame', () => {
       (o) => o.id === 'o1',
     )!;
 
-  it('holds at the start, moves through the middle, lands exactly at the end', () => {
+  it('runs at a steady linear pace and lands exactly at the end', () => {
     expect(o1At(0).x).toBe(0);
-
-    const mid = o1At(0.5).x;
-    expect(mid).toBeGreaterThan(0);
-    expect(mid).toBeLessThan(40);
-
+    expect(o1At(0.25).x).toBeCloseTo(10);
+    expect(o1At(0.5).x).toBeCloseTo(20);
     expect(o1At(1)).toMatchObject({ x: 40, y: 0 });
   });
 
@@ -190,8 +178,8 @@ describe('interpolateFrame', () => {
   });
 
   it('snaps a mover to the ends under reduced motion', () => {
-    expect([0, 40]).toContain(o1At(0.5, true).x);
-    expect([0, 40]).toContain(o1At(0.9, true).x);
+    expect(o1At(0.3, true).x).toBe(0);
+    expect(o1At(0.7, true).x).toBe(40);
   });
 
   it('still cross-fades a benched player under reduced motion', () => {

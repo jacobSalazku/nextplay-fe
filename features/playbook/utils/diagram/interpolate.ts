@@ -1,12 +1,10 @@
 import { actionEndpoints, bezierPoint } from './geometry';
 import type { Action, Phase, PlacedObject, Point } from './types';
 
-// Every transition opens with a short hold on the 'from' pose so the eye
-// registers the keyframe, then the move plays out.
-const HOLD_MS = 280;
+// The move time for a transition with no explicit step timeline.
+const DEFAULT_SEGMENT_MS = 900;
 
-const DEFAULT_MOVE_MS = 820;
-
+// Being the subject of one of these in a step puts a player on that step's beat.
 const MOVE_ACTIONS: ReadonlySet<Action['type']> = new Set([
   'cut',
   'dribble',
@@ -18,9 +16,6 @@ const BALL_ACTIONS: ReadonlySet<Action['type']> = new Set(['pass', 'handoff']);
 
 const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
 
-export const easeInOutCubic = (t: number) =>
-  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 export const lerpPoint = (a: Point, b: Point, t: number): Point => ({
@@ -28,28 +23,28 @@ export const lerpPoint = (a: Point, b: Point, t: number): Point => ({
   y: lerp(a.y, b.y, t),
 });
 
+// shortest way round the circle, in degrees
 export const lerpAngle = (a: number, b: number, t: number) => {
   const d = ((((b - a) % 360) + 540) % 360) - 180;
   return a + d * t;
 };
 
-// The move time of the transition leaving `from` — the sum of its step
-// durations, or the default when it has no timeline.
-const segmentMoveMs = (from: Phase) =>
+// How long the transition leaving `from` runs — the sum of its step durations,
+// or the default when it has no timeline. There is no pause between steps or
+// phases: playback runs at a steady pace start to finish.
+const segmentMs = (from: Phase) =>
   from.steps && from.steps.length > 0
     ? from.steps.reduce((sum, s) => sum + s.durationMs, 0)
-    : DEFAULT_MOVE_MS;
-
-const segmentDurationMs = (from: Phase) => HOLD_MS + segmentMoveMs(from);
+    : DEFAULT_SEGMENT_MS;
 
 export const animationDurationMs = (phases: Phase[]) =>
-  phases.slice(0, -1).reduce((sum, from) => sum + segmentDurationMs(from), 0);
+  phases.slice(0, -1).reduce((sum, from) => sum + segmentMs(from), 0);
 
 // The 0..1 progress at which the transition leaving phase `index` begins — the
 // last phase maps to the very end.
 export function phaseStartProgress(phases: Phase[], index: number): number {
   if (phases.length < 2 || index <= 0) return 0;
-  const durations = phases.slice(0, -1).map(segmentDurationMs);
+  const durations = phases.slice(0, -1).map(segmentMs);
   const total = durations.reduce((sum, d) => sum + d, 0);
   if (total === 0) return 0;
   const before = durations.slice(0, index).reduce((sum, d) => sum + d, 0);
@@ -64,7 +59,7 @@ export type FrameSlice = { fromIndex: number; toIndex: number; t: number };
 export function resolveFrame(phases: Phase[], progress: number): FrameSlice {
   if (phases.length < 2) return { fromIndex: 0, toIndex: 0, t: 0 };
 
-  const durations = phases.slice(0, -1).map(segmentDurationMs);
+  const durations = phases.slice(0, -1).map(segmentMs);
   const total = durations.reduce((sum, d) => sum + d, 0);
   const target = clamp01(progress) * total;
 
@@ -122,7 +117,7 @@ function lerpFacing(a?: number, b?: number, t = 0): number | undefined {
 function stepWindow(
   from: Phase,
   matches: (action: Action) => boolean,
-  moveMs: number,
+  totalMs: number,
 ): { pre: number; d: number } {
   let pre = 0;
   let found: { pre: number; d: number } | null = null;
@@ -136,11 +131,11 @@ function stepWindow(
     pre += step.durationMs;
   }
 
-  return found ?? { pre: 0, d: moveMs };
+  return found ?? { pre: 0, d: totalMs };
 }
 
-// Eased 0..1 for a mover, given how many ms into the move sequence we are and
-// which slice of it belongs to that mover. `reduce` snaps it for minimised
+// Linear 0..1 for a mover, given how many ms into the transition we are and
+// which slice of it is that mover's beat. `reduce` snaps it for minimised
 // motion.
 function beatProgress(
   activeMs: number,
@@ -148,8 +143,7 @@ function beatProgress(
   reduce: boolean,
 ): number {
   const local = window.d > 0 ? clamp01((activeMs - window.pre) / window.d) : 1;
-  if (reduce) return local < 0.5 ? 0 : 1;
-  return easeInOutCubic(local);
+  return reduce ? (local < 0.5 ? 0 : 1) : local;
 }
 
 export function interpolateFrame(
@@ -161,12 +155,8 @@ export function interpolateFrame(
   const from = phases[fromIndex];
   const to = phases[toIndex];
 
-  const moveMs = segmentMoveMs(from);
-  // ms into the move sequence: the leading hold is spent first
-  const activeMs = Math.min(
-    moveMs,
-    Math.max(0, t * segmentDurationMs(from) - HOLD_MS),
-  );
+  const totalMs = segmentMs(from);
+  const activeMs = clamp01(t) * totalMs;
 
   const at = (phase: Phase, id: string) =>
     phase.objects.find((o) => o.id === id) ?? null;
@@ -184,7 +174,7 @@ export function interpolateFrame(
       const window = stepWindow(
         from,
         (action) => action.fromId === id && MOVE_ACTIONS.has(action.type),
-        moveMs,
+        totalMs,
       );
       const p = beatProgress(activeMs, window, reduce);
       const path = soloPath(from, id);
@@ -209,7 +199,7 @@ export function interpolateFrame(
     toIndex,
     t,
     objects,
-    ball: ball(from, to, activeMs, moveMs, reduce, objects),
+    ball: ball(from, to, activeMs, totalMs, reduce, objects),
   };
 }
 
@@ -217,7 +207,7 @@ function ball(
   from: Phase,
   to: Phase,
   activeMs: number,
-  moveMs: number,
+  totalMs: number,
   reduce: boolean,
   objects: FrameObject[],
 ): Point | null {
@@ -246,7 +236,7 @@ function ball(
     const window = stepWindow(
       from,
       (action) => pass != null && action.id === pass.id,
-      moveMs,
+      totalMs,
     );
     const p = beatProgress(activeMs, window, reduce);
     const ends = pass && actionEndpoints(pass, from.objects);
