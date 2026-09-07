@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import type { Category } from '@/graphql/graphql';
 import { useConfirm } from '@/components/feedback/confirm-provider';
 import { Button } from '@/components/foundation/button/button';
+import { AnimateView } from './animate/animate-view';
 import { BreakdownView } from './breakdown/breakdown-view';
 import { EditorStage } from './editor-stage';
 import { ModeTabs, type EditorMode } from './mode-tabs';
@@ -272,6 +273,8 @@ export function PlayEditor({
           onEditStart={beginEdit}
           onEditEnd={endEdit}
         />
+      ) : mode === 'animate' ? (
+        <AnimateView court={court} phases={phases} />
       ) : (
         <div className="flex flex-1 flex-col gap-2 overflow-hidden p-2 lg:flex-row">
           <div className="flex min-h-0 flex-1 flex-col gap-2">

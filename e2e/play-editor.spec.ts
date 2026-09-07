@@ -216,6 +216,59 @@ test.describe('play editor flow', () => {
     expect(await pos(token())).toEqual(p2Pos);
   });
 
+  test('animate: playing moves a token, scrubbing is deterministic', async ({
+    page,
+  }) => {
+    // Arrange — two phases with player 1 in a different spot in each
+    await newPlay(page);
+    const token = () => page.getByRole('button', { name: 'Move player 1' });
+    await page.getByRole('button', { name: 'Add phase' }).click();
+    await drag(page, token(), { x: 520, y: 260 });
+
+    await page.getByRole('tab', { name: 'Animate' }).click();
+    // the moving token layer, order-stable, so we can compare whole frames
+    const layout = () =>
+      page
+        .locator('svg[aria-label^="Play animation"] [data-object-id]')
+        .evaluateAll((els) =>
+          els.map((el) => el.getAttribute('transform')).join('|'),
+        );
+    await expect(
+      page.locator('svg[aria-label^="Play animation"]'),
+    ).toBeVisible();
+    const at0 = await layout();
+    const slider = page.getByRole('slider', { name: 'Timeline' });
+    // native setter + input event, so React's onChange fires like a real drag
+    const scrub = (value: number) =>
+      slider.evaluate((el, v) => {
+        const setter = Object.getOwnPropertyDescriptor(
+          window.HTMLInputElement.prototype,
+          'value',
+        )!.set!;
+        setter.call(el, String(v));
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+      }, value);
+
+    // Act — play
+    await page.getByRole('button', { name: 'Play', exact: true }).click();
+
+    // Assert — the frame changes and the timeline advances
+    await expect.poll(layout).not.toBe(at0);
+    await expect
+      .poll(async () => Number(await slider.inputValue()))
+      .toBeGreaterThan(0);
+
+    // Act — stop, then scrub to the end and back to the start
+    const pause = page.getByRole('button', { name: 'Pause', exact: true });
+    if (await pause.count()) await pause.click();
+
+    await scrub(1);
+    await expect.poll(layout).not.toBe(at0);
+
+    await scrub(0);
+    await expect.poll(layout).toBe(at0);
+  });
+
   test('warns before leaving with unsaved changes', async ({ page }) => {
     // Arrange — a fresh play with one dragged (unsaved) player
     await newPlay(page);

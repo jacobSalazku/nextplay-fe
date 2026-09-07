@@ -291,6 +291,20 @@ describe('PlayEditor — breakdown', () => {
   });
 });
 
+describe('PlayEditor — animate', () => {
+  it('opens the Animate tab and prompts for a second phase', async () => {
+    // Arrange
+    const user = userEvent.setup();
+    renderEditor();
+
+    // Act
+    await user.click(screen.getByRole('tab', { name: 'Animate' }));
+
+    // Assert — the seed play has one phase, so there is nothing to animate yet
+    expect(screen.getByText(/add a second phase/i)).toBeInTheDocument();
+  });
+});
+
 describe('PlayEditor — rename', () => {
   it('renames the play from the header title', async () => {
     // Arrange
