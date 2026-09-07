@@ -11,13 +11,12 @@ const TABS = [
   { value: 'breakdown', label: 'Breakdown', icon: MessageSquare },
 ] as const;
 
-export function ModeTabs({
-  mode,
-  onChange,
-}: {
+type ModeTabsProps = {
   mode: EditorMode;
   onChange: (mode: EditorMode) => void;
-}) {
+};
+
+export function ModeTabs({ mode, onChange }: ModeTabsProps) {
   return (
     <div
       role="tablist"

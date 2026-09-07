@@ -9,19 +9,19 @@ const CATEGORIES: { value: Category; label: string }[] = [
   { value: Category.Defensive, label: 'Defense' },
   { value: Category.Special, label: 'Special' },
 ];
+type PlayMetaProps = {
+  name: string;
+  category: Category;
+  onRename: (name: string) => void;
+  onCategoryChange: (category: Category) => void;
+};
 
-// Play-level metadata on the Breakdown screen: title + category.
 export function PlayMeta({
   name,
   category,
   onRename,
   onCategoryChange,
-}: {
-  name: string;
-  category: Category;
-  onRename: (name: string) => void;
-  onCategoryChange: (category: Category) => void;
-}) {
+}: PlayMetaProps) {
   const [draft, setDraft] = useState(name);
 
   const commit = () => {

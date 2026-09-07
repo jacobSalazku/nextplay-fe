@@ -113,6 +113,31 @@ test.describe('play editor flow', () => {
     await expect(overlayPaths).toHaveCount(0);
   });
 
+  test('breakdown: set a category and a phase note, and they persist', async ({
+    page,
+  }) => {
+    // Arrange
+    await newPlay(page);
+    await page.getByRole('tab', { name: 'Breakdown' }).click();
+
+    // Act — pick a category and write a note
+    await page.getByRole('button', { name: 'Defense' }).click();
+    await page.getByLabel('Phase 1 note').fill('Punch it inside to the 5.');
+    await page.getByRole('button', { name: /save/i }).click();
+    await expect(page.getByRole('button', { name: /save/i })).toBeDisabled();
+
+    // Assert — both survive a reload
+    await page.reload();
+    await page.getByRole('tab', { name: 'Breakdown' }).click();
+    await expect(page.getByRole('button', { name: 'Defense' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await expect(page.getByLabel('Phase 1 note')).toHaveValue(
+      'Punch it inside to the 5.',
+    );
+  });
+
   test('match man-to-man, give the ball, bench a player, and undo', async ({
     page,
   }) => {
