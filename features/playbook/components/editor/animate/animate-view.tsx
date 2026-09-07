@@ -22,7 +22,7 @@ export function AnimateView({ court, phases }: Props) {
   const [loop, setLoop] = useState(false);
   const reduce = useReducedMotion();
 
-  const durationMs = animationDurationMs(phases.length) / speed;
+  const durationMs = animationDurationMs(phases) / speed;
   const { progress, playing, toggle, seek, restart } = useAnimationClock({
     durationMs,
     loop,
