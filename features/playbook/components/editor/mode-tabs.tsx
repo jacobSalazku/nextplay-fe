@@ -3,13 +3,13 @@
 import { cn } from '@/utils/tw-merge';
 import { MessageSquare, Pencil, Play } from 'lucide-react';
 
-export type EditorMode = 'draw' | 'breakdown';
+export type EditorMode = 'draw' | 'animate' | 'breakdown';
 
-const TABS = [
+const TABS: { value: EditorMode; label: string; icon: typeof Pencil }[] = [
   { value: 'draw', label: 'Draw', icon: Pencil },
-  { value: 'animate', label: 'Animate', icon: Play, disabled: true },
+  { value: 'animate', label: 'Animate', icon: Play },
   { value: 'breakdown', label: 'Breakdown', icon: MessageSquare },
-] as const;
+];
 
 type ModeTabsProps = {
   mode: EditorMode;
@@ -23,31 +23,24 @@ export function ModeTabs({ mode, onChange }: ModeTabsProps) {
       aria-label="Editor mode"
       className="flex rounded-lg border border-white/10 bg-slate-900 p-0.5"
     >
-      {TABS.map(({ value, label, icon: Icon, ...rest }) => {
-        const disabled = 'disabled' in rest && rest.disabled;
-        return (
-          <button
-            key={value}
-            type="button"
-            role="tab"
-            aria-selected={mode === value}
-            disabled={disabled}
-            onClick={() => !disabled && onChange(value as EditorMode)}
-            className={cn(
-              'flex items-center gap-1.5 rounded-md px-3 py-1 text-sm transition',
-              mode === value
-                ? 'bg-slate-700 text-white'
-                : 'text-gray-400 hover:text-white',
-              disabled
-                ? 'cursor-not-allowed opacity-40 hover:text-gray-400'
-                : 'cursor-pointer',
-            )}
-          >
-            <Icon className="h-3.5 w-3.5" />
-            {label}
-          </button>
-        );
-      })}
+      {TABS.map(({ value, label, icon: Icon }) => (
+        <button
+          key={value}
+          type="button"
+          role="tab"
+          aria-selected={mode === value}
+          onClick={() => onChange(value)}
+          className={cn(
+            'flex cursor-pointer items-center gap-1.5 rounded-md px-3 py-1 text-sm transition',
+            mode === value
+              ? 'bg-slate-700 text-white'
+              : 'text-gray-400 hover:text-white',
+          )}
+        >
+          <Icon className="h-3.5 w-3.5" />
+          {label}
+        </button>
+      ))}
     </div>
   );
 }
