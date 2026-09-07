@@ -5,7 +5,18 @@ import type { Category } from '@/graphql/graphql';
 import { PhaseNoteCard } from './phase-note-card';
 import { PlayMeta } from './play-meta';
 
-// The Breakdown tab: play metadata + a note per phase.
+type BreakdownProps = {
+  name: string;
+  category: Category;
+  court: CourtType;
+  phases: Phase[];
+  onRename: (name: string) => void;
+  onCategoryChange: (category: Category) => void;
+  onNoteChange: (index: number, note: string) => void;
+  onEditStart: () => void;
+  onEditEnd: () => void;
+};
+
 export function BreakdownView({
   name,
   category,
@@ -16,17 +27,7 @@ export function BreakdownView({
   onNoteChange,
   onEditStart,
   onEditEnd,
-}: {
-  name: string;
-  category: Category;
-  court: CourtType;
-  phases: Phase[];
-  onRename: (name: string) => void;
-  onCategoryChange: (category: Category) => void;
-  onNoteChange: (index: number, note: string) => void;
-  onEditStart: () => void;
-  onEditEnd: () => void;
-}) {
+}: BreakdownProps) {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 overflow-y-auto p-4">
       <PlayMeta

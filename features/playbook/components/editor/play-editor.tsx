@@ -7,12 +7,14 @@ import { useUpdatePlay } from '@/features/playbook/hooks/play/use-update-play';
 import type { PlayDiagram } from '@/features/playbook/utils/diagram/types';
 import { isTypingTarget } from '@/features/playbook/utils/editor/keyboard';
 import { usePlayEditorStore } from '@/store/use-play-editor-store';
-import type { Category } from '@/graphql/graphql';
 import { ArrowLeft, Pencil, Redo2, Save, Undo2 } from 'lucide-react';
 import { toast } from 'sonner';
+import type { Category } from '@/graphql/graphql';
 import { useConfirm } from '@/components/feedback/confirm-provider';
 import { Button } from '@/components/foundation/button/button';
+import { BreakdownView } from './breakdown/breakdown-view';
 import { EditorStage } from './editor-stage';
+import { ModeTabs, type EditorMode } from './mode-tabs';
 import { PhaseStrip } from './phase-strip';
 import { RosterPanel } from './roster-panel';
 import { ToolDock } from './tool-dock';
@@ -25,10 +27,29 @@ type Props = {
   diagram: PlayDiagram;
 };
 
-export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
+export function PlayEditor({
+  playId,
+  routeKey,
+  name,
+  category: initialCategory,
+  diagram,
+}: Props) {
   const router = useRouter();
   const confirm = useConfirm();
-  const { savePlay, isSaving, renamePlay } = useUpdatePlay(routeKey, playId);
+  const { savePlay, isSaving, renamePlay, setPlayCategory } = useUpdatePlay(
+    routeKey,
+    playId,
+  );
+
+  const [mode, setMode] = useState<EditorMode>('draw');
+
+  // category is play metadata, written immediately (not with the diagram save);
+  // optimistic locally, rolled back on failure.
+  const [category, setCategory] = useState(initialCategory);
+  const changeCategory = (next: Category) => {
+    setCategory(next);
+    setPlayCategory(next).catch(() => setCategory(initialCategory));
+  };
 
   // Load this play into the singleton store. The initializer hydrates before
   // the first paint (no empty flash); the effect re-hydrates only if the store
@@ -74,6 +95,7 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
   const addAction = usePlayEditorStore((s) => s.addAction);
   const updateAction = usePlayEditorStore((s) => s.updateAction);
   const deleteAction = usePlayEditorStore((s) => s.deleteAction);
+  const setPhaseNote = usePlayEditorStore((s) => s.setPhaseNote);
   const undo = usePlayEditorStore((s) => s.undo);
   const redo = usePlayEditorStore((s) => s.redo);
   const markSaved = usePlayEditorStore((s) => s.markSaved);
@@ -169,8 +191,8 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
 
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-slate-950 text-white">
-      <header className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
-        <div className="flex min-w-0 items-center gap-3">
+      <header className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <Button
             variant="close"
             className="text-gray-200 hover:bg-white/10 hover:text-white"
@@ -205,7 +227,10 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
             )}
           </h1>
         </div>
-        <div className="flex items-center gap-2">
+
+        <ModeTabs mode={mode} onChange={setMode} />
+
+        <div className="flex flex-1 items-center justify-end gap-2">
           <Button
             variant="close"
             className="text-gray-200 hover:bg-white/10 hover:text-white disabled:text-gray-600"
@@ -235,54 +260,68 @@ export function PlayEditor({ playId, routeKey, name, diagram }: Props) {
         </div>
       </header>
 
-      <div className="flex flex-1 flex-col gap-2 overflow-hidden p-2 lg:flex-row">
-        <div className="flex min-h-0 flex-1 flex-col gap-2">
-          <div className="flex min-h-0 flex-1 items-center justify-center">
-            <EditorStage
-              court={court}
-              phase={phase}
-              ballHolderId={phase.ballHolderId}
-              tool={tool}
-              selection={selection}
-              onSelect={select}
-              onPickSelect={() => setTool('select')}
-              onDraw={draw}
-              onBeginEdit={beginEdit}
-              onEndEdit={endEdit}
-              onMove={moveObject}
-              onBend={(id, bend) => updateAction(id, { bend })}
-              onRotate={rotateObject}
-              onSetBall={setBallHolder}
-              onDelete={deleteSelection}
-            />
-          </div>
-          <div className="flex shrink-0 flex-wrap items-center justify-between gap-3">
-            <ToolDock tool={tool} onToolChange={setTool} />
-            <PhaseStrip
-              phases={phases}
-              court={court}
-              activeIndex={activePhaseIndex}
-              onSelect={setActivePhase}
-              onAdd={addPhase}
-              onDelete={deletePhase}
-              onReorder={reorderPhase}
-            />
-          </div>
-        </div>
-
-        <RosterPanel
-          objects={phase.objects}
-          rosterCount={rosterCount}
-          ballHolderId={phase.ballHolderId}
-          selectedId={selection?.kind === 'object' ? selection.id : null}
-          onBench={benchObject}
-          onUnbench={unbenchObject}
-          onAddSlot={addSlot}
-          onMatchManToMan={matchManToMan}
-          onSetBall={setBallHolder}
-          onSelect={(id) => select({ kind: 'object', id })}
+      {mode === 'breakdown' ? (
+        <BreakdownView
+          name={name}
+          category={category}
+          court={court}
+          phases={phases}
+          onRename={(next) => renamePlay(next).catch(() => {})}
+          onCategoryChange={changeCategory}
+          onNoteChange={setPhaseNote}
+          onEditStart={beginEdit}
+          onEditEnd={endEdit}
         />
-      </div>
+      ) : (
+        <div className="flex flex-1 flex-col gap-2 overflow-hidden p-2 lg:flex-row">
+          <div className="flex min-h-0 flex-1 flex-col gap-2">
+            <div className="flex min-h-0 flex-1 items-center justify-center">
+              <EditorStage
+                court={court}
+                phase={phase}
+                ballHolderId={phase.ballHolderId}
+                tool={tool}
+                selection={selection}
+                onSelect={select}
+                onPickSelect={() => setTool('select')}
+                onDraw={draw}
+                onBeginEdit={beginEdit}
+                onEndEdit={endEdit}
+                onMove={moveObject}
+                onBend={(id, bend) => updateAction(id, { bend })}
+                onRotate={rotateObject}
+                onSetBall={setBallHolder}
+                onDelete={deleteSelection}
+              />
+            </div>
+            <div className="flex shrink-0 flex-wrap items-center justify-between gap-3">
+              <ToolDock tool={tool} onToolChange={setTool} />
+              <PhaseStrip
+                phases={phases}
+                court={court}
+                activeIndex={activePhaseIndex}
+                onSelect={setActivePhase}
+                onAdd={addPhase}
+                onDelete={deletePhase}
+                onReorder={reorderPhase}
+              />
+            </div>
+          </div>
+
+          <RosterPanel
+            objects={phase.objects}
+            rosterCount={rosterCount}
+            ballHolderId={phase.ballHolderId}
+            selectedId={selection?.kind === 'object' ? selection.id : null}
+            onBench={benchObject}
+            onUnbench={unbenchObject}
+            onAddSlot={addSlot}
+            onMatchManToMan={matchManToMan}
+            onSetBall={setBallHolder}
+            onSelect={(id) => select({ kind: 'object', id })}
+          />
+        </div>
+      )}
     </div>
   );
 }

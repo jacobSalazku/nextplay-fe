@@ -3,7 +3,15 @@
 import { CourtDiagram } from '@/features/playbook/components/diagram/court-diagram';
 import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
 
-// One phase in the Breakdown list: its diagram and an editable note.
+type PhaseNoteCardProps = {
+  index: number;
+  phase: Phase;
+  court: CourtType;
+  onNoteChange: (index: number, note: string) => void;
+  onEditStart: () => void;
+  onEditEnd: () => void;
+};
+
 export function PhaseNoteCard({
   index,
   phase,
@@ -11,14 +19,7 @@ export function PhaseNoteCard({
   onNoteChange,
   onEditStart,
   onEditEnd,
-}: {
-  index: number;
-  phase: Phase;
-  court: CourtType;
-  onNoteChange: (index: number, note: string) => void;
-  onEditStart: () => void;
-  onEditEnd: () => void;
-}) {
+}: PhaseNoteCardProps) {
   return (
     <div className="flex gap-4 rounded-xl border border-white/10 bg-slate-900/40 p-4">
       <div className="w-36 shrink-0">
