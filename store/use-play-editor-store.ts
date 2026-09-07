@@ -416,10 +416,26 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
       if (activePhase(get()).actions.length >= MAX_ACTIONS) return false;
 
       const action: Action = { ...input, id: newActionId() };
+      const index = get().activePhaseIndex;
+      // a pass / handoff from whoever holds the ball moves possession to the
+      // receiver by the next phase — one commit, so undo reverts both
+      const handsOff =
+        (action.type === 'pass' || action.type === 'handoff') &&
+        action.toId != null &&
+        get().phases[index].ballHolderId === action.fromId &&
+        index + 1 < get().phases.length;
+
       commitPhase((phase) => ({
         ...phase,
         actions: [...phase.actions, action],
       }));
+      if (handsOff) {
+        set((state) => ({
+          phases: state.phases.map((phase, i) =>
+            i === index + 1 ? { ...phase, ballHolderId: action.toId } : phase,
+          ),
+        }));
+      }
       set({ selection: { kind: 'action', id: action.id } });
       return true;
     },

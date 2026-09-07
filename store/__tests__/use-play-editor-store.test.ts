@@ -95,6 +95,26 @@ describe('usePlayEditorStore', () => {
     expect(store().isDirty).toBe(true);
   });
 
+  it('moves possession to the receiver a phase later when a pass is drawn', () => {
+    // Arrange — o1 has the ball, and there is a next phase
+    hydrate();
+    store().setBallHolder('o1');
+    store().addPhase();
+    store().setActivePhase(0);
+
+    // Act
+    store().addAction({ type: 'pass', fromId: 'o1', toId: 'o2' });
+
+    // Assert — phase 1 keeps o1, phase 2 now has o2
+    expect(store().phases[0].ballHolderId).toBe('o1');
+    expect(store().phases[1].ballHolderId).toBe('o2');
+
+    // and it is one undo step
+    store().undo();
+    expect(store().phases[0].actions).toHaveLength(0);
+    expect(store().phases[1].ballHolderId).toBe('o1');
+  });
+
   it('refuses a 31st action', () => {
     // Arrange
     hydrate();
