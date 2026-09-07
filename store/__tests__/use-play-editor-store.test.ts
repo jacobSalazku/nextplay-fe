@@ -339,7 +339,6 @@ describe('usePlayEditorStore', () => {
     hydrate();
     store().moveObject('o1', 11, 22);
     store().setBallHolder('o1');
-    store().addAction({ type: 'pass', fromId: 'o1', toId: 'o2' });
 
     // Act
     store().addPhase();
@@ -353,9 +352,20 @@ describe('usePlayEditorStore', () => {
     });
     expect(phase().actions).toHaveLength(0);
     expect(phase().ballHolderId).toBe('o1');
+  });
 
-    // and the first phase is untouched
-    expect(store().phases[0].actions).toHaveLength(1);
+  it('opens the new phase with the receiver holding it after a pass', () => {
+    // Arrange — o1 has the ball and passes to o2 in phase 1
+    hydrate();
+    store().setBallHolder('o1');
+    store().addAction({ type: 'pass', fromId: 'o1', toId: 'o2' });
+
+    // Act
+    store().addPhase();
+
+    // Assert
+    expect(store().phases[0].ballHolderId).toBe('o1');
+    expect(phase().ballHolderId).toBe('o2');
   });
 
   it('edits only the active phase', () => {

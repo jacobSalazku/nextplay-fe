@@ -253,11 +253,23 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
       const { phases } = get();
       if (phases.length >= MAX_PHASES) return;
       const prev = phases[phases.length - 1];
+      // if the previous phase passes the ball off, the new phase opens with the
+      // receiver holding it
+      const passOut =
+        prev.ballHolderId != null
+          ? prev.actions.find(
+              (a) =>
+                (a.type === 'pass' || a.type === 'handoff') &&
+                a.fromId === prev.ballHolderId &&
+                a.toId != null,
+            )
+          : undefined;
+      const holder = passOut?.toId ?? prev.ballHolderId;
       const next: Phase = {
         id: newPhaseId(),
         objects: prev.objects.map((o) => ({ ...o })),
         actions: [],
-        ...(prev.ballHolderId ? { ballHolderId: prev.ballHolderId } : {}),
+        ...(holder ? { ballHolderId: holder } : {}),
       };
       commitPhases([...phases, next], phases.length);
     },
