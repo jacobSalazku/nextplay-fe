@@ -265,6 +265,20 @@ describe('interpolateFrame', () => {
     expect(interpolateFrame([from, to], 0.5).ball).toBeNull();
   });
 
+  it('flies the ball to the rim on a shot', () => {
+    const a = phase('p1', {
+      objects: [obj('o1', 20, 80)],
+      ballHolderId: 'o1',
+      actions: [
+        { id: 's1', type: 'shot', fromId: 'o1', toPoint: { x: 50, y: 10 } },
+      ],
+    });
+    const b = phase('p2', { objects: [obj('o1', 20, 80)] });
+
+    expect(interpolateFrame([a, b], 0.1).ball!.y).toBeGreaterThan(50); // still near the shooter
+    expect(interpolateFrame([a, b], 1).ball).toMatchObject({ x: 50, y: 10 });
+  });
+
   it('draws each route in step with its beat', () => {
     const a = phase('p1', {
       objects: [obj('o1', 0), obj('o2', 0, 50)],

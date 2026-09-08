@@ -317,6 +317,18 @@ function ball(
     return o ? { x: o.x, y: o.y } : null;
   };
 
+  // a shot from the current holder — the ball flies to where it was aimed
+  if (a != null) {
+    const shot = from.actions.find(
+      (action) => action.fromId === a && action.type === 'shot',
+    );
+    const ends = shot && actionEndpoints(shot, from.objects);
+    if (shot && ends) {
+      const window = stepWindow(from, (x) => x.id === shot.id, totalMs);
+      return followWarped(ends, ends.b, beatProgress(activeMs, window, reduce));
+    }
+  }
+
   if (a != null && a === b) return framePos(a);
 
   if (a != null && b != null) {
