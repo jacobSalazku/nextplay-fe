@@ -309,10 +309,10 @@ export function PlayEditor({
                 onDelete={deleteSelection}
               />
             </div>
-            <div className="flex shrink-0 items-center gap-3 overflow-x-auto rounded-2xl bg-[#faf6ec] px-3 py-2.5 shadow-lg shadow-black/20">
+            <div className="flex shrink-0 items-center gap-3 rounded-2xl bg-[#faf6ec] px-3 py-1.5 shadow-lg shadow-black/20">
               <ToolDock tool={tool} onToolChange={setTool} />
-              <div className="h-9 w-px shrink-0 bg-[#e0d5bb]" />
-              <div className="min-w-4 flex-1" />
+              <div className="h-8 w-px shrink-0 bg-[#e0d5bb]" />
+              <div className="min-w-0 flex-1" />
               <PhaseStrip
                 phases={phases}
                 court={court}

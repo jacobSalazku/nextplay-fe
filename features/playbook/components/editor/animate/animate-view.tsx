@@ -88,7 +88,7 @@ export function AnimateView({
         court={court}
         activeIndex={activeIndex}
         onSelect={selectPhase}
-        className="w-40"
+        className="w-52"
       />
 
       <div className="flex min-w-0 flex-1 flex-col gap-3">

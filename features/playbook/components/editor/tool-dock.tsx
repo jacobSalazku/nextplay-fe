@@ -69,7 +69,7 @@ export function ToolDock({
     <div
       role="toolbar"
       aria-label="Drawing tools"
-      className="flex items-center"
+      className="flex shrink-0 items-center"
     >
       <button
         type="button"
@@ -78,7 +78,7 @@ export function ToolDock({
         title="Select (V)"
         onClick={() => onToolChange('select')}
         className={cn(
-          'flex shrink-0 cursor-pointer flex-col items-center gap-1 rounded-xl px-4 py-2 text-xs font-semibold transition',
+          'flex shrink-0 cursor-pointer flex-col items-center gap-0.5 rounded-lg px-3.5 py-1 text-xs font-semibold transition',
           tool === 'select'
             ? 'bg-[#1f2d4d] text-white'
             : 'text-[#1f2d4d] hover:bg-black/5',
@@ -88,7 +88,7 @@ export function ToolDock({
         Select
       </button>
 
-      <div className="mx-2 h-9 w-px bg-[#e0d5bb]" />
+      <div className="mx-1.5 h-8 w-px bg-[#e0d5bb]" />
 
       <div className="flex items-center gap-0.5">
         {DRAW_TOOLS.map(({ tool: value, label, icon: Icon, shortcut }) => (
@@ -100,7 +100,7 @@ export function ToolDock({
             title={`${label} (${shortcut})`}
             onClick={() => onToolChange(value)}
             className={cn(
-              'flex shrink-0 cursor-pointer flex-col items-center gap-1 rounded-xl px-3 py-2 text-xs transition',
+              'flex shrink-0 cursor-pointer flex-col items-center gap-0.5 rounded-lg px-2.5 py-1 text-xs transition',
               tool === value
                 ? 'bg-[#1f2d4d]/10 font-semibold text-[#1f2d4d]'
                 : 'text-[#a89372] hover:bg-black/5',

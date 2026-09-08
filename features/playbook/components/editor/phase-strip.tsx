@@ -71,7 +71,7 @@ export function PhaseStrip({
       ref={rowRef}
       role="tablist"
       aria-label="Phases"
-      className="flex items-center gap-2 overflow-x-auto"
+      className="flex min-w-0 items-center gap-2 overflow-x-auto"
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={() => setDrag(null)}
@@ -103,7 +103,7 @@ export function PhaseStrip({
             <PhaseThumbnail
               court={court}
               phase={phase}
-              className="pointer-events-none block w-full"
+              className="pointer-events-none block aspect-[3/2] w-full"
             />
             <span className="absolute bottom-0.5 left-1.5 text-[11px] font-semibold text-[#8a7355]">
               {index + 1}
@@ -129,7 +129,7 @@ export function PhaseStrip({
           type="button"
           aria-label="Add phase"
           onClick={onAdd}
-          className="flex aspect-square w-24 shrink-0 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-[#cdb894] text-[#a89372] transition hover:border-[#1f2d4d]/40 hover:text-[#1f2d4d]"
+          className="flex aspect-[3/2] w-24 shrink-0 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-[#cdb894] text-[#a89372] transition hover:border-[#1f2d4d]/40 hover:text-[#1f2d4d]"
         >
           <Plus className="h-5 w-5" />
         </button>

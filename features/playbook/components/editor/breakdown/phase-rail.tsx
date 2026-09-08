@@ -23,7 +23,7 @@ export function PhaseRail({
     <nav
       aria-label="Phases"
       className={cn(
-        'flex w-44 shrink-0 flex-col gap-2 overflow-y-auto rounded-2xl bg-[#e9dcc0] p-3',
+        'flex w-52 shrink-0 flex-col gap-2 overflow-y-auto rounded-2xl bg-[#e9dcc0] p-3',
         className,
       )}
     >
@@ -48,7 +48,7 @@ export function PhaseRail({
           <PhaseThumbnail
             court={court}
             phase={phase}
-            className="pointer-events-none block w-full"
+            className="pointer-events-none block aspect-[3/2] w-full"
           />
         </button>
       ))}
