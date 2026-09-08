@@ -125,7 +125,7 @@ describe('BreakdownView', () => {
     render(<BreakdownView {...props} />);
 
     expect(
-      screen.getByRole('heading', { name: /Phase 1/ }),
+      screen.getByRole('heading', { name: 'Step notes' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('group', { name: 'Category' })).toBeInTheDocument();
     await waitFor(() => expect(screen.getByText('Iso')).toBeInTheDocument());

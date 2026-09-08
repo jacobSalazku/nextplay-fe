@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { cn } from '@/utils/tw-merge';
 import Highlight from '@tiptap/extension-highlight';
+import Placeholder from '@tiptap/extension-placeholder';
 import TextAlignExtension from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import { EditorContent, useEditor, type Extension } from '@tiptap/react';
@@ -42,6 +43,10 @@ export function PhaseNotesEditor({
       Underline,
       Highlight,
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      Placeholder.configure({
+        placeholder:
+          "What's the read here? Where does everyone go, and what if the defense switches?",
+      }),
     ],
     content,
     onFocus: onEditStart,

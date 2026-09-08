@@ -57,7 +57,7 @@ export function TransportBar({
       <div className="relative flex-1 px-[7px]">
         <div className="pointer-events-none absolute inset-x-[7px] top-1/2 flex -translate-y-1/2 justify-between">
           {Array.from({ length: phaseCount }, (_, i) => (
-            <span key={i} className="h-2 w-px bg-white/25" />
+            <span key={i} className="h-2.5 w-0.5 rounded-full bg-white/40" />
           ))}
         </div>
         <input

@@ -123,7 +123,6 @@ export function AnimateView({
       </div>
 
       <ActionTimeline
-        phaseNumber={shownIndex + 1}
         actions={shown.actions}
         objects={shown.objects}
         steps={shown.steps}

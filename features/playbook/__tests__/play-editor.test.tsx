@@ -261,7 +261,7 @@ describe('PlayEditor — breakdown', () => {
 
     // Assert — the notes panel for the current phase, with its toolbar
     expect(
-      screen.getByRole('heading', { name: /Phase 1/ }),
+      screen.getByRole('heading', { name: 'Step notes' }),
     ).toBeInTheDocument();
     expect(
       await screen.findByRole('toolbar', { name: 'Formatting' }),

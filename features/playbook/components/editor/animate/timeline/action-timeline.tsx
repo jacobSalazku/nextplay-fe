@@ -18,7 +18,6 @@ import {
 } from './steps';
 
 type Props = {
-  phaseNumber: number;
   actions: Action[];
   objects: PlacedObject[];
   steps?: Step[];
@@ -28,7 +27,6 @@ type Props = {
 };
 
 export function ActionTimeline({
-  phaseNumber,
   actions,
   objects,
   steps,
@@ -69,20 +67,16 @@ export function ActionTimeline({
         className,
       )}
     >
-      <div className="px-5 pt-5 pb-3">
-        <h2 className="text-xl font-bold">Phase {phaseNumber}</h2>
-      </div>
-
-      <div className="border-t border-[#e6dcc4]" />
+      <h2 className="border-b border-[#e6dcc4] px-5 py-3.5 text-xs font-semibold tracking-wider text-[#8a7a5c] uppercase">
+        Action timeline
+      </h2>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
-        <p className="text-xs font-semibold tracking-wider text-[#a89372] uppercase">
-          Action timeline
-        </p>
-
         {groups.length === 0 ? (
-          <p className="mt-3 text-sm text-[#6b6350]">
-            Draw moves in this phase to sequence them.
+          <p className="text-sm text-[#6b6350]">
+            No moves in this phase yet. Switch to{' '}
+            <strong className="font-semibold text-[#1f2d4d]">Draw</strong> to
+            add passes, cuts and screens — they show up here to sequence.
           </p>
         ) : (
           <ol className="mt-2 flex flex-col">

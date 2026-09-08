@@ -208,6 +208,18 @@ export function PhaseRail({
                 />
               </button>
 
+              <span
+                aria-hidden
+                className={cn(
+                  'pointer-events-none absolute bottom-1 left-1 flex h-5 w-5 items-center justify-center rounded-md text-[11px] font-bold',
+                  index === activeIndex
+                    ? 'bg-[#1f2d4d] text-white'
+                    : 'bg-white/85 text-[#1f2d4d]',
+                )}
+              >
+                {index + 1}
+              </span>
+
               <PhaseMenu
                 onDuplicate={
                   onDuplicate && phases.length < MAX_PHASES

@@ -15,7 +15,6 @@ const actions: Action[] = [
 ];
 
 const base = {
-  phaseNumber: 1,
   actions,
   objects,
   onChange: vi.fn(),
@@ -30,7 +29,7 @@ describe('ActionTimeline', () => {
     render(<ActionTimeline {...base} />);
 
     expect(
-      screen.getByRole('heading', { name: 'Phase 1' }),
+      screen.getByRole('heading', { name: 'Action timeline' }),
     ).toBeInTheDocument();
     expect(screen.getByText(/action timeline/i)).toBeInTheDocument();
     expect(screen.getByText('Dribble by Player 1')).toBeInTheDocument();

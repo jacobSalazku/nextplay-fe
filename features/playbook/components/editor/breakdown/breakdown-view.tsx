@@ -72,8 +72,10 @@ export function BreakdownView({
         aria-label="Phase notes"
         className="flex max-h-full w-96 shrink-0 flex-col self-start overflow-hidden rounded-2xl bg-[#faf6ec] text-slate-900"
       >
-        <header className="flex items-center justify-between gap-3 border-b border-[#e6dcc4] px-5 py-4">
-          <h2 className="text-xl font-bold">Phase {activeIndex + 1}</h2>
+        <header className="flex items-center justify-between gap-3 border-b border-[#e6dcc4] px-5 py-3.5">
+          <h2 className="text-xs font-semibold tracking-wider text-[#8a7a5c] uppercase">
+            Step notes
+          </h2>
           <CategoryPicker value={category} onChange={onCategoryChange} />
         </header>
 
