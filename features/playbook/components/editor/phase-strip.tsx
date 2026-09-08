@@ -71,7 +71,7 @@ export function PhaseStrip({
       ref={rowRef}
       role="tablist"
       aria-label="Phases"
-      className="flex min-w-0 items-center gap-2 overflow-x-auto"
+      className="scrollbar-none flex min-w-0 max-w-full items-center gap-2 overflow-x-auto"
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={() => setDrag(null)}

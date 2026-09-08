@@ -17,12 +17,22 @@ type ModeTabsProps = {
 };
 
 export function ModeTabs({ mode, onChange }: ModeTabsProps) {
+  const activeIndex = TABS.findIndex((t) => t.value === mode);
+
   return (
     <div
       role="tablist"
       aria-label="Editor mode"
-      className="flex rounded-lg border border-white/10 bg-slate-900 p-0.5"
+      className="relative flex w-[22rem] max-w-full shrink-0 rounded-xl border border-white/10 bg-slate-900 p-1"
     >
+      <span
+        aria-hidden
+        className="absolute inset-y-1 left-1 rounded-lg bg-slate-700 shadow transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
+        style={{
+          width: `calc((100% - 0.5rem) / ${TABS.length})`,
+          transform: `translateX(${activeIndex * 100}%)`,
+        }}
+      />
       {TABS.map(({ value, label, icon: Icon }) => (
         <button
           key={value}
@@ -31,13 +41,11 @@ export function ModeTabs({ mode, onChange }: ModeTabsProps) {
           aria-selected={mode === value}
           onClick={() => onChange(value)}
           className={cn(
-            'flex cursor-pointer items-center gap-1.5 rounded-md px-3 py-1 text-sm transition',
-            mode === value
-              ? 'bg-slate-700 text-white'
-              : 'text-gray-400 hover:text-white',
+            'relative z-10 flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg px-5 py-2 text-sm font-medium transition-colors',
+            mode === value ? 'text-white' : 'text-gray-400 hover:text-white',
           )}
         >
-          <Icon className="h-3.5 w-3.5" />
+          <Icon className="h-4 w-4" />
           {label}
         </button>
       ))}

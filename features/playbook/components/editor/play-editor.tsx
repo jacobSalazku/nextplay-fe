@@ -267,78 +267,83 @@ export function PlayEditor({
         </div>
       </header>
 
-      {mode === 'breakdown' ? (
-        <BreakdownView
-          category={category}
-          court={court}
-          phases={phases}
-          activeIndex={activePhaseIndex}
-          onSelectPhase={setActivePhase}
-          onCategoryChange={changeCategory}
-          onNoteChange={setPhaseNote}
-          onEditStart={beginEdit}
-          onEditEnd={endEdit}
-        />
-      ) : mode === 'animate' ? (
-        <AnimateView
-          court={court}
-          phases={phases}
-          onStepsChange={setPhaseSteps}
-          onEditStart={beginEdit}
-          onRemoveAction={deleteActionAt}
-        />
-      ) : (
-        <div className="flex flex-1 flex-col gap-2 overflow-hidden p-2 lg:flex-row">
-          <div className="flex min-h-0 flex-1 flex-col gap-2">
-            <div className="flex min-h-0 flex-1 items-center justify-center">
-              <EditorStage
-                court={court}
-                phase={phase}
-                ballHolderId={phase.ballHolderId}
-                tool={tool}
-                selection={selection}
-                onSelect={select}
-                onPickSelect={() => setTool('select')}
-                onDraw={draw}
-                onBeginEdit={beginEdit}
-                onEndEdit={endEdit}
-                onMove={moveObject}
-                onBend={(id, bend) => updateAction(id, { bend })}
-                onRotate={rotateObject}
-                onSetBall={setBallHolder}
-                onDelete={deleteSelection}
-              />
-            </div>
-            <div className="flex shrink-0 items-center gap-3 rounded-2xl bg-[#faf6ec] px-3 py-1.5 shadow-lg shadow-black/20">
-              <ToolDock tool={tool} onToolChange={setTool} />
-              <div className="h-8 w-px shrink-0 bg-[#e0d5bb]" />
-              <div className="min-w-0 flex-1" />
-              <PhaseStrip
-                phases={phases}
-                court={court}
-                activeIndex={activePhaseIndex}
-                onSelect={setActivePhase}
-                onAdd={addPhase}
-                onDelete={deletePhase}
-                onReorder={reorderPhase}
-              />
-            </div>
-          </div>
-
-          <RosterPanel
-            objects={phase.objects}
-            rosterCount={rosterCount}
-            ballHolderId={phase.ballHolderId}
-            selectedId={selection?.kind === 'object' ? selection.id : null}
-            onBench={benchObject}
-            onUnbench={unbenchObject}
-            onAddSlot={addSlot}
-            onMatchManToMan={matchManToMan}
-            onSetBall={setBallHolder}
-            onSelect={(id) => select({ kind: 'object', id })}
+      <div
+        key={mode}
+        className="editor-view-enter flex min-h-0 flex-1 flex-col"
+      >
+        {mode === 'breakdown' ? (
+          <BreakdownView
+            category={category}
+            court={court}
+            phases={phases}
+            activeIndex={activePhaseIndex}
+            onSelectPhase={setActivePhase}
+            onCategoryChange={changeCategory}
+            onNoteChange={setPhaseNote}
+            onEditStart={beginEdit}
+            onEditEnd={endEdit}
           />
-        </div>
-      )}
+        ) : mode === 'animate' ? (
+          <AnimateView
+            court={court}
+            phases={phases}
+            onStepsChange={setPhaseSteps}
+            onEditStart={beginEdit}
+            onRemoveAction={deleteActionAt}
+          />
+        ) : (
+          <div className="flex flex-1 flex-col gap-2 overflow-hidden p-2 lg:flex-row">
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col items-center gap-2">
+              <div className="flex min-h-0 w-full flex-1 items-center justify-center">
+                <EditorStage
+                  court={court}
+                  phase={phase}
+                  ballHolderId={phase.ballHolderId}
+                  tool={tool}
+                  selection={selection}
+                  onSelect={select}
+                  onPickSelect={() => setTool('select')}
+                  onDraw={draw}
+                  onBeginEdit={beginEdit}
+                  onEndEdit={endEdit}
+                  onMove={moveObject}
+                  onBend={(id, bend) => updateAction(id, { bend })}
+                  onRotate={rotateObject}
+                  onSetBall={setBallHolder}
+                  onDelete={deleteSelection}
+                />
+              </div>
+              <div className="flex w-full max-w-4xl shrink-0 items-center gap-3 rounded-2xl bg-[#faf6ec] px-3 py-1.5 shadow-lg shadow-black/20">
+                <ToolDock tool={tool} onToolChange={setTool} />
+                <div className="h-8 w-px shrink-0 bg-[#e0d5bb]" />
+                <div className="min-w-4 flex-1" />
+                <PhaseStrip
+                  phases={phases}
+                  court={court}
+                  activeIndex={activePhaseIndex}
+                  onSelect={setActivePhase}
+                  onAdd={addPhase}
+                  onDelete={deletePhase}
+                  onReorder={reorderPhase}
+                />
+              </div>
+            </div>
+
+            <RosterPanel
+              objects={phase.objects}
+              rosterCount={rosterCount}
+              ballHolderId={phase.ballHolderId}
+              selectedId={selection?.kind === 'object' ? selection.id : null}
+              onBench={benchObject}
+              onUnbench={unbenchObject}
+              onAddSlot={addSlot}
+              onMatchManToMan={matchManToMan}
+              onSetBall={setBallHolder}
+              onSelect={(id) => select({ kind: 'object', id })}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
