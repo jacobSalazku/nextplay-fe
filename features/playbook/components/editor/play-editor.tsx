@@ -14,9 +14,9 @@ import { useConfirm } from '@/components/feedback/confirm-provider';
 import { Button } from '@/components/foundation/button/button';
 import { AnimateView } from './animate/animate-view';
 import { BreakdownView } from './breakdown/breakdown-view';
+import { PhaseRail } from './breakdown/phase-rail';
 import { EditorStage } from './editor-stage';
 import { ModeTabs, type EditorMode } from './mode-tabs';
-import { PhaseStrip } from './phase-strip';
 import { RosterPanel } from './roster-panel';
 import { ToolDock } from './tool-dock';
 
@@ -278,6 +278,9 @@ export function PlayEditor({
             phases={phases}
             activeIndex={activePhaseIndex}
             onSelectPhase={setActivePhase}
+            onAddPhase={addPhase}
+            onDeletePhase={deletePhase}
+            onReorderPhase={reorderPhase}
             onCategoryChange={changeCategory}
             onNoteChange={setPhaseNote}
             onEditStart={beginEdit}
@@ -287,46 +290,48 @@ export function PlayEditor({
           <AnimateView
             court={court}
             phases={phases}
+            activeIndex={activePhaseIndex}
+            onSelectPhase={setActivePhase}
+            onAddPhase={addPhase}
+            onDeletePhase={deletePhase}
+            onReorderPhase={reorderPhase}
             onStepsChange={setPhaseSteps}
             onEditStart={beginEdit}
             onRemoveAction={deleteActionAt}
           />
         ) : (
-          <div className="flex flex-1 flex-col gap-2 overflow-hidden p-2 lg:flex-row lg:justify-center">
-            <div className="relative flex min-h-0 min-w-0 flex-1 flex-col lg:max-w-[92vh]">
-              <div className="flex min-h-0 w-full flex-1 items-center justify-center">
-                <EditorStage
-                  court={court}
-                  phase={phase}
-                  ballHolderId={phase.ballHolderId}
-                  tool={tool}
-                  selection={selection}
-                  onSelect={select}
-                  onPickSelect={() => setTool('select')}
-                  onDraw={draw}
-                  onBeginEdit={beginEdit}
-                  onEndEdit={endEdit}
-                  onMove={moveObject}
-                  onBend={(id, bend) => updateAction(id, { bend })}
-                  onRotate={rotateObject}
-                  onSetBall={setBallHolder}
-                  onDelete={deleteSelection}
-                />
-              </div>
-              <div className="pointer-events-none absolute inset-x-2 bottom-3 flex justify-center">
-                <div className="pointer-events-auto flex max-w-full items-center gap-3 rounded-2xl bg-[#faf6ec] px-3 py-1.5 shadow-lg shadow-black/25">
+          <div className="flex flex-1 gap-3 overflow-hidden p-3">
+            <PhaseRail
+              phases={phases}
+              court={court}
+              activeIndex={activePhaseIndex}
+              onSelect={setActivePhase}
+              onAdd={addPhase}
+              onDelete={deletePhase}
+              onReorder={reorderPhase}
+            />
+
+            <div className="relative flex min-h-0 min-w-0 flex-1 flex-col items-center">
+              <EditorStage
+                court={court}
+                phase={phase}
+                ballHolderId={phase.ballHolderId}
+                tool={tool}
+                selection={selection}
+                onSelect={select}
+                onPickSelect={() => setTool('select')}
+                onDraw={draw}
+                onBeginEdit={beginEdit}
+                onEndEdit={endEdit}
+                onMove={moveObject}
+                onBend={(id, bend) => updateAction(id, { bend })}
+                onRotate={rotateObject}
+                onSetBall={setBallHolder}
+                onDelete={deleteSelection}
+              />
+              <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center">
+                <div className="pointer-events-auto flex items-center rounded-2xl bg-[#faf6ec] px-3 py-1.5 shadow-lg shadow-black/25">
                   <ToolDock tool={tool} onToolChange={setTool} />
-                  <div className="h-8 w-px shrink-0 bg-[#e0d5bb]" />
-                  <div className="min-w-4 flex-1" />
-                  <PhaseStrip
-                    phases={phases}
-                    court={court}
-                    activeIndex={activePhaseIndex}
-                    onSelect={setActivePhase}
-                    onAdd={addPhase}
-                    onDelete={deletePhase}
-                    onReorder={reorderPhase}
-                  />
                 </div>
               </div>
             </div>

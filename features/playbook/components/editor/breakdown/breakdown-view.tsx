@@ -12,6 +12,9 @@ type BreakdownProps = {
   phases: Phase[];
   activeIndex: number;
   onSelectPhase: (index: number) => void;
+  onAddPhase: () => void;
+  onDeletePhase: (index: number) => void;
+  onReorderPhase: (from: number, to: number) => void;
   onCategoryChange: (category: Category) => void;
   onNoteChange: (index: number, note: string) => void;
   onEditStart: () => void;
@@ -24,6 +27,9 @@ export function BreakdownView({
   phases,
   activeIndex,
   onSelectPhase,
+  onAddPhase,
+  onDeletePhase,
+  onReorderPhase,
   onCategoryChange,
   onNoteChange,
   onEditStart,
@@ -33,12 +39,15 @@ export function BreakdownView({
 
   return (
     <div className="flex min-h-0 flex-1 justify-center overflow-y-auto p-6">
-      <div className="flex w-full max-w-5xl items-start gap-5">
+      <div className="flex h-full w-full max-w-5xl items-start gap-5">
         <PhaseRail
           phases={phases}
           court={court}
           activeIndex={activeIndex}
           onSelect={onSelectPhase}
+          onAdd={onAddPhase}
+          onDelete={onDeletePhase}
+          onReorder={onReorderPhase}
         />
 
         <div className="flex flex-1 flex-col rounded-2xl bg-[#faf6ec] p-5 text-slate-900">

@@ -46,13 +46,49 @@ describe('PhaseRail', () => {
     );
 
     expect(screen.getByText('Phase 2 / 4')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Phase 2' })).toHaveAttribute(
+    expect(screen.getByRole('tab', { name: 'Phase 2' })).toHaveAttribute(
       'aria-current',
       'true',
     );
 
-    await user.click(screen.getByRole('button', { name: 'Phase 3' }));
+    await user.click(screen.getByRole('tab', { name: 'Phase 3' }));
     expect(onSelect).toHaveBeenCalledWith(2);
+  });
+
+  it('adds and deletes phases when those handlers are given', async () => {
+    const user = userEvent.setup();
+    const onAdd = vi.fn();
+    const onDelete = vi.fn();
+    render(
+      <PhaseRail
+        phases={phases(3)}
+        court="half"
+        activeIndex={0}
+        onSelect={vi.fn()}
+        onAdd={onAdd}
+        onDelete={onDelete}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Add phase' }));
+    expect(onAdd).toHaveBeenCalledOnce();
+
+    await user.click(screen.getByRole('button', { name: 'Delete phase 2' }));
+    expect(onDelete).toHaveBeenCalledWith(1);
+  });
+
+  it('hides add / delete when their handlers are absent', () => {
+    render(
+      <PhaseRail
+        phases={phases(3)}
+        court="half"
+        activeIndex={0}
+        onSelect={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Add phase' })).toBeNull();
+    expect(screen.queryByRole('button', { name: /delete phase/i })).toBeNull();
   });
 });
 
@@ -63,6 +99,9 @@ describe('BreakdownView', () => {
     phases: phases(3),
     activeIndex: 0,
     onSelectPhase: vi.fn(),
+    onAddPhase: vi.fn(),
+    onDeletePhase: vi.fn(),
+    onReorderPhase: vi.fn(),
     onCategoryChange: vi.fn(),
     onNoteChange: vi.fn(),
     onEditStart: vi.fn(),

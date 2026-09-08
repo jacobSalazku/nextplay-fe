@@ -21,6 +21,11 @@ const twoPhases = (over: Partial<Phase> = {}): Phase[] => [
 
 const props = {
   court: 'half' as const,
+  activeIndex: 0,
+  onSelectPhase: vi.fn(),
+  onAddPhase: vi.fn(),
+  onDeletePhase: vi.fn(),
+  onReorderPhase: vi.fn(),
   onStepsChange: vi.fn(),
   onEditStart: vi.fn(),
   onRemoveAction: vi.fn(),
