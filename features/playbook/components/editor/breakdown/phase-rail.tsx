@@ -1,6 +1,6 @@
 'use client';
 
-import { PhaseThumbnail } from '@/features/playbook/components/diagram/phase-thumbnail';
+import { CourtDiagram } from '@/features/playbook/components/diagram/court-diagram';
 import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
 import { cn } from '@/utils/tw-merge';
 
@@ -39,16 +39,16 @@ export function PhaseRail({
           aria-current={index === activeIndex}
           onClick={() => onSelect(index)}
           className={cn(
-            'block w-full shrink-0 cursor-pointer overflow-hidden rounded-xl border-2 transition',
+            'block w-full shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 transition',
             index === activeIndex
               ? 'border-[#1f2d4d]'
               : 'border-[#cdb894] hover:border-[#1f2d4d]/40',
           )}
         >
-          <PhaseThumbnail
+          <CourtDiagram
             court={court}
             phase={phase}
-            className="pointer-events-none block aspect-[3/2] w-full"
+            className="pointer-events-none block w-full"
           />
         </button>
       ))}

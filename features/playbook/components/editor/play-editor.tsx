@@ -292,8 +292,8 @@ export function PlayEditor({
             onRemoveAction={deleteActionAt}
           />
         ) : (
-          <div className="flex flex-1 flex-col gap-2 overflow-hidden p-2 lg:flex-row">
-            <div className="flex min-h-0 min-w-0 flex-1 flex-col items-center gap-2">
+          <div className="flex flex-1 flex-col gap-2 overflow-hidden p-2 lg:flex-row lg:justify-center">
+            <div className="relative flex min-h-0 min-w-0 flex-1 flex-col lg:max-w-[92vh]">
               <div className="flex min-h-0 w-full flex-1 items-center justify-center">
                 <EditorStage
                   court={court}
@@ -313,19 +313,21 @@ export function PlayEditor({
                   onDelete={deleteSelection}
                 />
               </div>
-              <div className="flex w-full max-w-4xl shrink-0 items-center gap-3 rounded-2xl bg-[#faf6ec] px-3 py-1.5 shadow-lg shadow-black/20">
-                <ToolDock tool={tool} onToolChange={setTool} />
-                <div className="h-8 w-px shrink-0 bg-[#e0d5bb]" />
-                <div className="min-w-4 flex-1" />
-                <PhaseStrip
-                  phases={phases}
-                  court={court}
-                  activeIndex={activePhaseIndex}
-                  onSelect={setActivePhase}
-                  onAdd={addPhase}
-                  onDelete={deletePhase}
-                  onReorder={reorderPhase}
-                />
+              <div className="pointer-events-none absolute inset-x-2 bottom-3 flex justify-center">
+                <div className="pointer-events-auto flex max-w-full items-center gap-3 rounded-2xl bg-[#faf6ec] px-3 py-1.5 shadow-lg shadow-black/25">
+                  <ToolDock tool={tool} onToolChange={setTool} />
+                  <div className="h-8 w-px shrink-0 bg-[#e0d5bb]" />
+                  <div className="min-w-4 flex-1" />
+                  <PhaseStrip
+                    phases={phases}
+                    court={court}
+                    activeIndex={activePhaseIndex}
+                    onSelect={setActivePhase}
+                    onAdd={addPhase}
+                    onDelete={deletePhase}
+                    onReorder={reorderPhase}
+                  />
+                </div>
               </div>
             </div>
 

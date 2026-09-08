@@ -23,8 +23,6 @@ type Props = {
   actions: Action[];
   objects: PlacedObject[];
   steps?: Step[];
-  showTitle: boolean;
-  onShowTitleChange: (value: boolean) => void;
   onChange: (steps: Step[]) => void;
   onRemoveAction: (id: string) => void;
   onPlay: () => void;
@@ -35,8 +33,6 @@ export function ActionTimeline({
   actions,
   objects,
   steps,
-  showTitle,
-  onShowTitleChange,
   onChange,
   onRemoveAction,
   onPlay,
@@ -73,15 +69,6 @@ export function ActionTimeline({
     >
       <div className="px-5 pt-5 pb-3">
         <h2 className="text-xl font-bold">Phase {phaseNumber}</h2>
-        <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm text-[#4a4636]">
-          <input
-            type="checkbox"
-            checked={showTitle}
-            onChange={(e) => onShowTitleChange(e.target.checked)}
-            className="h-4 w-4 cursor-pointer rounded border-[#c9bd9d] accent-[#1f2d4d]"
-          />
-          Show title in animation
-        </label>
       </div>
 
       <div className="border-t border-[#e6dcc4]" />

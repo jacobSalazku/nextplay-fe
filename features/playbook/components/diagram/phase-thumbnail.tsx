@@ -26,7 +26,7 @@ export function PhaseThumbnail({
   return (
     <svg
       viewBox={`0 0 ${w} ${h}`}
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio="xMidYMid meet"
       className={className}
       role="img"
       aria-hidden

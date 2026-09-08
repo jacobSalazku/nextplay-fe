@@ -37,7 +37,6 @@ export function AnimateView({
 }: Props) {
   const [speed, setSpeed] = useState(1);
   const [loop, setLoop] = useState(false);
-  const [titlePhases, setTitlePhases] = useState<Record<string, boolean>>({});
   // which phase's timeline is being edited — a direct selection, not derived
   // from the scrubber (a progress round-trip lands on the wrong side of a
   // segment boundary half the time)
@@ -69,7 +68,6 @@ export function AnimateView({
     ? frame.fromIndex
     : Math.min(selected, phases.length - 1);
   const active = phases[activeIndex];
-  const showTitle = titlePhases[active.id] ?? false;
 
   const selectPhase = (index: number) => {
     setSelected(index);
@@ -97,7 +95,7 @@ export function AnimateView({
             court={court}
             phases={phases}
             frame={frame}
-            title={showTitle ? `Phase ${activeIndex + 1}` : undefined}
+            title={`Phase ${activeIndex + 1}`}
           />
         </div>
 
@@ -120,10 +118,6 @@ export function AnimateView({
         actions={active.actions}
         objects={active.objects}
         steps={active.steps}
-        showTitle={showTitle}
-        onShowTitleChange={(value) =>
-          setTitlePhases((prev) => ({ ...prev, [active.id]: value }))
-        }
         onChange={(steps) => {
           onEditStart();
           onStepsChange(activeIndex, steps);

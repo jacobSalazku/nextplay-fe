@@ -18,8 +18,6 @@ const base = {
   phaseNumber: 1,
   actions,
   objects,
-  showTitle: false,
-  onShowTitleChange: vi.fn(),
   onChange: vi.fn(),
   onRemoveAction: vi.fn(),
   onPlay: vi.fn(),
@@ -41,15 +39,6 @@ describe('ActionTimeline', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('Dribble by Player 1')).toBeInTheDocument();
     expect(screen.getByText('Pass by Player 1')).toBeInTheDocument();
-  });
-
-  it('toggles the show-title checkbox', async () => {
-    const user = userEvent.setup();
-    const onShowTitleChange = vi.fn();
-    render(<ActionTimeline {...base} onShowTitleChange={onShowTitleChange} />);
-
-    await user.click(screen.getByLabelText(/show title in animation/i));
-    expect(onShowTitleChange).toHaveBeenCalledWith(true);
   });
 
   it('groups two moves with "Run with step above"', async () => {
