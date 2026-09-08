@@ -14,6 +14,7 @@ type BreakdownProps = {
   onSelectPhase: (index: number) => void;
   onAddPhase: () => void;
   onDeletePhase: (index: number) => void;
+  onDuplicatePhase: (index: number) => void;
   onReorderPhase: (from: number, to: number) => void;
   onCategoryChange: (category: Category) => void;
   onNoteChange: (index: number, note: string) => void;
@@ -29,6 +30,7 @@ export function BreakdownView({
   onSelectPhase,
   onAddPhase,
   onDeletePhase,
+  onDuplicatePhase,
   onReorderPhase,
   onCategoryChange,
   onNoteChange,
@@ -47,6 +49,7 @@ export function BreakdownView({
           onSelect={onSelectPhase}
           onAdd={onAddPhase}
           onDelete={onDeletePhase}
+          onDuplicate={onDuplicatePhase}
           onReorder={onReorderPhase}
         />
 

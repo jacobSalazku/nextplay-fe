@@ -25,6 +25,7 @@ const props = {
   onSelectPhase: vi.fn(),
   onAddPhase: vi.fn(),
   onDeletePhase: vi.fn(),
+  onDuplicatePhase: vi.fn(),
   onReorderPhase: vi.fn(),
   onStepsChange: vi.fn(),
   onEditStart: vi.fn(),

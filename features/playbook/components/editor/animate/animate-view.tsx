@@ -27,6 +27,7 @@ type Props = {
   onSelectPhase: (index: number) => void;
   onAddPhase: () => void;
   onDeletePhase: (index: number) => void;
+  onDuplicatePhase: (index: number) => void;
   onReorderPhase: (from: number, to: number) => void;
   onStepsChange: (index: number, steps: Step[]) => void;
   onEditStart: () => void;
@@ -40,6 +41,7 @@ export function AnimateView({
   onSelectPhase,
   onAddPhase,
   onDeletePhase,
+  onDuplicatePhase,
   onReorderPhase,
   onStepsChange,
   onEditStart,
@@ -92,6 +94,7 @@ export function AnimateView({
         onSelect={selectPhase}
         onAdd={onAddPhase}
         onDelete={onDeletePhase}
+        onDuplicate={onDuplicatePhase}
         onReorder={onReorderPhase}
       />
 

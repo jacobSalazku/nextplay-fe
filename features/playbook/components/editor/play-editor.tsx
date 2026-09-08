@@ -86,6 +86,7 @@ export function PlayEditor({
   const select = usePlayEditorStore((s) => s.select);
   const addPhase = usePlayEditorStore((s) => s.addPhase);
   const deletePhase = usePlayEditorStore((s) => s.deletePhase);
+  const duplicatePhase = usePlayEditorStore((s) => s.duplicatePhase);
   const setActivePhase = usePlayEditorStore((s) => s.setActivePhase);
   const reorderPhase = usePlayEditorStore((s) => s.reorderPhase);
   const beginEdit = usePlayEditorStore((s) => s.beginEdit);
@@ -280,6 +281,7 @@ export function PlayEditor({
             onSelectPhase={setActivePhase}
             onAddPhase={addPhase}
             onDeletePhase={deletePhase}
+            onDuplicatePhase={duplicatePhase}
             onReorderPhase={reorderPhase}
             onCategoryChange={changeCategory}
             onNoteChange={setPhaseNote}
@@ -294,6 +296,7 @@ export function PlayEditor({
             onSelectPhase={setActivePhase}
             onAddPhase={addPhase}
             onDeletePhase={deletePhase}
+            onDuplicatePhase={duplicatePhase}
             onReorderPhase={reorderPhase}
             onStepsChange={setPhaseSteps}
             onEditStart={beginEdit}
@@ -308,6 +311,7 @@ export function PlayEditor({
               onSelect={setActivePhase}
               onAdd={addPhase}
               onDelete={deletePhase}
+              onDuplicate={duplicatePhase}
               onReorder={reorderPhase}
             />
 

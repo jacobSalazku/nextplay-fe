@@ -436,6 +436,29 @@ describe('usePlayEditorStore', () => {
     expect(store().phases).toHaveLength(1);
   });
 
+  it('duplicates a phase right after it, with fresh action ids', () => {
+    // Arrange — phase 0 has a sequenced action
+    hydrate();
+    store().addAction({ type: 'cut', fromId: 'o1', toId: 'o2' });
+    const originalId = phase().actions[0].id;
+    store().setPhaseSteps(0, [
+      { id: 'g0', actionIds: [originalId], durationMs: 700 },
+    ]);
+
+    // Act
+    store().duplicatePhase(0);
+
+    // Assert — the copy sits at index 1 and is the active phase
+    expect(store().phases).toHaveLength(2);
+    expect(store().activePhaseIndex).toBe(1);
+
+    const copy = store().phases[1];
+    expect(copy.id).not.toBe(store().phases[0].id);
+    expect(copy.actions[0].id).not.toBe(originalId);
+    // its step timeline points at the copy's own action
+    expect(copy.steps?.[0].actionIds).toEqual([copy.actions[0].id]);
+  });
+
   it('sets and clears a note on any phase, not just the active one', () => {
     // Arrange
     hydrate();

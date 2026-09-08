@@ -71,6 +71,7 @@ type PlayEditorState = {
   endEdit: () => void;
   addPhase: () => void;
   deletePhase: (index: number) => void;
+  duplicatePhase: (index: number) => void;
   setActivePhase: (index: number) => void;
   reorderPhase: (from: number, to: number) => void;
   setPhaseNote: (index: number, note: string) => void;
@@ -291,6 +292,36 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
         activePhaseIndex: Math.max(0, Math.min(index, state.phases.length - 1)),
         selection: null,
       })),
+
+    duplicatePhase: (index) => {
+      const { phases } = get();
+      if (phases.length >= MAX_PHASES || index < 0 || index >= phases.length) {
+        return;
+      }
+      const src = phases[index];
+      // fresh action ids so the copy is self-contained; remap the steps to match
+      const idMap = new Map(src.actions.map((a) => [a.id, newActionId()]));
+      const copy: Phase = {
+        id: newPhaseId(),
+        objects: src.objects.map((o) => ({ ...o })),
+        actions: src.actions.map((a) => ({ ...a, id: idMap.get(a.id)! })),
+        ...(src.ballHolderId ? { ballHolderId: src.ballHolderId } : {}),
+        ...(src.note ? { note: src.note } : {}),
+        ...(src.steps
+          ? {
+              steps: src.steps.map((s, i) => ({
+                id: `g${i}`,
+                actionIds: s.actionIds.map((aid) => idMap.get(aid) ?? aid),
+                durationMs: s.durationMs,
+              })),
+            }
+          : {}),
+      };
+      commitPhases(
+        [...phases.slice(0, index + 1), copy, ...phases.slice(index + 1)],
+        index + 1,
+      );
+    },
 
     reorderPhase: (from, to) => {
       const { phases, activePhaseIndex } = get();

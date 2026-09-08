@@ -1,16 +1,84 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CourtDiagram } from '@/features/playbook/components/diagram/court-diagram';
 import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
-import {
-  MAX_PHASES,
-  phaseIndexAt,
-} from '@/features/playbook/utils/editor/phase-rail';
+import { MAX_PHASES } from '@/features/playbook/utils/editor/phase-rail';
 import { cn } from '@/utils/tw-merge';
-import { Plus, X } from 'lucide-react';
+import { Copy, MoreVertical, Plus, Trash2 } from 'lucide-react';
 
 const DRAG_THRESHOLD = 4; // px before a press becomes a drag
+
+function PhaseMenu({
+  onDuplicate,
+  onDelete,
+}: {
+  onDuplicate?: () => void;
+  onDelete?: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: PointerEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('pointerdown', close);
+    return () => document.removeEventListener('pointerdown', close);
+  }, [open]);
+
+  if (!onDuplicate && !onDelete) return null;
+
+  const item =
+    'flex w-full cursor-pointer items-center gap-2 px-3 py-1.5 text-left text-sm hover:bg-black/5';
+
+  return (
+    <div ref={ref} className="absolute top-1 right-1 z-10">
+      <button
+        type="button"
+        aria-label="Phase options"
+        aria-expanded={open}
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={() => setOpen((o) => !o)}
+        className="flex h-5 w-5 cursor-pointer items-center justify-center rounded-md bg-[#1f2d4d]/85 text-white transition hover:bg-[#1f2d4d]"
+      >
+        <MoreVertical className="h-3 w-3" />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 mt-1 w-36 overflow-hidden rounded-lg border border-[#d8cbac] bg-[#faf6ec] py-1 text-[#1f2d4d] shadow-lg">
+          {onDuplicate && (
+            <button
+              type="button"
+              className={item}
+              onClick={() => {
+                onDuplicate();
+                setOpen(false);
+              }}
+            >
+              <Copy className="h-3.5 w-3.5" />
+              Duplicate
+            </button>
+          )}
+          {onDelete && (
+            <button
+              type="button"
+              className={cn(item, 'text-red-700')}
+              onClick={() => {
+                onDelete();
+                setOpen(false);
+              }}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Delete
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 type PhaseRailProps = {
   phases: Phase[];
@@ -19,6 +87,7 @@ type PhaseRailProps = {
   onSelect: (index: number) => void;
   onAdd?: () => void;
   onDelete?: (index: number) => void;
+  onDuplicate?: (index: number) => void;
   onReorder?: (from: number, to: number) => void;
   className?: string;
 };
@@ -30,46 +99,62 @@ export function PhaseRail({
   onSelect,
   onAdd,
   onDelete,
+  onDuplicate,
   onReorder,
   className,
 }: PhaseRailProps) {
   const listRef = useRef<HTMLDivElement>(null);
   const startY = useRef(0);
   const moved = useRef(false);
-  const [drag, setDrag] = useState<{ from: number; dy: number } | null>(null);
+  const [drag, setDrag] = useState<{ from: number; insertAt: number } | null>(
+    null,
+  );
 
-  const onPointerDown = (index: number) => (event: React.PointerEvent) => {
-    event.currentTarget.setPointerCapture?.(event.pointerId);
-    startY.current = event.clientY;
+  const insertAtFor = (clientY: number) =>
+    Array.from(
+      listRef.current?.querySelectorAll<HTMLElement>('[data-phase]') ?? [],
+    ).filter((el) => {
+      const r = el.getBoundingClientRect();
+      return (r.top + r.bottom) / 2 < clientY;
+    }).length;
+
+  const onPointerDown = (index: number) => (e: React.PointerEvent) => {
+    if (!onReorder) return;
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    startY.current = e.clientY;
     moved.current = false;
-    setDrag({ from: index, dy: 0 });
+    setDrag({ from: index, insertAt: index });
   };
 
-  const onPointerMove = (event: React.PointerEvent) => {
+  const onPointerMove = (e: React.PointerEvent) => {
     if (!drag) return;
-    const dy = event.clientY - startY.current;
-    if (Math.abs(dy) > DRAG_THRESHOLD) moved.current = true;
-    setDrag({ from: drag.from, dy });
+    if (Math.abs(e.clientY - startY.current) > DRAG_THRESHOLD) {
+      moved.current = true;
+    }
+    if (moved.current) {
+      setDrag({ from: drag.from, insertAt: insertAtFor(e.clientY) });
+    }
   };
 
-  const onPointerUp = (event: React.PointerEvent) => {
-    event.currentTarget.releasePointerCapture?.(event.pointerId);
+  const onPointerUp = (e: React.PointerEvent, index: number) => {
+    e.currentTarget.releasePointerCapture?.(e.pointerId);
     const current = drag;
     setDrag(null);
-    if (!current) return;
 
-    if (!moved.current || !onReorder) {
-      onSelect(current.from);
+    if (!current || !moved.current || !onReorder) {
+      onSelect(index);
       return;
     }
-    const bounds = Array.from(
-      listRef.current?.querySelectorAll<HTMLElement>('[data-phase]') ?? [],
-    ).map((el) => {
-      const r = el.getBoundingClientRect();
-      return { start: r.top, end: r.bottom };
-    });
-    onReorder(current.from, phaseIndexAt(bounds, event.clientY));
+    const { from, insertAt } = current;
+    const to = insertAt > from ? insertAt - 1 : insertAt;
+    if (to !== from) {
+      onReorder(from, Math.max(0, Math.min(to, phases.length - 1)));
+    }
   };
+
+  const dropLine = (
+    <div className="mx-1 h-[3px] shrink-0 rounded-full bg-[#1f2d4d]" />
+  );
 
   return (
     <nav
@@ -87,56 +172,59 @@ export function PhaseRail({
         ref={listRef}
         role="tablist"
         aria-label="Phases"
-        className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto"
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={() => setDrag(null)}
+        className="flex min-h-0 flex-1 touch-none flex-col gap-2 overflow-y-auto"
       >
         {phases.map((phase, index) => (
-          <div
-            key={phase.id}
-            data-phase
-            className="group relative shrink-0"
-            style={
-              drag?.from === index
-                ? { transform: `translateY(${drag.dy}px)`, zIndex: 10 }
-                : undefined
-            }
-          >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={index === activeIndex}
-              aria-current={index === activeIndex}
-              aria-label={`Phase ${index + 1}`}
-              onPointerDown={onPointerDown(index)}
+          <div key={phase.id}>
+            {drag?.insertAt === index && dropLine}
+            <div
+              data-phase
               className={cn(
-                'block w-full cursor-pointer touch-none overflow-hidden rounded-lg border-2 transition',
-                index === activeIndex
-                  ? 'border-[#1f2d4d]'
-                  : 'border-[#cdb894] hover:border-[#1f2d4d]/40',
+                'group relative',
+                drag?.from === index && 'opacity-40',
               )}
             >
-              <CourtDiagram
-                court={court}
-                phase={phase}
-                className="pointer-events-none block w-full"
-              />
-            </button>
-
-            {onDelete && phases.length > 1 && (
               <button
                 type="button"
-                aria-label={`Delete phase ${index + 1}`}
-                onPointerDown={(event) => event.stopPropagation()}
-                onClick={() => onDelete(index)}
-                className="absolute top-1 right-1 flex h-4 w-4 cursor-pointer items-center justify-center rounded-full bg-[#1f2d4d]/85 text-white opacity-0 transition group-hover:opacity-100 hover:bg-red-600"
+                role="tab"
+                aria-selected={index === activeIndex}
+                aria-current={index === activeIndex}
+                aria-label={`Phase ${index + 1}`}
+                onPointerDown={onPointerDown(index)}
+                onPointerMove={onPointerMove}
+                onPointerUp={(e) => onPointerUp(e, index)}
+                onPointerCancel={() => setDrag(null)}
+                className={cn(
+                  'block w-full cursor-pointer touch-none overflow-hidden rounded-lg border-2 transition',
+                  index === activeIndex
+                    ? 'border-[#1f2d4d]'
+                    : 'border-[#cdb894] hover:border-[#1f2d4d]/40',
+                )}
               >
-                <X className="h-2.5 w-2.5" />
+                <CourtDiagram
+                  court={court}
+                  phase={phase}
+                  className="pointer-events-none block w-full"
+                />
               </button>
-            )}
+
+              <PhaseMenu
+                onDuplicate={
+                  onDuplicate && phases.length < MAX_PHASES
+                    ? () => onDuplicate(index)
+                    : undefined
+                }
+                onDelete={
+                  onDelete && phases.length > 1
+                    ? () => onDelete(index)
+                    : undefined
+                }
+              />
+            </div>
           </div>
         ))}
+
+        {drag?.insertAt === phases.length && dropLine}
 
         {onAdd && phases.length < MAX_PHASES && (
           <button
