@@ -152,8 +152,14 @@ export function PhaseRail({
     }
   };
 
-  const dropLine = (
-    <div className="mx-1 h-[3px] shrink-0 rounded-full bg-[#1f2d4d]" />
+  // absolutely positioned so showing it never nudges the cards
+  const dropLine = (edge: 'top' | 'bottom') => (
+    <div
+      className={cn(
+        'pointer-events-none absolute inset-x-1 z-20 h-[3px] -translate-y-1/2 rounded-full bg-[#1f2d4d]',
+        edge === 'top' ? '-top-1' : '-bottom-[3px]',
+      )}
+    />
   );
 
   return (
@@ -175,68 +181,68 @@ export function PhaseRail({
         className="flex min-h-0 flex-1 touch-none flex-col gap-2 overflow-y-auto"
       >
         {phases.map((phase, index) => (
-          <div key={phase.id}>
-            {drag?.insertAt === index && dropLine}
-            <div
-              data-phase
+          <div
+            key={phase.id}
+            data-phase
+            className={cn(
+              'group relative',
+              drag?.from === index && 'opacity-40',
+            )}
+          >
+            {drag?.insertAt === index && dropLine('top')}
+            {drag?.insertAt === phases.length &&
+              index === phases.length - 1 &&
+              dropLine('bottom')}
+            <button
+              type="button"
+              role="tab"
+              aria-selected={index === activeIndex}
+              aria-current={index === activeIndex}
+              aria-label={`Phase ${index + 1}`}
+              onPointerDown={onPointerDown(index)}
+              onPointerMove={onPointerMove}
+              onPointerUp={(e) => onPointerUp(e, index)}
+              onPointerCancel={() => setDrag(null)}
               className={cn(
-                'group relative',
-                drag?.from === index && 'opacity-40',
+                'block w-full cursor-pointer touch-none overflow-hidden rounded-lg border-2 transition',
+                index === activeIndex
+                  ? 'border-[#1f2d4d]'
+                  : 'border-[#cdb894] hover:border-[#1f2d4d]/40',
               )}
             >
-              <button
-                type="button"
-                role="tab"
-                aria-selected={index === activeIndex}
-                aria-current={index === activeIndex}
-                aria-label={`Phase ${index + 1}`}
-                onPointerDown={onPointerDown(index)}
-                onPointerMove={onPointerMove}
-                onPointerUp={(e) => onPointerUp(e, index)}
-                onPointerCancel={() => setDrag(null)}
-                className={cn(
-                  'block w-full cursor-pointer touch-none overflow-hidden rounded-lg border-2 transition',
-                  index === activeIndex
-                    ? 'border-[#1f2d4d]'
-                    : 'border-[#cdb894] hover:border-[#1f2d4d]/40',
-                )}
-              >
-                <CourtDiagram
-                  court={court}
-                  phase={phase}
-                  className="pointer-events-none block w-full"
-                />
-              </button>
-
-              <span
-                aria-hidden
-                className={cn(
-                  'pointer-events-none absolute bottom-1 left-1 flex h-5 w-5 items-center justify-center rounded-md text-[11px] font-bold',
-                  index === activeIndex
-                    ? 'bg-[#1f2d4d] text-white'
-                    : 'bg-white/85 text-[#1f2d4d]',
-                )}
-              >
-                {index + 1}
-              </span>
-
-              <PhaseMenu
-                onDuplicate={
-                  onDuplicate && phases.length < MAX_PHASES
-                    ? () => onDuplicate(index)
-                    : undefined
-                }
-                onDelete={
-                  onDelete && phases.length > 1
-                    ? () => onDelete(index)
-                    : undefined
-                }
+              <CourtDiagram
+                court={court}
+                phase={phase}
+                className="pointer-events-none block w-full"
               />
-            </div>
+            </button>
+
+            <span
+              aria-hidden
+              className={cn(
+                'pointer-events-none absolute bottom-1 left-1 flex h-5 w-5 items-center justify-center rounded-md text-[11px] font-bold',
+                index === activeIndex
+                  ? 'bg-[#1f2d4d] text-white'
+                  : 'bg-white/85 text-[#1f2d4d]',
+              )}
+            >
+              {index + 1}
+            </span>
+
+            <PhaseMenu
+              onDuplicate={
+                onDuplicate && phases.length < MAX_PHASES
+                  ? () => onDuplicate(index)
+                  : undefined
+              }
+              onDelete={
+                onDelete && phases.length > 1
+                  ? () => onDelete(index)
+                  : undefined
+              }
+            />
           </div>
         ))}
-
-        {drag?.insertAt === phases.length && dropLine}
 
         {onAdd && phases.length < MAX_PHASES && (
           <button
