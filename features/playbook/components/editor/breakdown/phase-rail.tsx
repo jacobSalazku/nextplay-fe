@@ -6,6 +6,7 @@ import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
 import { MAX_PHASES } from '@/features/playbook/utils/editor/phase-rail';
 import { cn } from '@/utils/tw-merge';
 import { Copy, MoreVertical, Plus, Trash2 } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 const DRAG_THRESHOLD = 4; // px before a press becomes a drag
 
@@ -104,11 +105,22 @@ export function PhaseRail({
   className,
 }: PhaseRailProps) {
   const listRef = useRef<HTMLDivElement>(null);
-  const startY = useRef(0);
-  const moved = useRef(false);
-  const [drag, setDrag] = useState<{ from: number; insertAt: number } | null>(
-    null,
-  );
+  // live drag bookkeeping — a ref so a pointermove never reads a stale closure
+  const press = useRef<{
+    from: number;
+    startX: number;
+    startY: number;
+    w: number;
+    moved: boolean;
+  } | null>(null);
+  // set only once the drag is real; drives the drop line + floating thumbnail
+  const [drag, setDrag] = useState<{
+    from: number;
+    insertAt: number;
+    x: number;
+    y: number;
+    w: number;
+  } | null>(null);
 
   const insertAtFor = (clientY: number) =>
     Array.from(
@@ -121,34 +133,54 @@ export function PhaseRail({
   const onPointerDown = (index: number) => (e: React.PointerEvent) => {
     if (!onReorder) return;
     e.currentTarget.setPointerCapture?.(e.pointerId);
-    startY.current = e.clientY;
-    moved.current = false;
-    setDrag({ from: index, insertAt: index });
+    press.current = {
+      from: index,
+      startX: e.clientX,
+      startY: e.clientY,
+      w: e.currentTarget.getBoundingClientRect().width,
+      moved: false,
+    };
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!drag) return;
-    if (Math.abs(e.clientY - startY.current) > DRAG_THRESHOLD) {
-      moved.current = true;
+    const p = press.current;
+    if (!p) return;
+    if (
+      !p.moved &&
+      (Math.abs(e.clientX - p.startX) > DRAG_THRESHOLD ||
+        Math.abs(e.clientY - p.startY) > DRAG_THRESHOLD)
+    ) {
+      p.moved = true;
     }
-    if (moved.current) {
-      setDrag({ from: drag.from, insertAt: insertAtFor(e.clientY) });
+    if (p.moved) {
+      setDrag({
+        from: p.from,
+        insertAt: insertAtFor(e.clientY),
+        x: e.clientX,
+        y: e.clientY,
+        w: p.w,
+      });
     }
+  };
+
+  const endDrag = () => {
+    press.current = null;
+    setDrag(null);
   };
 
   const onPointerUp = (e: React.PointerEvent, index: number) => {
     e.currentTarget.releasePointerCapture?.(e.pointerId);
-    const current = drag;
-    setDrag(null);
+    const p = press.current;
+    const dropAt = drag?.insertAt;
+    endDrag();
 
-    if (!current || !moved.current || !onReorder) {
+    if (!p || !p.moved || !onReorder || dropAt === undefined) {
       onSelect(index);
       return;
     }
-    const { from, insertAt } = current;
-    const to = insertAt > from ? insertAt - 1 : insertAt;
-    if (to !== from) {
-      onReorder(from, Math.max(0, Math.min(to, phases.length - 1)));
+    const to = dropAt > p.from ? dropAt - 1 : dropAt;
+    if (to !== p.from) {
+      onReorder(p.from, Math.max(0, Math.min(to, phases.length - 1)));
     }
   };
 
@@ -186,7 +218,7 @@ export function PhaseRail({
             data-phase
             className={cn(
               'group relative',
-              drag?.from === index && 'opacity-40',
+              drag?.from === index && 'opacity-30',
             )}
           >
             {drag?.insertAt === index && dropLine('top')}
@@ -202,7 +234,7 @@ export function PhaseRail({
               onPointerDown={onPointerDown(index)}
               onPointerMove={onPointerMove}
               onPointerUp={(e) => onPointerUp(e, index)}
-              onPointerCancel={() => setDrag(null)}
+              onPointerCancel={endDrag}
               className={cn(
                 'block w-full cursor-pointer touch-none overflow-hidden rounded-lg border-2 transition',
                 index === activeIndex
@@ -255,6 +287,23 @@ export function PhaseRail({
           </button>
         )}
       </div>
+
+      {drag &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            aria-hidden
+            className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2 rotate-2 overflow-hidden rounded-lg border-2 border-[#1f2d4d] opacity-90 shadow-xl shadow-black/30"
+            style={{ left: drag.x, top: drag.y, width: drag.w }}
+          >
+            <CourtDiagram
+              court={court}
+              phase={phases[drag.from]}
+              className="block w-full"
+            />
+          </div>,
+          document.body,
+        )}
     </nav>
   );
 }
