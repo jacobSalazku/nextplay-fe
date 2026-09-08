@@ -31,11 +31,12 @@ type Props = {
   phases: Phase[];
   frame: AnimationFrame;
   title?: string;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 // Read-only playback surface. Each route inks itself in as its beat runs, and
 // the tokens move along it at the same time.
-export function AnimationStage({ court, phases, frame, title }: Props) {
+export function AnimationStage({ court, phases, frame, title, ref }: Props) {
   const { w, h } = COURT_VIEWBOX[court];
   const sy = courtScaleY(court);
 
@@ -60,6 +61,7 @@ export function AnimationStage({ court, phases, frame, title }: Props) {
 
   return (
     <div
+      ref={ref}
       className="relative h-full max-w-full"
       style={{ aspectRatio: `${w} / ${h}` }}
     >

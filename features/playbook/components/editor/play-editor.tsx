@@ -18,6 +18,7 @@ import { PhaseRail } from './breakdown/phase-rail';
 import { EditorStage } from './editor-stage';
 import { ModeTabs, type EditorMode } from './mode-tabs';
 import { RosterPanel } from './roster-panel';
+import { StageColumn } from './stage-column';
 import { ToolDock } from './tool-dock';
 
 type Props = {
@@ -303,7 +304,7 @@ export function PlayEditor({
             onRemoveAction={deleteActionAt}
           />
         ) : (
-          <div className="flex flex-1 gap-3 overflow-hidden p-3">
+          <div className="flex min-h-0 flex-1 gap-3 overflow-hidden p-3">
             <PhaseRail
               phases={phases}
               court={court}
@@ -315,32 +316,31 @@ export function PlayEditor({
               onReorder={reorderPhase}
             />
 
-            <div className="relative flex min-h-0 min-w-0 flex-1 flex-col items-center">
-              <div className="flex min-h-0 w-full flex-1 items-center justify-center pb-16">
-                <EditorStage
-                  court={court}
-                  phase={phase}
-                  ballHolderId={phase.ballHolderId}
-                  tool={tool}
-                  selection={selection}
-                  onSelect={select}
-                  onPickSelect={() => setTool('select')}
-                  onDraw={draw}
-                  onBeginEdit={beginEdit}
-                  onEndEdit={endEdit}
-                  onMove={moveObject}
-                  onBend={(id, bend) => updateAction(id, { bend })}
-                  onRotate={rotateObject}
-                  onSetBall={setBallHolder}
-                  onDelete={deleteSelection}
-                />
-              </div>
-              <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center">
-                <div className="pointer-events-auto flex items-center rounded-2xl bg-[#faf6ec] px-3 py-1.5 shadow-lg shadow-black/25">
+            <StageColumn
+              controls={
+                <div className="flex items-center rounded-2xl bg-[#faf6ec] px-3 py-1.5 shadow-lg shadow-black/25">
                   <ToolDock tool={tool} onToolChange={setTool} />
                 </div>
-              </div>
-            </div>
+              }
+            >
+              <EditorStage
+                court={court}
+                phase={phase}
+                ballHolderId={phase.ballHolderId}
+                tool={tool}
+                selection={selection}
+                onSelect={select}
+                onPickSelect={() => setTool('select')}
+                onDraw={draw}
+                onBeginEdit={beginEdit}
+                onEndEdit={endEdit}
+                onMove={moveObject}
+                onBend={(id, bend) => updateAction(id, { bend })}
+                onRotate={rotateObject}
+                onSetBall={setBallHolder}
+                onDelete={deleteSelection}
+              />
+            </StageColumn>
 
             <RosterPanel
               objects={phase.objects}

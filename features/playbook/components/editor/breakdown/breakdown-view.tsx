@@ -1,5 +1,6 @@
 'use client';
 
+import { StageColumn } from '../stage-column';
 import { COURT_VIEWBOX } from '@/features/playbook/components/diagram/court';
 import { CourtDiagram } from '@/features/playbook/components/diagram/court-diagram';
 import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
@@ -55,7 +56,7 @@ export function BreakdownView({
         onReorder={onReorderPhase}
       />
 
-      <div className="flex min-w-0 flex-1 items-center justify-center">
+      <StageColumn>
         <div
           className="relative h-full max-w-full"
           style={{ aspectRatio: `${w} / ${h}` }}
@@ -66,11 +67,11 @@ export function BreakdownView({
             className="absolute inset-0 h-full w-full"
           />
         </div>
-      </div>
+      </StageColumn>
 
       <section
         aria-label="Phase notes"
-        className="flex max-h-full w-96 shrink-0 flex-col self-start overflow-hidden rounded-2xl bg-[#faf6ec] text-slate-900"
+        className="flex max-h-full w-80 shrink-0 flex-col self-start overflow-hidden rounded-2xl bg-[#faf6ec] text-slate-900"
       >
         <header className="flex items-center justify-between gap-3 border-b border-[#e6dcc4] px-5 py-3.5">
           <h2 className="text-xs font-semibold tracking-wider text-[#8a7a5c] uppercase">

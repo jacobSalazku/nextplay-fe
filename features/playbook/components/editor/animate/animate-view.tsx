@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PhaseRail } from '../breakdown/phase-rail';
+import { StageColumn } from '../stage-column';
 import { useAnimationClock } from '@/features/playbook/hooks/editor/use-animation-clock';
 import {
   animationDurationMs,
@@ -51,6 +52,19 @@ export function AnimateView({
   const [loop, setLoop] = useState(false);
   const reduce = useReducedMotion();
 
+  // the transport bar tracks the court's rendered width so the two line up
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [courtWidth, setCourtWidth] = useState<number>();
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setCourtWidth(entry.contentRect.width);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   const durationMs = animationDurationMs(phases) / speed;
   const { progress, playing, toggle, seek, restart } = useAnimationClock({
     durationMs,
@@ -86,7 +100,7 @@ export function AnimateView({
   };
 
   return (
-    <div className="flex flex-1 gap-3 overflow-hidden p-3">
+    <div className="flex min-h-0 flex-1 gap-3 overflow-hidden p-3">
       <PhaseRail
         phases={phases}
         court={court}
@@ -98,29 +112,35 @@ export function AnimateView({
         onReorder={onReorderPhase}
       />
 
-      <div className="flex min-w-0 flex-1 flex-col gap-3">
-        <div className="flex min-h-0 flex-1 items-center justify-center">
-          <AnimationStage
-            court={court}
-            phases={phases}
-            frame={frame}
-            title={`Phase ${shownIndex + 1}`}
-          />
-        </div>
-
-        <TransportBar
-          playing={playing}
-          progress={progress}
-          phaseCount={phases.length}
-          speed={speed}
-          loop={loop}
-          onToggle={toggle}
-          onRestart={restart}
-          onSeek={scrubTo}
-          onSpeed={setSpeed}
-          onLoop={setLoop}
+      <StageColumn
+        controls={
+          <div
+            className="w-full max-w-full"
+            style={courtWidth ? { width: courtWidth } : undefined}
+          >
+            <TransportBar
+              playing={playing}
+              progress={progress}
+              phaseCount={phases.length}
+              speed={speed}
+              loop={loop}
+              onToggle={toggle}
+              onRestart={restart}
+              onSeek={scrubTo}
+              onSpeed={setSpeed}
+              onLoop={setLoop}
+            />
+          </div>
+        }
+      >
+        <AnimationStage
+          ref={stageRef}
+          court={court}
+          phases={phases}
+          frame={frame}
+          title={`Phase ${shownIndex + 1}`}
         />
-      </div>
+      </StageColumn>
 
       <ActionTimeline
         actions={shown.actions}

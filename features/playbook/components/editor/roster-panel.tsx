@@ -57,7 +57,7 @@ export function RosterPanel({
   return (
     <aside
       aria-label="Roster"
-      className="w-full shrink-0 space-y-5 overflow-y-auto rounded-xl border border-white/10 bg-slate-900/60 p-3 lg:w-52"
+      className="w-full shrink-0 space-y-5 overflow-y-auto rounded-xl border border-white/10 bg-slate-900/60 p-3 lg:w-80"
     >
       <section className="space-y-2">
         <h2 className="text-xs font-semibold tracking-wide text-gray-300 uppercase">
