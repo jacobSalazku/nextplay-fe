@@ -7,7 +7,6 @@ import type {
   Step,
 } from '@/features/playbook/utils/diagram/types';
 import { cn } from '@/utils/tw-merge';
-import { Play } from 'lucide-react';
 import { StepCard } from './step-card';
 import {
   groupsFromSteps,
@@ -25,7 +24,7 @@ type Props = {
   steps?: Step[];
   onChange: (steps: Step[]) => void;
   onRemoveAction: (id: string) => void;
-  onPlay: () => void;
+  className?: string;
 };
 
 export function ActionTimeline({
@@ -35,7 +34,7 @@ export function ActionTimeline({
   steps,
   onChange,
   onRemoveAction,
-  onPlay,
+  className,
 }: Props) {
   const dragId = useRef<string | null>(null);
   const groups = groupsFromSteps(actions, steps);
@@ -65,7 +64,10 @@ export function ActionTimeline({
   return (
     <section
       aria-label="Action timeline"
-      className="flex w-80 shrink-0 flex-col overflow-hidden rounded-2xl bg-[#faf6ec] text-[#1f2d4d]"
+      className={cn(
+        'flex max-h-full w-80 shrink-0 flex-col self-start overflow-hidden rounded-2xl bg-[#faf6ec] text-[#1f2d4d]',
+        className,
+      )}
     >
       <div className="px-5 pt-5 pb-3">
         <h2 className="text-xl font-bold">Phase {phaseNumber}</h2>
@@ -146,17 +148,6 @@ export function ActionTimeline({
             <strong className="font-semibold text-[#1f2d4d]">after</strong>.
           </p>
         )}
-      </div>
-
-      <div className="border-t border-[#e6dcc4] p-4">
-        <button
-          type="button"
-          onClick={onPlay}
-          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#1f2d4d] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#2b3c63]"
-        >
-          <Play className="h-4 w-4" fill="currentColor" />
-          Play full animation
-        </button>
       </div>
     </section>
   );

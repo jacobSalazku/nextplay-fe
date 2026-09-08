@@ -132,7 +132,6 @@ export function AnimateView({
           onStepsChange(shownIndex, steps);
         }}
         onRemoveAction={(id) => onRemoveAction(shownIndex, id)}
-        onPlay={restart}
       />
     </div>
   );

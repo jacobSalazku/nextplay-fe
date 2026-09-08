@@ -20,23 +20,19 @@ const base = {
   objects,
   onChange: vi.fn(),
   onRemoveAction: vi.fn(),
-  onPlay: vi.fn(),
 };
 
 const kebab = (i: number) =>
   screen.getAllByRole('button', { name: 'Timing options' })[i];
 
 describe('ActionTimeline', () => {
-  it('shows the phase header, the timeline label and the play button', () => {
+  it('shows the phase header, the timeline label and the moves', () => {
     render(<ActionTimeline {...base} />);
 
     expect(
       screen.getByRole('heading', { name: 'Phase 1' }),
     ).toBeInTheDocument();
     expect(screen.getByText(/action timeline/i)).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /play full animation/i }),
-    ).toBeInTheDocument();
     expect(screen.getByText('Dribble by Player 1')).toBeInTheDocument();
     expect(screen.getByText('Pass by Player 1')).toBeInTheDocument();
   });
@@ -108,16 +104,5 @@ describe('ActionTimeline', () => {
     await user.click(screen.getByRole('button', { name: 'Remove action' }));
 
     expect(onRemoveAction).toHaveBeenCalledWith('a1');
-  });
-
-  it('runs the whole animation from the play button', async () => {
-    const user = userEvent.setup();
-    const onPlay = vi.fn();
-    render(<ActionTimeline {...base} onPlay={onPlay} />);
-
-    await user.click(
-      screen.getByRole('button', { name: /play full animation/i }),
-    );
-    expect(onPlay).toHaveBeenCalledOnce();
   });
 });
