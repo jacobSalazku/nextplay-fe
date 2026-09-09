@@ -38,10 +38,13 @@ async function drag(page: Page, from: Locator, to: { x: number; y: number }) {
   await page.mouse.up();
 }
 
+// the rendered cx/cy are full-precision floats (the y axis is scaled into the
+// viewBox), so round before comparing — a save/reload round-trip can wobble the
+// last decimal without the player having actually moved
 const pos = (token: Locator) =>
   token.evaluate((el) => ({
-    x: el.getAttribute('cx'),
-    y: el.getAttribute('cy'),
+    x: Number(el.getAttribute('cx')).toFixed(2),
+    y: Number(el.getAttribute('cy')).toFixed(2),
   }));
 
 test.describe('play editor flow', () => {

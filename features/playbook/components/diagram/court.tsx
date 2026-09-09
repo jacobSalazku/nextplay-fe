@@ -59,8 +59,8 @@ export function Court({ court }: { court: CourtType }) {
     <>
       <defs>
         <linearGradient id="court-wood" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#DEB887" />
-          <stop offset="1" stopColor="#CFA068" />
+          <stop offset="0" stopColor="#CE9E62" />
+          <stop offset="1" stopColor="#B98850" />
         </linearGradient>
         <pattern
           id="court-planks"

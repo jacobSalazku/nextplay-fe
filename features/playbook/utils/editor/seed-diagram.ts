@@ -11,7 +11,7 @@ export function toFormationObjects(value: unknown): PlacedObject[] {
 }
 
 // The starting diagram for a new play: one phase holding the chosen
-// formation's tokens, no actions, no timeline yet.
+// formation's tokens, no actions.
 export function seedDiagram(
   court: CourtType,
   objects: PlacedObject[],
@@ -20,6 +20,5 @@ export function seedDiagram(
     version: 1,
     court,
     phases: [{ id: 'p1', objects, actions: [] }],
-    timeline: [],
   };
 }

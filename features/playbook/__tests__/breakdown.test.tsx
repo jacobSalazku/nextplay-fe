@@ -46,13 +46,61 @@ describe('PhaseRail', () => {
     );
 
     expect(screen.getByText('Phase 2 / 4')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Phase 2' })).toHaveAttribute(
+    expect(screen.getByRole('tab', { name: 'Phase 2' })).toHaveAttribute(
       'aria-current',
       'true',
     );
 
-    await user.click(screen.getByRole('button', { name: 'Phase 3' }));
+    await user.click(screen.getByRole('tab', { name: 'Phase 3' }));
     expect(onSelect).toHaveBeenCalledWith(2);
+  });
+
+  it('adds a phase, and duplicates / deletes one from its menu', async () => {
+    const user = userEvent.setup();
+    const onAdd = vi.fn();
+    const onDelete = vi.fn();
+    const onDuplicate = vi.fn();
+    render(
+      <PhaseRail
+        phases={phases(3)}
+        court="half"
+        activeIndex={0}
+        onSelect={vi.fn()}
+        onAdd={onAdd}
+        onDelete={onDelete}
+        onDuplicate={onDuplicate}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Add phase' }));
+    expect(onAdd).toHaveBeenCalledOnce();
+
+    // the second phase's menu
+    await user.click(
+      screen.getAllByRole('button', { name: 'Phase options' })[1],
+    );
+    await user.click(screen.getByRole('button', { name: 'Duplicate' }));
+    expect(onDuplicate).toHaveBeenCalledWith(1);
+
+    await user.click(
+      screen.getAllByRole('button', { name: 'Phase options' })[2],
+    );
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    expect(onDelete).toHaveBeenCalledWith(2);
+  });
+
+  it('shows no menu or add card when those handlers are absent', () => {
+    render(
+      <PhaseRail
+        phases={phases(3)}
+        court="half"
+        activeIndex={0}
+        onSelect={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Add phase' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Phase options' })).toBeNull();
   });
 });
 
@@ -63,6 +111,10 @@ describe('BreakdownView', () => {
     phases: phases(3),
     activeIndex: 0,
     onSelectPhase: vi.fn(),
+    onAddPhase: vi.fn(),
+    onDeletePhase: vi.fn(),
+    onDuplicatePhase: vi.fn(),
+    onReorderPhase: vi.fn(),
     onCategoryChange: vi.fn(),
     onNoteChange: vi.fn(),
     onEditStart: vi.fn(),
@@ -73,7 +125,7 @@ describe('BreakdownView', () => {
     render(<BreakdownView {...props} />);
 
     expect(
-      screen.getByRole('heading', { name: /Phase 1/ }),
+      screen.getByRole('heading', { name: 'Step notes' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('group', { name: 'Category' })).toBeInTheDocument();
     await waitFor(() => expect(screen.getByText('Iso')).toBeInTheDocument());

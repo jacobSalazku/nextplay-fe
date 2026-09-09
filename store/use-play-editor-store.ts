@@ -7,6 +7,7 @@ import type {
   PlayDiagram,
   PlayObjectKind,
   Point,
+  Step,
 } from '@/features/playbook/utils/diagram/types';
 import {
   makeSlotObject,
@@ -70,9 +71,11 @@ type PlayEditorState = {
   endEdit: () => void;
   addPhase: () => void;
   deletePhase: (index: number) => void;
+  duplicatePhase: (index: number) => void;
   setActivePhase: (index: number) => void;
   reorderPhase: (from: number, to: number) => void;
   setPhaseNote: (index: number, note: string) => void;
+  setPhaseSteps: (index: number, steps: Step[]) => void;
   moveObject: (id: string, x: number, y: number) => void;
   rotateObject: (id: string, facing: number) => void;
   benchObject: (id: string) => void;
@@ -83,6 +86,7 @@ type PlayEditorState = {
   addAction: (action: Omit<Action, 'id'>) => boolean;
   updateAction: (id: string, patch: { bend?: Point }) => void;
   deleteAction: (id: string) => void;
+  deleteActionAt: (index: number, id: string) => void;
   undo: () => void;
   redo: () => void;
   markSaved: () => void;
@@ -124,6 +128,21 @@ const patchById = <T extends { id: string }>(
 const withoutBall = (phase: Phase): Phase => {
   const next = { ...phase };
   delete next.ballHolderId;
+  return next;
+};
+
+// Drop gone action ids from the phase's step timeline; a step left empty goes,
+// and an empty timeline is removed entirely.
+const pruneSteps = (
+  phase: Phase,
+  gone: (actionId: string) => boolean,
+): Phase => {
+  if (!phase.steps) return phase;
+  const steps = phase.steps
+    .map((s) => ({ ...s, actionIds: s.actionIds.filter((id) => !gone(id)) }))
+    .filter((s) => s.actionIds.length > 0);
+  const next: Phase = { ...phase, steps };
+  if (steps.length === 0) delete next.steps;
   return next;
 };
 
@@ -236,11 +255,23 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
       const { phases } = get();
       if (phases.length >= MAX_PHASES) return;
       const prev = phases[phases.length - 1];
+      // if the previous phase passes the ball off, the new phase opens with the
+      // receiver holding it
+      const passOut =
+        prev.ballHolderId != null
+          ? prev.actions.find(
+              (a) =>
+                (a.type === 'pass' || a.type === 'handoff') &&
+                a.fromId === prev.ballHolderId &&
+                a.toId != null,
+            )
+          : undefined;
+      const holder = passOut?.toId ?? prev.ballHolderId;
       const next: Phase = {
         id: newPhaseId(),
         objects: prev.objects.map((o) => ({ ...o })),
         actions: [],
-        ...(prev.ballHolderId ? { ballHolderId: prev.ballHolderId } : {}),
+        ...(holder ? { ballHolderId: holder } : {}),
       };
       commitPhases([...phases, next], phases.length);
     },
@@ -261,6 +292,36 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
         activePhaseIndex: Math.max(0, Math.min(index, state.phases.length - 1)),
         selection: null,
       })),
+
+    duplicatePhase: (index) => {
+      const { phases } = get();
+      if (phases.length >= MAX_PHASES || index < 0 || index >= phases.length) {
+        return;
+      }
+      const src = phases[index];
+      // fresh action ids so the copy is self-contained; remap the steps to match
+      const idMap = new Map(src.actions.map((a) => [a.id, newActionId()]));
+      const copy: Phase = {
+        id: newPhaseId(),
+        objects: src.objects.map((o) => ({ ...o })),
+        actions: src.actions.map((a) => ({ ...a, id: idMap.get(a.id)! })),
+        ...(src.ballHolderId ? { ballHolderId: src.ballHolderId } : {}),
+        ...(src.note ? { note: src.note } : {}),
+        ...(src.steps
+          ? {
+              steps: src.steps.map((s, i) => ({
+                id: `g${i}`,
+                actionIds: s.actionIds.map((aid) => idMap.get(aid) ?? aid),
+                durationMs: s.durationMs,
+              })),
+            }
+          : {}),
+      };
+      commitPhases(
+        [...phases.slice(0, index + 1), copy, ...phases.slice(index + 1)],
+        index + 1,
+      );
+    },
 
     reorderPhase: (from, to) => {
       const { phases, activePhaseIndex } = get();
@@ -283,6 +344,13 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
         return next;
       }),
 
+    setPhaseSteps: (index, steps) =>
+      editPhaseAt(index, (phase) => {
+        const next: Phase = { ...phase, steps };
+        if (steps.length === 0) delete next.steps;
+        return next;
+      }),
+
     moveObject: (id, x, y) => {
       set((state) => ({ homes: { ...state.homes, [id]: { x, y } } }));
       editPhase((phase) => ({
@@ -300,13 +368,19 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
     benchObject: (id) => {
       if (!activePhase(get()).objects.some((o) => o.id === id)) return;
       editAllPhases((phase) => {
-        const next: Phase = {
-          ...phase,
-          objects: phase.objects.filter((o) => o.id !== id),
-          actions: phase.actions.filter(
-            (a) => a.fromId !== id && a.toId !== id,
-          ),
-        };
+        const gone = new Set(
+          phase.actions
+            .filter((a) => a.fromId === id || a.toId === id)
+            .map((a) => a.id),
+        );
+        const next = pruneSteps(
+          {
+            ...phase,
+            objects: phase.objects.filter((o) => o.id !== id),
+            actions: phase.actions.filter((a) => !gone.has(a.id)),
+          },
+          (actionId) => gone.has(actionId),
+        );
         return phase.ballHolderId === id ? withoutBall(next) : next;
       });
       set((state) =>
@@ -386,10 +460,26 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
       if (activePhase(get()).actions.length >= MAX_ACTIONS) return false;
 
       const action: Action = { ...input, id: newActionId() };
+      const index = get().activePhaseIndex;
+      // a pass / handoff from whoever holds the ball moves possession to the
+      // receiver by the next phase — one commit, so undo reverts both
+      const handsOff =
+        (action.type === 'pass' || action.type === 'handoff') &&
+        action.toId != null &&
+        get().phases[index].ballHolderId === action.fromId &&
+        index + 1 < get().phases.length;
+
       commitPhase((phase) => ({
         ...phase,
         actions: [...phase.actions, action],
       }));
+      if (handsOff) {
+        set((state) => ({
+          phases: state.phases.map((phase, i) =>
+            i === index + 1 ? { ...phase, ballHolderId: action.toId } : phase,
+          ),
+        }));
+      }
       set({ selection: { kind: 'action', id: action.id } });
       return true;
     },
@@ -404,16 +494,28 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
         }),
       })),
 
-    deleteAction: (id) => {
-      commitPhase((phase) => ({
-        ...phase,
-        actions: phase.actions.filter((action) => action.id !== id),
-      }));
-      set((state) =>
-        state.selection?.kind === 'action' && state.selection.id === id
+    deleteAction: (id) => get().deleteActionAt(get().activePhaseIndex, id),
+
+    deleteActionAt: (index, id) => {
+      set((state) => ({
+        isDirty: true,
+        history: clip([...state.history, snapshotOf(state)]),
+        future: [],
+        phases: state.phases.map((phase, i) =>
+          i === index
+            ? pruneSteps(
+                {
+                  ...phase,
+                  actions: phase.actions.filter((a) => a.id !== id),
+                },
+                (actionId) => actionId === id,
+              )
+            : phase,
+        ),
+        ...(state.selection?.kind === 'action' && state.selection.id === id
           ? { selection: null }
-          : {},
-      );
+          : {}),
+      }));
     },
 
     undo: () => {
@@ -456,7 +558,7 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
 
     toDiagram: () => {
       const { court, phases } = get();
-      return { version: 1, court, phases, timeline: [] };
+      return { version: 1, court, phases };
     },
   };
 });

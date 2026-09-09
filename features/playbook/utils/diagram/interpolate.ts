@@ -1,22 +1,30 @@
 import { actionEndpoints, bezierPoint } from './geometry';
 import type { Action, Phase, PlacedObject, Point } from './types';
 
-// Front slice of every segment where players hold the 'from' pose before moving,
-// so the eye registers each keyframe. The rest of the segment is the move.
-export const HOLD_FRACTION = 0.22;
+// The move time for a transition with no moves to time.
+const DEFAULT_SEGMENT_MS = 900;
+// Per-move beat when a phase has no explicit step timeline.
+const DEFAULT_BEAT_MS = 700;
 
-const MOVE_MS = 900;
-const HOLD_MS = 260;
-export const SEGMENT_MS = MOVE_MS + HOLD_MS;
-
-// Only these drag a player along their drawn curve; a screen ends in a hold, and
-// pass / shot / handoff move the ball, not a body.
+// Being the subject of one of these in a step puts a player on that step's beat.
+const MOVE_ACTIONS: ReadonlySet<Action['type']> = new Set([
+  'cut',
+  'dribble',
+  'screen',
+]);
+// A screen ends in a plant, so only these two are followed along their curve.
 const PATH_ACTIONS: ReadonlySet<Action['type']> = new Set(['cut', 'dribble']);
 const BALL_ACTIONS: ReadonlySet<Action['type']> = new Set(['pass', 'handoff']);
 
+// Consecutive steps overlap by this fraction of the shorter one, so the play
+// flows from one beat into the next instead of stopping between them.
+const BEAT_OVERLAP = 0.4;
+
 const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
 
-export const easeInOutCubic = (t: number) =>
+// eased in and out, so a mover accelerates off the mark and settles onto its
+// spot rather than snapping to a constant speed
+const easeInOut = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -32,34 +40,120 @@ export const lerpAngle = (a: number, b: number, t: number) => {
   return a + d * t;
 };
 
-export const animationDurationMs = (phaseCount: number) =>
-  Math.max(0, phaseCount - 1) * SEGMENT_MS;
+// Where each step's beat starts, and how long the whole transition runs. Beats
+// overlap, so `total` is less than the naive sum of durations.
+function beatLayout(steps: { durationMs: number }[]): {
+  starts: number[];
+  total: number;
+} {
+  const starts: number[] = [];
+  let cursor = 0;
+  for (let i = 0; i < steps.length; i++) {
+    starts.push(cursor);
+    const next = steps[i + 1];
+    const overlap = next
+      ? BEAT_OVERLAP * Math.min(steps[i].durationMs, next.durationMs)
+      : 0;
+    cursor += steps[i].durationMs - overlap;
+  }
+  const last = steps.length - 1;
+  return {
+    starts,
+    total: last >= 0 ? starts[last] + steps[last].durationMs : 0,
+  };
+}
+
+type Beat = { actionIds: string[]; durationMs: number };
+
+// The step timeline the phase actually plays: its own `steps` if set, otherwise
+// each move on its own beat in draw order — one after another is the default,
+// grouping moves into a step runs them together.
+const effectiveSteps = (from: Phase): Beat[] =>
+  from.steps && from.steps.length > 0
+    ? from.steps
+    : from.actions.map((a) => ({
+        actionIds: [a.id],
+        durationMs: DEFAULT_BEAT_MS,
+      }));
+
+// How long the transition leaving `from` runs — its overlapped beats, or the
+// default when there are no moves. No pause between beats or phases.
+const segmentMs = (from: Phase) => {
+  const beats = effectiveSteps(from);
+  return beats.length > 0 ? beatLayout(beats).total : DEFAULT_SEGMENT_MS;
+};
+
+// The end state of a single phase's own actions: every mover sits at its
+// drawn endpoint, the ball with whoever it was passed to. Lets a one-phase
+// play still animate — there is always something to run.
+function synthEndPhase(phase: Phase): Phase {
+  const objects = phase.objects.map((obj) => {
+    const move = phase.actions.find(
+      (a) => a.fromId === obj.id && MOVE_ACTIONS.has(a.type),
+    );
+    const ends = move && actionEndpoints(move, phase.objects);
+    return ends ? { ...obj, x: ends.b.x, y: ends.b.y } : obj;
+  });
+
+  const pass =
+    phase.ballHolderId != null
+      ? phase.actions.find(
+          (a) =>
+            a.fromId === phase.ballHolderId &&
+            a.toId != null &&
+            BALL_ACTIONS.has(a.type),
+        )
+      : undefined;
+
+  return {
+    ...phase,
+    id: `${phase.id}~end`,
+    objects,
+    actions: [],
+    ...(pass?.toId ? { ballHolderId: pass.toId } : {}),
+  };
+}
+
+const playbackPhases = (phases: Phase[]): Phase[] =>
+  phases.length >= 2 ? phases : [phases[0], synthEndPhase(phases[0])];
+
+export const animationDurationMs = (phases: Phase[]) =>
+  playbackPhases(phases)
+    .slice(0, -1)
+    .reduce((sum, from) => sum + segmentMs(from), 0);
+
+// The 0..1 progress at which the transition leaving phase `index` begins — the
+// last phase maps to the very end.
+export function phaseStartProgress(phases: Phase[], index: number): number {
+  if (index <= 0) return 0;
+  const durations = playbackPhases(phases).slice(0, -1).map(segmentMs);
+  const total = durations.reduce((sum, d) => sum + d, 0);
+  if (total === 0) return 0;
+  const before = durations.slice(0, index).reduce((sum, d) => sum + d, 0);
+  return Math.min(1, before / total);
+}
 
 export type FrameSlice = { fromIndex: number; toIndex: number; t: number };
 
-// A normalised 0..1 progress across the whole play maps to a segment plus an
-// eased position within it (0 during that segment's hold, then eased 0..1).
-// `reduce` snaps that to 0 or 1 — a slideshow of keyframes for viewers who
-// asked the OS to minimise motion.
-export function resolveFrame(
-  phaseCount: number,
-  progress: number,
-  reduce = false,
-): FrameSlice {
-  if (phaseCount < 2) return { fromIndex: 0, toIndex: 0, t: 0 };
+// A normalised 0..1 progress across the whole play maps to a segment and a
+// linear 0..1 position within it. Segments are weighted by their duration, so a
+// long multi-step transition gets a proportionally wider slice of the scrubber.
+export function resolveFrame(phases: Phase[], progress: number): FrameSlice {
+  const seq = playbackPhases(phases);
+  const durations = seq.slice(0, -1).map(segmentMs);
+  const total = durations.reduce((sum, d) => sum + d, 0);
+  const target = clamp01(progress) * total;
 
-  const segments = phaseCount - 1;
-  const scaled = clamp01(progress) * segments;
-  const seg = Math.min(segments - 1, Math.floor(scaled));
-  const local = scaled - seg;
-  const moved =
-    local <= HOLD_FRACTION ? 0 : (local - HOLD_FRACTION) / (1 - HOLD_FRACTION);
-
-  return {
-    fromIndex: seg,
-    toIndex: seg + 1,
-    t: reduce ? (moved < 0.5 ? 0 : 1) : easeInOutCubic(clamp01(moved)),
-  };
+  let acc = 0;
+  for (let i = 0; i < durations.length; i++) {
+    const last = i === durations.length - 1;
+    if (target <= acc + durations[i] || last) {
+      const local = durations[i] > 0 ? (target - acc) / durations[i] : 1;
+      return { fromIndex: i, toIndex: i + 1, t: clamp01(local) };
+    }
+    acc += durations[i];
+  }
+  return { fromIndex: 0, toIndex: 1, t: 0 };
 }
 
 export type FrameObject = PlacedObject & { opacity: number };
@@ -70,20 +164,23 @@ export type AnimationFrame = {
   t: number;
   objects: FrameObject[];
   ball: Point | null;
+  // from-phase routes with how far each is drawn (0..1), keyed by action id —
+  // a line draws itself as its beat runs
+  routes: { id: string; progress: number }[];
 };
 
 type Ends = { a: Point; b: Point; ctrl: Point | null };
 
 // The single cut / dribble drawn from `id` in `phase`, or null when there is
 // none or more than one (ambiguous — fall back to a straight move).
-function soloMovement(phase: Phase, id: string): Ends | null {
+function soloPath(phase: Phase, id: string): Ends | null {
   const hits = phase.actions.filter(
     (action) => action.fromId === id && PATH_ACTIONS.has(action.type),
   );
   return hits.length === 1 ? actionEndpoints(hits[0], phase.objects) : null;
 }
 
-// Follow the drawn curve, but ramp a correction over the move so the mover ends
+// Follow the drawn curve, ramping a correction over the move so the mover ends
 // exactly on `end` even when the coach's arrow stopped somewhere else.
 function followWarped(ends: Ends, end: Point, t: number): Point {
   const raw = bezierPoint(ends.a, ends.b, ends.ctrl, t);
@@ -98,18 +195,55 @@ function lerpFacing(a?: number, b?: number, t = 0): number | undefined {
   return lerpAngle(a ?? b!, b ?? a!, t);
 }
 
+// When in the move sequence an action (or an object's move) runs. Walks the
+// steps; the last one matching wins (a mover scripted late holds until then).
+// Unscripted movement fills the whole window.
+function stepWindow(
+  from: Phase,
+  matches: (action: Action) => boolean,
+  totalMs: number,
+): { pre: number; d: number } {
+  const steps = effectiveSteps(from);
+  if (steps.length === 0) return { pre: 0, d: totalMs };
+
+  const { starts } = beatLayout(steps);
+  let found: { pre: number; d: number } | null = null;
+
+  steps.forEach((step, i) => {
+    const hit = step.actionIds.some((id) => {
+      const action = from.actions.find((x) => x.id === id);
+      return action != null && matches(action);
+    });
+    if (hit) found = { pre: starts[i], d: step.durationMs };
+  });
+
+  return found ?? { pre: 0, d: totalMs };
+}
+
+// Eased 0..1 for a mover, given how many ms into the transition we are and
+// which slice of it is that mover's beat. `reduce` snaps it for minimised
+// motion.
+function beatProgress(
+  activeMs: number,
+  window: { pre: number; d: number },
+  reduce: boolean,
+): number {
+  const local = window.d > 0 ? clamp01((activeMs - window.pre) / window.d) : 1;
+  return reduce ? (local < 0.5 ? 0 : 1) : easeInOut(local);
+}
+
 export function interpolateFrame(
   phases: Phase[],
   progress: number,
   reduce = false,
 ): AnimationFrame {
-  const { fromIndex, toIndex, t } = resolveFrame(
-    phases.length,
-    progress,
-    reduce,
-  );
-  const from = phases[fromIndex];
-  const to = phases[toIndex];
+  const seq = playbackPhases(phases);
+  const { fromIndex, toIndex, t } = resolveFrame(seq, progress);
+  const from = seq[fromIndex];
+  const to = seq[toIndex];
+
+  const totalMs = segmentMs(from);
+  const activeMs = clamp01(t) * totalMs;
 
   const at = (phase: Phase, id: string) =>
     phase.objects.find((o) => o.id === id) ?? null;
@@ -124,9 +258,15 @@ export function interpolateFrame(
     const b = at(to, id);
 
     if (a && b) {
-      const path = soloMovement(from, id);
-      const pos = path ? followWarped(path, b, t) : lerpPoint(a, b, t);
-      const facing = lerpFacing(a.facing, b.facing, t);
+      const window = stepWindow(
+        from,
+        (action) => action.fromId === id && MOVE_ACTIONS.has(action.type),
+        totalMs,
+      );
+      const p = beatProgress(activeMs, window, reduce);
+      const path = soloPath(from, id);
+      const pos = path ? followWarped(path, b, p) : lerpPoint(a, b, p);
+      const facing = lerpFacing(a.facing, b.facing, p);
       objects.push({
         ...a,
         x: pos.x,
@@ -141,13 +281,31 @@ export function interpolateFrame(
     }
   }
 
-  return { fromIndex, toIndex, t, objects, ball: ball(from, to, t, objects) };
+  const routes = from.actions.map((action) => ({
+    id: action.id,
+    progress: beatProgress(
+      activeMs,
+      stepWindow(from, (x) => x.id === action.id, totalMs),
+      reduce,
+    ),
+  }));
+
+  return {
+    fromIndex,
+    toIndex,
+    t,
+    objects,
+    ball: ball(from, to, activeMs, totalMs, reduce, objects),
+    routes,
+  };
 }
 
 function ball(
   from: Phase,
   to: Phase,
-  t: number,
+  activeMs: number,
+  totalMs: number,
+  reduce: boolean,
   objects: FrameObject[],
 ): Point | null {
   const a = from.ballHolderId;
@@ -158,6 +316,18 @@ function ball(
     const o = objects.find((ob) => ob.id === id);
     return o ? { x: o.x, y: o.y } : null;
   };
+
+  // a shot from the current holder — the ball flies to where it was aimed
+  if (a != null) {
+    const shot = from.actions.find(
+      (action) => action.fromId === a && action.type === 'shot',
+    );
+    const ends = shot && actionEndpoints(shot, from.objects);
+    if (shot && ends) {
+      const window = stepWindow(from, (x) => x.id === shot.id, totalMs);
+      return followWarped(ends, ends.b, beatProgress(activeMs, window, reduce));
+    }
+  }
 
   if (a != null && a === b) return framePos(a);
 
@@ -172,8 +342,14 @@ function ball(
         action.toId === b &&
         BALL_ACTIONS.has(action.type),
     );
+    const window = stepWindow(
+      from,
+      (action) => pass != null && action.id === pass.id,
+      totalMs,
+    );
+    const p = beatProgress(activeMs, window, reduce);
     const ends = pass && actionEndpoints(pass, from.objects);
-    return ends ? followWarped(ends, end, t) : lerpPoint(start, end, t);
+    return ends ? followWarped(ends, end, p) : lerpPoint(start, end, p);
   }
 
   return framePos((a ?? b)!);

@@ -260,7 +260,9 @@ describe('PlayEditor — breakdown', () => {
     await user.click(screen.getByRole('tab', { name: 'Breakdown' }));
 
     // Assert — the notes panel for the current phase, with its toolbar
-    expect(screen.getByRole('heading', { name: /Phase 1/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Step notes' }),
+    ).toBeInTheDocument();
     expect(
       await screen.findByRole('toolbar', { name: 'Formatting' }),
     ).toBeInTheDocument();
@@ -292,7 +294,7 @@ describe('PlayEditor — breakdown', () => {
 });
 
 describe('PlayEditor — animate', () => {
-  it('opens the Animate tab and prompts for a second phase', async () => {
+  it('opens the Animate tab with the timeline and player', async () => {
     // Arrange
     const user = userEvent.setup();
     renderEditor();
@@ -300,8 +302,13 @@ describe('PlayEditor — animate', () => {
     // Act
     await user.click(screen.getByRole('tab', { name: 'Animate' }));
 
-    // Assert — the seed play has one phase, so there is nothing to animate yet
-    expect(screen.getByText(/add a second phase/i)).toBeInTheDocument();
+    // Assert — the one-phase seed play still animates
+    expect(
+      screen.getByRole('region', { name: 'Action timeline' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('img', { name: /play animation/i }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -330,6 +337,36 @@ describe('PlayEditor — rename', () => {
         expect.objectContaining({ id: 'play-1', name: 'Horns flare' }),
       ),
     );
+  });
+
+  it('keeps unsaved edits when the play props change (e.g. a rename refresh)', () => {
+    // Arrange — an in-progress edit in the store
+    const store = usePlayEditorStore.getState;
+    const { rerender } = renderWithClient(
+      <PlayEditor
+        playId="play-1"
+        routeKey="team~1"
+        name="Horns"
+        category={Category.Offensive}
+        diagram={seedDiagram('half', objects)}
+      />,
+    );
+    act(() => store().addAction({ type: 'cut', fromId: 'o1', toId: 'o2' }));
+    const actionId = store().phases[0].actions[0].id;
+
+    // Act — an RSC refresh after a rename: new name + new diagram identity
+    rerender(
+      <PlayEditor
+        playId="play-1"
+        routeKey="team~1"
+        name="Horns flare"
+        category={Category.Offensive}
+        diagram={seedDiagram('half', objects)}
+      />,
+    );
+
+    // Assert — the drawn action is still there
+    expect(store().phases[0].actions[0].id).toBe(actionId);
   });
 
   it('does not call the backend when the name is unchanged', async () => {

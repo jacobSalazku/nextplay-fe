@@ -1,5 +1,8 @@
 'use client';
 
+import { StageColumn } from '../stage-column';
+import { COURT_VIEWBOX } from '@/features/playbook/components/diagram/court';
+import { CourtDiagram } from '@/features/playbook/components/diagram/court-diagram';
 import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
 import type { Category } from '@/graphql/graphql';
 import { CategoryPicker } from './category-picker';
@@ -12,6 +15,10 @@ type BreakdownProps = {
   phases: Phase[];
   activeIndex: number;
   onSelectPhase: (index: number) => void;
+  onAddPhase: () => void;
+  onDeletePhase: (index: number) => void;
+  onDuplicatePhase: (index: number) => void;
+  onReorderPhase: (from: number, to: number) => void;
   onCategoryChange: (category: Category) => void;
   onNoteChange: (index: number, note: string) => void;
   onEditStart: () => void;
@@ -24,34 +31,56 @@ export function BreakdownView({
   phases,
   activeIndex,
   onSelectPhase,
+  onAddPhase,
+  onDeletePhase,
+  onDuplicatePhase,
+  onReorderPhase,
   onCategoryChange,
   onNoteChange,
   onEditStart,
   onEditEnd,
 }: BreakdownProps) {
   const phase = phases[activeIndex];
+  const { w, h } = COURT_VIEWBOX[court];
 
   return (
-    <div className="flex min-h-0 flex-1 justify-center overflow-y-auto p-6">
-      <div className="flex w-full max-w-5xl items-start gap-5">
-        <PhaseRail
-          phases={phases}
-          court={court}
-          activeIndex={activeIndex}
-          onSelect={onSelectPhase}
-        />
+    <div className="flex min-h-0 flex-1 gap-3 overflow-hidden p-3">
+      <PhaseRail
+        phases={phases}
+        court={court}
+        activeIndex={activeIndex}
+        onSelect={onSelectPhase}
+        onAdd={onAddPhase}
+        onDelete={onDeletePhase}
+        onDuplicate={onDuplicatePhase}
+        onReorder={onReorderPhase}
+      />
 
-        <div className="flex flex-1 flex-col rounded-2xl bg-[#faf6ec] p-5 text-slate-900">
-          <div className="mb-3 flex items-start justify-between gap-4">
-            <h2 className="text-xl font-bold">
-              Phase {activeIndex + 1}
-              <span className="ml-2 align-middle text-sm font-normal text-slate-500">
-                Step notes
-              </span>
-            </h2>
-            <CategoryPicker value={category} onChange={onCategoryChange} />
-          </div>
+      <StageColumn>
+        <div
+          className="relative h-full max-w-full"
+          style={{ aspectRatio: `${w} / ${h}` }}
+        >
+          <CourtDiagram
+            court={court}
+            phase={phase}
+            className="absolute inset-0 h-full w-full"
+          />
+        </div>
+      </StageColumn>
 
+      <section
+        aria-label="Phase notes"
+        className="flex max-h-full w-80 shrink-0 flex-col self-start overflow-hidden rounded-2xl bg-[#faf6ec] text-slate-900"
+      >
+        <header className="flex items-center justify-between gap-3 border-b border-[#e6dcc4] px-5 py-3.5">
+          <h2 className="text-xs font-semibold tracking-wider text-[#8a7a5c] uppercase">
+            Step notes
+          </h2>
+          <CategoryPicker value={category} onChange={onCategoryChange} />
+        </header>
+
+        <div className="flex min-h-0 flex-1 flex-col p-4">
           <PhaseNotesEditor
             phaseId={phase.id}
             content={phase.note ?? ''}
@@ -60,7 +89,7 @@ export function BreakdownView({
             onEditEnd={onEditEnd}
           />
         </div>
-      </div>
+      </section>
     </div>
   );
 }

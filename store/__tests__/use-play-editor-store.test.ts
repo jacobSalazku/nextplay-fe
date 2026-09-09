@@ -95,6 +95,26 @@ describe('usePlayEditorStore', () => {
     expect(store().isDirty).toBe(true);
   });
 
+  it('moves possession to the receiver a phase later when a pass is drawn', () => {
+    // Arrange — o1 has the ball, and there is a next phase
+    hydrate();
+    store().setBallHolder('o1');
+    store().addPhase();
+    store().setActivePhase(0);
+
+    // Act
+    store().addAction({ type: 'pass', fromId: 'o1', toId: 'o2' });
+
+    // Assert — phase 1 keeps o1, phase 2 now has o2
+    expect(store().phases[0].ballHolderId).toBe('o1');
+    expect(store().phases[1].ballHolderId).toBe('o2');
+
+    // and it is one undo step
+    store().undo();
+    expect(store().phases[0].actions).toHaveLength(0);
+    expect(store().phases[1].ballHolderId).toBe('o1');
+  });
+
   it('refuses a 31st action', () => {
     // Arrange
     hydrate();
@@ -145,6 +165,21 @@ describe('usePlayEditorStore', () => {
     // Assert
     expect(phase().actions).toHaveLength(0);
     expect(store().selection).toBeNull();
+  });
+
+  it('deletes an action from a phase that is not the active one', () => {
+    // Arrange — an action on phase 1, then move to phase 2
+    hydrate();
+    store().addAction({ type: 'cut', fromId: 'o1', toId: 'o2' });
+    const { id } = phase().actions[0];
+    store().addPhase(); // active = 1
+
+    // Act
+    store().deleteActionAt(0, id);
+
+    // Assert
+    expect(store().phases[0].actions).toHaveLength(0);
+    expect(store().isDirty).toBe(true);
   });
 
   it('clears the dirty flag once saved', () => {
@@ -319,7 +354,6 @@ describe('usePlayEditorStore', () => {
     hydrate();
     store().moveObject('o1', 11, 22);
     store().setBallHolder('o1');
-    store().addAction({ type: 'pass', fromId: 'o1', toId: 'o2' });
 
     // Act
     store().addPhase();
@@ -333,9 +367,20 @@ describe('usePlayEditorStore', () => {
     });
     expect(phase().actions).toHaveLength(0);
     expect(phase().ballHolderId).toBe('o1');
+  });
 
-    // and the first phase is untouched
-    expect(store().phases[0].actions).toHaveLength(1);
+  it('opens the new phase with the receiver holding it after a pass', () => {
+    // Arrange — o1 has the ball and passes to o2 in phase 1
+    hydrate();
+    store().setBallHolder('o1');
+    store().addAction({ type: 'pass', fromId: 'o1', toId: 'o2' });
+
+    // Act
+    store().addPhase();
+
+    // Assert
+    expect(store().phases[0].ballHolderId).toBe('o1');
+    expect(phase().ballHolderId).toBe('o2');
   });
 
   it('edits only the active phase', () => {
@@ -391,6 +436,29 @@ describe('usePlayEditorStore', () => {
     expect(store().phases).toHaveLength(1);
   });
 
+  it('duplicates a phase right after it, with fresh action ids', () => {
+    // Arrange — phase 0 has a sequenced action
+    hydrate();
+    store().addAction({ type: 'cut', fromId: 'o1', toId: 'o2' });
+    const originalId = phase().actions[0].id;
+    store().setPhaseSteps(0, [
+      { id: 'g0', actionIds: [originalId], durationMs: 700 },
+    ]);
+
+    // Act
+    store().duplicatePhase(0);
+
+    // Assert — the copy sits at index 1 and is the active phase
+    expect(store().phases).toHaveLength(2);
+    expect(store().activePhaseIndex).toBe(1);
+
+    const copy = store().phases[1];
+    expect(copy.id).not.toBe(store().phases[0].id);
+    expect(copy.actions[0].id).not.toBe(originalId);
+    // its step timeline points at the copy's own action
+    expect(copy.steps?.[0].actionIds).toEqual([copy.actions[0].id]);
+  });
+
   it('sets and clears a note on any phase, not just the active one', () => {
     // Arrange
     hydrate();
@@ -425,6 +493,66 @@ describe('usePlayEditorStore', () => {
 
     // Assert — back to no note in one step
     expect('note' in store().phases[0]).toBe(false);
+  });
+
+  it('sets a step timeline on a phase and clears it back to none', () => {
+    // Arrange — a phase with one action to sequence
+    hydrate();
+    store().addAction({ type: 'cut', fromId: 'o1', toId: 'o2' });
+    const actionId = phase().actions[0].id;
+
+    // Act
+    store().setPhaseSteps(0, [
+      { id: 's1', actionIds: [actionId], durationMs: 700 },
+    ]);
+
+    // Assert
+    expect(store().phases[0].steps).toEqual([
+      { id: 's1', actionIds: [actionId], durationMs: 700 },
+    ]);
+
+    // Act — clear
+    store().setPhaseSteps(0, []);
+
+    // Assert — the key is gone, not left as []
+    expect('steps' in store().phases[0]).toBe(false);
+  });
+
+  it('drops a deleted action from the step timeline', () => {
+    // Arrange — two actions, both sequenced
+    hydrate();
+    store().addAction({ type: 'cut', fromId: 'o1', toId: 'o2' });
+    store().addAction({ type: 'pass', fromId: 'o2', toId: 'o1' });
+    const [a1, a2] = phase().actions.map((a) => a.id);
+    store().setPhaseSteps(0, [
+      { id: 's1', actionIds: [a1], durationMs: 500 },
+      { id: 's2', actionIds: [a2], durationMs: 500 },
+    ]);
+
+    // Act — delete the first action
+    store().deleteAction(a1);
+
+    // Assert — its step is gone, the other survives
+    expect(phase().steps).toEqual([
+      { id: 's2', actionIds: [a2], durationMs: 500 },
+    ]);
+  });
+
+  it('strips a benched player from the step timeline', () => {
+    // Arrange — o1 both screens (stays sequenced) and is passed to
+    hydrate();
+    store().addAction({ type: 'screen', fromId: 'o1', toId: 'o2' });
+    store().addAction({ type: 'cut', fromId: 'o2', toId: 'o1' });
+    const [screen, cut] = phase().actions.map((a) => a.id);
+    store().setPhaseSteps(0, [
+      { id: 's1', actionIds: [screen, cut], durationMs: 800 },
+    ]);
+
+    // Act — bench o1: both actions reference it, so both go
+    store().benchObject('o1');
+
+    // Assert — the emptied step, and the timeline, are gone
+    expect('steps' in store().phases[0]).toBe(false);
   });
 
   it('reorders phases and follows the active one', () => {

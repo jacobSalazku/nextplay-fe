@@ -14,10 +14,11 @@ import { useConfirm } from '@/components/feedback/confirm-provider';
 import { Button } from '@/components/foundation/button/button';
 import { AnimateView } from './animate/animate-view';
 import { BreakdownView } from './breakdown/breakdown-view';
+import { PhaseRail } from './breakdown/phase-rail';
 import { EditorStage } from './editor-stage';
 import { ModeTabs, type EditorMode } from './mode-tabs';
-import { PhaseStrip } from './phase-strip';
 import { RosterPanel } from './roster-panel';
+import { StageColumn } from './stage-column';
 import { ToolDock } from './tool-dock';
 
 type Props = {
@@ -65,8 +66,12 @@ export function PlayEditor({
     if (!store.hydrated || store.playId !== playId) {
       store.hydrate({ playId, routeKey, name, diagram });
     }
-    return store.reset;
   }, [playId, routeKey, name, diagram]);
+
+  // Reset only when the editor actually unmounts — not on every prop change. A
+  // rename or a category change triggers an RSC refresh (new `name` / `diagram`
+  // identity); resetting there would wipe the animation the coach is building.
+  useEffect(() => usePlayEditorStore.getState().reset, []);
 
   const court = usePlayEditorStore((s) => s.court);
   const phases = usePlayEditorStore((s) => s.phases);
@@ -82,6 +87,7 @@ export function PlayEditor({
   const select = usePlayEditorStore((s) => s.select);
   const addPhase = usePlayEditorStore((s) => s.addPhase);
   const deletePhase = usePlayEditorStore((s) => s.deletePhase);
+  const duplicatePhase = usePlayEditorStore((s) => s.duplicatePhase);
   const setActivePhase = usePlayEditorStore((s) => s.setActivePhase);
   const reorderPhase = usePlayEditorStore((s) => s.reorderPhase);
   const beginEdit = usePlayEditorStore((s) => s.beginEdit);
@@ -96,7 +102,9 @@ export function PlayEditor({
   const addAction = usePlayEditorStore((s) => s.addAction);
   const updateAction = usePlayEditorStore((s) => s.updateAction);
   const deleteAction = usePlayEditorStore((s) => s.deleteAction);
+  const deleteActionAt = usePlayEditorStore((s) => s.deleteActionAt);
   const setPhaseNote = usePlayEditorStore((s) => s.setPhaseNote);
+  const setPhaseSteps = usePlayEditorStore((s) => s.setPhaseSteps);
   const undo = usePlayEditorStore((s) => s.undo);
   const redo = usePlayEditorStore((s) => s.redo);
   const markSaved = usePlayEditorStore((s) => s.markSaved);
@@ -261,24 +269,60 @@ export function PlayEditor({
         </div>
       </header>
 
-      {mode === 'breakdown' ? (
-        <BreakdownView
-          category={category}
-          court={court}
-          phases={phases}
-          activeIndex={activePhaseIndex}
-          onSelectPhase={setActivePhase}
-          onCategoryChange={changeCategory}
-          onNoteChange={setPhaseNote}
-          onEditStart={beginEdit}
-          onEditEnd={endEdit}
-        />
-      ) : mode === 'animate' ? (
-        <AnimateView court={court} phases={phases} />
-      ) : (
-        <div className="flex flex-1 flex-col gap-2 overflow-hidden p-2 lg:flex-row">
-          <div className="flex min-h-0 flex-1 flex-col gap-2">
-            <div className="flex min-h-0 flex-1 items-center justify-center">
+      <div
+        key={mode}
+        className="editor-view-enter flex min-h-0 flex-1 flex-col"
+      >
+        {mode === 'breakdown' ? (
+          <BreakdownView
+            category={category}
+            court={court}
+            phases={phases}
+            activeIndex={activePhaseIndex}
+            onSelectPhase={setActivePhase}
+            onAddPhase={addPhase}
+            onDeletePhase={deletePhase}
+            onDuplicatePhase={duplicatePhase}
+            onReorderPhase={reorderPhase}
+            onCategoryChange={changeCategory}
+            onNoteChange={setPhaseNote}
+            onEditStart={beginEdit}
+            onEditEnd={endEdit}
+          />
+        ) : mode === 'animate' ? (
+          <AnimateView
+            court={court}
+            phases={phases}
+            activeIndex={activePhaseIndex}
+            onSelectPhase={setActivePhase}
+            onAddPhase={addPhase}
+            onDeletePhase={deletePhase}
+            onDuplicatePhase={duplicatePhase}
+            onReorderPhase={reorderPhase}
+            onStepsChange={setPhaseSteps}
+            onEditStart={beginEdit}
+            onRemoveAction={deleteActionAt}
+          />
+        ) : (
+          <div className="flex min-h-0 flex-1 gap-3 overflow-hidden p-3">
+            <PhaseRail
+              phases={phases}
+              court={court}
+              activeIndex={activePhaseIndex}
+              onSelect={setActivePhase}
+              onAdd={addPhase}
+              onDelete={deletePhase}
+              onDuplicate={duplicatePhase}
+              onReorder={reorderPhase}
+            />
+
+            <StageColumn
+              controls={
+                <div className="flex items-center rounded-2xl bg-[#faf6ec] px-3 py-1.5 shadow-lg shadow-black/25">
+                  <ToolDock tool={tool} onToolChange={setTool} />
+                </div>
+              }
+            >
               <EditorStage
                 court={court}
                 phase={phase}
@@ -296,35 +340,23 @@ export function PlayEditor({
                 onSetBall={setBallHolder}
                 onDelete={deleteSelection}
               />
-            </div>
-            <div className="flex shrink-0 flex-wrap items-center justify-between gap-3">
-              <ToolDock tool={tool} onToolChange={setTool} />
-              <PhaseStrip
-                phases={phases}
-                court={court}
-                activeIndex={activePhaseIndex}
-                onSelect={setActivePhase}
-                onAdd={addPhase}
-                onDelete={deletePhase}
-                onReorder={reorderPhase}
-              />
-            </div>
-          </div>
+            </StageColumn>
 
-          <RosterPanel
-            objects={phase.objects}
-            rosterCount={rosterCount}
-            ballHolderId={phase.ballHolderId}
-            selectedId={selection?.kind === 'object' ? selection.id : null}
-            onBench={benchObject}
-            onUnbench={unbenchObject}
-            onAddSlot={addSlot}
-            onMatchManToMan={matchManToMan}
-            onSetBall={setBallHolder}
-            onSelect={(id) => select({ kind: 'object', id })}
-          />
-        </div>
-      )}
+            <RosterPanel
+              objects={phase.objects}
+              rosterCount={rosterCount}
+              ballHolderId={phase.ballHolderId}
+              selectedId={selection?.kind === 'object' ? selection.id : null}
+              onBench={benchObject}
+              onUnbench={unbenchObject}
+              onAddSlot={addSlot}
+              onMatchManToMan={matchManToMan}
+              onSetBall={setBallHolder}
+              onSelect={(id) => select({ kind: 'object', id })}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
