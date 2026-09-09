@@ -6,6 +6,9 @@ const MUTED = '#736b57';
 const RULE = '#e4dcc9';
 const INK = '#1b1b1b';
 
+// COURT_HALF (225) + the frame's border+padding (2 * (1 + 3))
+const COURT_HALF_CELL = 233;
+
 export const sheet = StyleSheet.create({
   page: {
     padding: 40,
@@ -39,15 +42,15 @@ export const sheet = StyleSheet.create({
     backgroundColor: ACCENT,
   },
 
-  phase: {
+  row: {
     flexDirection: 'row',
-    gap: 18,
-    paddingVertical: 14,
+    gap: 20,
+    paddingVertical: 12,
     borderTopWidth: 1,
     borderTopColor: RULE,
   },
-  firstPhase: { borderTopWidth: 0 },
-  court: { width: '38%' },
+  firstRow: { borderTopWidth: 0 },
+  cell: { width: COURT_HALF_CELL },
   tag: {
     fontFamily: 'Helvetica-Bold',
     fontSize: 8,
@@ -61,8 +64,15 @@ export const sheet = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   frame: { borderWidth: 1, borderColor: RULE, padding: 3 },
-  diagram: { width: '100%' },
-  notes: { flex: 1, fontSize: 10, lineHeight: 1.5 },
+  notes: { flex: 1, fontSize: 10, lineHeight: 1.5, paddingTop: 2 },
+
+  caption: { marginTop: 6, fontSize: 9.5, lineHeight: 1.5, color: '#3a3a3a' },
+  captionLead: {
+    fontFamily: 'Helvetica-Bold',
+    fontSize: 7.5,
+    letterSpacing: 1,
+    color: MUTED,
+  },
 
   paragraph: { marginBottom: 5 },
   heading: {
