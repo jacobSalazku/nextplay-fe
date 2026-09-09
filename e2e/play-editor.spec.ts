@@ -297,4 +297,18 @@ test.describe('play editor flow', () => {
     // Assert — same guard
     await expect(dialog).toBeVisible();
   });
+
+  test('exports the phases as a PNG', async ({ page }) => {
+    // Arrange
+    await newPlay(page);
+
+    // Act — Export ▸ All phases
+    await page.getByRole('button', { name: 'Export' }).click();
+    const download = page.waitForEvent('download');
+    await page.getByRole('button', { name: /All phases/ }).click();
+
+    // Assert — a .png actually came down
+    const file = await download;
+    expect(file.suggestedFilename()).toMatch(/\.png$/);
+  });
 });
