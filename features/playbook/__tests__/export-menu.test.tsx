@@ -4,11 +4,20 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const exportSheetPng = vi.fn((..._args: unknown[]) => Promise.resolve());
-const exportPhasePng = vi.fn((..._args: unknown[]) => Promise.resolve());
+const exportSheetPng = vi.fn<(...args: unknown[]) => Promise<void>>(
+  async () => {},
+);
+const exportPhasePng = vi.fn<(...args: unknown[]) => Promise<void>>(
+  async () => {},
+);
 vi.mock('../utils/diagram/export-diagram', () => ({
   exportSheetPng: (...args: unknown[]) => exportSheetPng(...args),
   exportPhasePng: (...args: unknown[]) => exportPhasePng(...args),
+}));
+
+const openPlaySheet = vi.fn();
+vi.mock('../utils/diagram/play-sheet', () => ({
+  openPlaySheet: (...args: unknown[]) => openPlaySheet(...args),
 }));
 
 const toastError = vi.fn();
@@ -26,12 +35,30 @@ const props = {
   phases,
   activeIndex: 1,
   playName: 'Zone Set',
+  category: 'OFFENSIVE',
 };
 
 beforeEach(() => vi.clearAllMocks());
 
 describe('ExportMenu', () => {
-  it('exports every phase on one sheet', async () => {
+  it('opens a printable coaching sheet for the whole play', async () => {
+    const user = userEvent.setup();
+    render(<ExportMenu {...props} />);
+
+    await user.click(screen.getByRole('button', { name: 'Export' }));
+    await user.click(screen.getByRole('button', { name: /Coaching sheet/ }));
+
+    expect(openPlaySheet).toHaveBeenCalledWith(
+      expect.objectContaining({
+        playName: 'Zone Set',
+        category: 'OFFENSIVE',
+        court: 'half',
+        phases,
+      }),
+    );
+  });
+
+  it('exports every phase on one image', async () => {
     const user = userEvent.setup();
     render(<ExportMenu {...props} />);
 
@@ -56,7 +83,7 @@ describe('ExportMenu', () => {
     );
   });
 
-  it('toasts when the export throws', async () => {
+  it('toasts when an export throws', async () => {
     exportSheetPng.mockRejectedValueOnce(new Error('boom'));
     const user = userEvent.setup();
     render(<ExportMenu {...props} />);

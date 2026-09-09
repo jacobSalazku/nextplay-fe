@@ -5,9 +5,10 @@ import {
   exportPhasePng,
   exportSheetPng,
 } from '@/features/playbook/utils/diagram/export-diagram';
+import { openPlaySheet } from '@/features/playbook/utils/diagram/play-sheet';
 import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
-import { cn } from '@/utils/tw-merge';
-import { Download, Loader2 } from 'lucide-react';
+import { FileText, ImageIcon, LayoutGrid, Loader2 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 
 type Props = {
@@ -15,12 +16,21 @@ type Props = {
   phases: Phase[];
   activeIndex: number;
   playName: string;
+  category: string;
 };
 
-export function ExportMenu({ court, phases, activeIndex, playName }: Props) {
+export function ExportMenu({
+  court,
+  phases,
+  activeIndex,
+  playName,
+  category,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const { data: session } = useSession();
+  const coachName = session?.user?.name ?? 'Coach';
 
   useEffect(() => {
     if (!open) return;
@@ -31,20 +41,20 @@ export function ExportMenu({ court, phases, activeIndex, playName }: Props) {
     return () => document.removeEventListener('pointerdown', close);
   }, [open]);
 
-  const run = async (task: () => Promise<void>) => {
+  const run = async (task: () => void | Promise<void>) => {
     setOpen(false);
     setBusy(true);
     try {
       await task();
     } catch {
-      toast.error('Could not export the diagram');
+      toast.error('Could not export the play');
     } finally {
       setBusy(false);
     }
   };
 
   const item =
-    'flex w-full cursor-pointer items-center justify-between gap-6 px-3 py-2 text-left text-sm hover:bg-white/10 disabled:opacity-50';
+    'flex w-full cursor-pointer items-start gap-3 px-3 py-2.5 text-left hover:bg-white/10';
 
   return (
     <div ref={ref} className="relative">
@@ -59,23 +69,51 @@ export function ExportMenu({ court, phases, activeIndex, playName }: Props) {
         {busy ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
-          <Download className="h-4 w-4" />
+          <ImageIcon className="h-4 w-4" aria-hidden />
         )}
         <span className="hidden sm:inline">Export</span>
       </button>
 
       {open && (
-        <div className="absolute right-0 z-20 mt-1 w-60 overflow-hidden rounded-lg border border-white/10 bg-slate-800 py-1 text-white shadow-xl">
+        <div className="absolute right-0 z-20 mt-1 w-72 overflow-hidden rounded-lg border border-white/10 bg-slate-800 py-1 text-white shadow-xl">
+          <button
+            type="button"
+            className={item}
+            onClick={() =>
+              run(() =>
+                openPlaySheet({
+                  playName,
+                  coachName,
+                  category,
+                  court,
+                  phases,
+                }),
+              )
+            }
+          >
+            <FileText className="mt-0.5 h-4 w-4 shrink-0 text-gray-300" />
+            <span>
+              Coaching sheet
+              <span className="block text-xs text-gray-400">
+                every phase with its notes — print or save as PDF
+              </span>
+            </span>
+          </button>
+
           <button
             type="button"
             className={item}
             onClick={() => run(() => exportSheetPng(court, phases, playName))}
           >
-            All phases
-            <span className="text-xs text-gray-400">
-              {phases.length} on one sheet
+            <LayoutGrid className="mt-0.5 h-4 w-4 shrink-0 text-gray-300" />
+            <span>
+              All phases (PNG)
+              <span className="block text-xs text-gray-400">
+                {phases.length} courts on one image
+              </span>
             </span>
           </button>
+
           <button
             type="button"
             className={item}
@@ -90,18 +128,17 @@ export function ExportMenu({ court, phases, activeIndex, playName }: Props) {
               )
             }
           >
-            Current phase
-            <span className="text-xs text-gray-400">
-              phase {activeIndex + 1}
+            <ImageIcon
+              className="mt-0.5 h-4 w-4 shrink-0 text-gray-300"
+              aria-hidden
+            />
+            <span>
+              Current phase (PNG)
+              <span className="block text-xs text-gray-400">
+                phase {activeIndex + 1} only
+              </span>
             </span>
           </button>
-          <p
-            className={cn(
-              'px-3 pt-1.5 pb-1 text-[11px] leading-snug text-gray-500',
-            )}
-          >
-            Saved as PNG to your downloads.
-          </p>
         </div>
       )}
     </div>

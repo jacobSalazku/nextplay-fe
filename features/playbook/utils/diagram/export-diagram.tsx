@@ -16,7 +16,7 @@ import type { CourtType, Phase } from './types';
 
 // Render one phase's <CourtDiagram> on a detached root and read back the SVG
 // children as a string — no server renderer, no always-mounted hidden nodes.
-function diagramInner(court: CourtType, phase: Phase): string {
+export function diagramInner(court: CourtType, phase: Phase): string {
   const host = document.createElement('div');
   const root = createRoot(host);
   flushSync(() =>
@@ -34,8 +34,8 @@ function diagramInner(court: CourtType, phase: Phase): string {
   return inner;
 }
 
-// escape for SVG text content
-const xmlText = (s: string) =>
+// escape for SVG / HTML text content
+export const xmlText = (s: string) =>
   s.replace(/[<>&]/g, (c) =>
     c === '<' ? '&lt;' : c === '>' ? '&gt;' : '&amp;',
   );
