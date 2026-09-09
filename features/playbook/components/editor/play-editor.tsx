@@ -267,7 +267,8 @@ export function PlayEditor({
             phases={phases}
             activeIndex={activePhaseIndex}
             playName={name}
-            category={category}
+            routeKey={routeKey}
+            playId={playId}
           />
 
           <Button

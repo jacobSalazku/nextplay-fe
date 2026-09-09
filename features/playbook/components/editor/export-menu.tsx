@@ -5,10 +5,8 @@ import {
   exportPhasePng,
   exportSheetPng,
 } from '@/features/playbook/utils/diagram/export-diagram';
-import { openPlaySheet } from '@/features/playbook/utils/diagram/play-sheet';
 import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
 import { FileText, ImageIcon, LayoutGrid, Loader2 } from 'lucide-react';
-import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 
 type Props = {
@@ -16,7 +14,8 @@ type Props = {
   phases: Phase[];
   activeIndex: number;
   playName: string;
-  category: string;
+  routeKey: string;
+  playId: string;
 };
 
 export function ExportMenu({
@@ -24,13 +23,12 @@ export function ExportMenu({
   phases,
   activeIndex,
   playName,
-  category,
+  routeKey,
+  playId,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { data: session } = useSession();
-  const coachName = session?.user?.name ?? 'Coach';
 
   useEffect(() => {
     if (!open) return;
@@ -51,6 +49,14 @@ export function ExportMenu({
     } finally {
       setBusy(false);
     }
+  };
+
+  const openSheet = () => {
+    const win = window.open(
+      `/team/${routeKey}/playbook/play/${playId}/sheet`,
+      '_blank',
+    );
+    if (!win) throw new Error('pop-up blocked');
   };
 
   const item =
@@ -76,26 +82,12 @@ export function ExportMenu({
 
       {open && (
         <div className="absolute right-0 z-20 mt-1 w-72 overflow-hidden rounded-lg border border-white/10 bg-slate-800 py-1 text-white shadow-xl">
-          <button
-            type="button"
-            className={item}
-            onClick={() =>
-              run(() =>
-                openPlaySheet({
-                  playName,
-                  coachName,
-                  category,
-                  court,
-                  phases,
-                }),
-              )
-            }
-          >
+          <button type="button" className={item} onClick={() => run(openSheet)}>
             <FileText className="mt-0.5 h-4 w-4 shrink-0 text-gray-300" />
             <span>
-              Coaching sheet
+              Coaching sheet (PDF)
               <span className="block text-xs text-gray-400">
-                every phase with its notes — print or save as PDF
+                every phase with its notes
               </span>
             </span>
           </button>

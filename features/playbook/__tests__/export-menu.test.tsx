@@ -15,11 +15,6 @@ vi.mock('../utils/diagram/export-diagram', () => ({
   exportPhasePng: (...args: unknown[]) => exportPhasePng(...args),
 }));
 
-const openPlaySheet = vi.fn();
-vi.mock('../utils/diagram/play-sheet', () => ({
-  openPlaySheet: (...args: unknown[]) => openPlaySheet(...args),
-}));
-
 const toastError = vi.fn();
 vi.mock('sonner', () => ({
   toast: { error: (...a: unknown[]) => toastError(...a) },
@@ -35,27 +30,28 @@ const props = {
   phases,
   activeIndex: 1,
   playName: 'Zone Set',
-  category: 'OFFENSIVE',
+  routeKey: 'cavs-1',
+  playId: 'play-9',
 };
 
 beforeEach(() => vi.clearAllMocks());
 
 describe('ExportMenu', () => {
-  it('opens a printable coaching sheet for the whole play', async () => {
+  it('opens the coaching-sheet PDF route in a new tab', async () => {
+    const open = vi
+      .spyOn(window, 'open')
+      .mockReturnValue({} as unknown as Window);
     const user = userEvent.setup();
     render(<ExportMenu {...props} />);
 
     await user.click(screen.getByRole('button', { name: 'Export' }));
     await user.click(screen.getByRole('button', { name: /Coaching sheet/ }));
 
-    expect(openPlaySheet).toHaveBeenCalledWith(
-      expect.objectContaining({
-        playName: 'Zone Set',
-        category: 'OFFENSIVE',
-        court: 'half',
-        phases,
-      }),
+    expect(open).toHaveBeenCalledWith(
+      '/team/cavs-1/playbook/play/play-9/sheet',
+      '_blank',
     );
+    open.mockRestore();
   });
 
   it('exports every phase on one image', async () => {
