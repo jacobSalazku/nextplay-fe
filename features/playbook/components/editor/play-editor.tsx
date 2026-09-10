@@ -16,6 +16,7 @@ import { AnimateView } from './animate/animate-view';
 import { BreakdownView } from './breakdown/breakdown-view';
 import { PhaseRail } from './breakdown/phase-rail';
 import { EditorStage } from './editor-stage';
+import { ExportMenu } from './export-menu';
 import { ModeTabs, type EditorMode } from './mode-tabs';
 import { RosterPanel } from './roster-panel';
 import { StageColumn } from './stage-column';
@@ -258,6 +259,18 @@ export function PlayEditor({
           >
             <Redo2 className="h-4 w-4" />
           </Button>
+
+          <div className="mx-1 h-6 w-px bg-white/10" />
+
+          <ExportMenu
+            court={court}
+            phases={phases}
+            activeIndex={activePhaseIndex}
+            playName={name}
+            routeKey={routeKey}
+            playId={playId}
+          />
+
           <Button
             variant="primary"
             onClick={save}
