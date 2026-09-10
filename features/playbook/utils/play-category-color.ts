@@ -1,3 +1,12 @@
+export const CATEGORY_LABEL: Record<string, string> = {
+  OFFENSIVE: 'Offense',
+  DEFENSIVE: 'Defense',
+  SPECIAL: 'Special teams',
+};
+
+export const categoryLabel = (category: string) =>
+  CATEGORY_LABEL[category] ?? category;
+
 export const getCategoryColor = (category: string) => {
   switch (category.toUpperCase()) {
     case 'OFFENSIVE':

@@ -15,13 +15,12 @@ const DASH: Partial<Record<Action['type'], string>> = {
   shot: '0.3 1.4',
 };
 
-export function Route({
-  action,
-  objects,
-}: {
+type RouteProps = {
   action: Action;
   objects: PlacedObject[];
-}) {
+};
+
+export function Route({ action, objects }: RouteProps) {
   const ends = actionEndpoints(action, objects);
   if (!ends) return null;
 

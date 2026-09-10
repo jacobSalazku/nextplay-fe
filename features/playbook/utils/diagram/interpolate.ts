@@ -114,8 +114,14 @@ function synthEndPhase(phase: Phase): Phase {
   };
 }
 
-const playbackPhases = (phases: Phase[]): Phase[] =>
-  phases.length >= 2 ? phases : [phases[0], synthEndPhase(phases[0])];
+// Every phase plays its own actions out: the playback runs phase → (that
+// phase's drawn end), phase by phase, rather than morphing one phase's setup
+// into the next. The trailing synth phase gives the last real phase a segment
+// of its own to animate in.
+const playbackPhases = (phases: Phase[]): Phase[] => [
+  ...phases,
+  synthEndPhase(phases[phases.length - 1]),
+];
 
 export const animationDurationMs = (phases: Phase[]) =>
   playbackPhases(phases)
@@ -238,9 +244,10 @@ export function interpolateFrame(
   reduce = false,
 ): AnimationFrame {
   const seq = playbackPhases(phases);
-  const { fromIndex, toIndex, t } = resolveFrame(seq, progress);
+  const { fromIndex, toIndex, t } = resolveFrame(phases, progress);
   const from = seq[fromIndex];
-  const to = seq[toIndex];
+  const next = seq[toIndex]; // only for players joining / leaving the floor
+  const end = synthEndPhase(from); // where this phase's own actions land
 
   const totalMs = segmentMs(from);
   const activeMs = clamp01(t) * totalMs;
@@ -250,35 +257,50 @@ export function interpolateFrame(
 
   const ids = new Set<string>();
   for (const o of from.objects) ids.add(o.id);
-  for (const o of to.objects) ids.add(o.id);
+  for (const o of next.objects) ids.add(o.id);
 
   const objects: FrameObject[] = [];
   for (const id of ids) {
     const a = at(from, id);
-    const b = at(to, id);
+    const stays = at(next, id) != null;
 
-    if (a && b) {
-      const window = stepWindow(
-        from,
-        (action) => action.fromId === id && MOVE_ACTIONS.has(action.type),
-        totalMs,
-      );
-      const p = beatProgress(activeMs, window, reduce);
-      const path = soloPath(from, id);
-      const pos = path ? followWarped(path, b, p) : lerpPoint(a, b, p);
-      const facing = lerpFacing(a.facing, b.facing, p);
-      objects.push({
-        ...a,
-        x: pos.x,
-        y: pos.y,
-        ...(facing == null ? null : { facing }),
-        opacity: 1,
-      });
-    } else if (a) {
-      objects.push({ ...a, opacity: 1 - t });
-    } else if (b) {
-      objects.push({ ...b, opacity: t });
+    if (a && !stays) {
+      objects.push({ ...a, opacity: 1 - t }); // benched next phase — fade out
+      continue;
     }
+    if (!a) {
+      const joining = at(next, id);
+      if (joining) objects.push({ ...joining, opacity: t }); // fade in
+      continue;
+    }
+
+    // Only players the coach gave a move to in THIS phase animate; the rest
+    // hold their spot while the phase plays out.
+    const moves = from.actions.some(
+      (action) => action.fromId === id && MOVE_ACTIONS.has(action.type),
+    );
+    if (!moves) {
+      objects.push({ ...a, opacity: 1 });
+      continue;
+    }
+
+    const target = at(end, id) ?? a;
+    const window = stepWindow(
+      from,
+      (action) => action.fromId === id && MOVE_ACTIONS.has(action.type),
+      totalMs,
+    );
+    const p = beatProgress(activeMs, window, reduce);
+    const path = soloPath(from, id);
+    const pos = path ? followWarped(path, target, p) : lerpPoint(a, target, p);
+    const facing = lerpFacing(a.facing, target.facing, p);
+    objects.push({
+      ...a,
+      x: pos.x,
+      y: pos.y,
+      ...(facing == null ? null : { facing }),
+      opacity: 1,
+    });
   }
 
   const routes = from.actions.map((action) => ({
@@ -295,7 +317,7 @@ export function interpolateFrame(
     toIndex,
     t,
     objects,
-    ball: ball(from, to, activeMs, totalMs, reduce, objects),
+    ball: ball(from, end, activeMs, totalMs, reduce, objects),
     routes,
   };
 }
