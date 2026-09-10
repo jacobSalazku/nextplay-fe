@@ -38,6 +38,13 @@ async function drag(page: Page, from: Locator, to: { x: number; y: number }) {
   await page.mouse.up();
 }
 
+// A screen point at fraction (fx, fy) of the editor canvas — layout-independent
+// so panel widths don't shift where a drag lands.
+async function courtPoint(page: Page, fx: number, fy: number) {
+  const box = (await page.locator('[role="application"]').boundingBox())!;
+  return { x: box.x + box.width * fx, y: box.y + box.height * fy };
+}
+
 // the rendered cx/cy are full-precision floats (the y axis is scaled into the
 // viewBox), so round before comparing — a save/reload round-trip can wobble the
 // last decimal without the player having actually moved
@@ -62,7 +69,7 @@ test.describe('play editor flow', () => {
     const before = await pos(token());
 
     // Act — drag the player, then save
-    await drag(page, token(), { x: 400, y: 300 });
+    await drag(page, token(), await courtPoint(page, 0.3, 0.25));
     expect(await pos(token())).not.toEqual(before);
 
     await page.getByRole('button', { name: /save/i }).click();
@@ -147,7 +154,7 @@ test.describe('play editor flow', () => {
     await expect(page.locator('.ProseMirror strong')).toBeVisible();
   });
 
-  test('match man-to-man, give the ball, bench a player, and undo', async ({
+  test('put opponents on court, give the ball, bench a player, and undo', async ({
     page,
   }) => {
     // Arrange
@@ -155,9 +162,11 @@ test.describe('play editor flow', () => {
     const tokens = page.locator('[role="application"] circle[role="button"]');
     const roster = page.getByRole('complementary', { name: 'Roster' });
 
-    // Act — add five defenders
+    // Act — put five opponents on the court from their roster chips
     const before = await tokens.count();
-    await roster.getByRole('button', { name: /match man-to-man/i }).click();
+    for (let n = 1; n <= 5; n++) {
+      await roster.getByRole('button', { name: `Opponent ${n}, benched` }).click();
+    }
 
     // Assert — five defender grab targets appeared
     await expect
@@ -167,6 +176,7 @@ test.describe('play editor flow', () => {
     // Act — give player 1 the ball from its roster chip, then save
     await roster.getByRole('button', { name: 'Give the ball to 1' }).click();
     await page.getByRole('button', { name: /save/i }).click();
+    await expect(page.getByRole('button', { name: /save/i })).toBeDisabled();
     await page.reload();
 
     // Assert — possession persisted
@@ -196,10 +206,11 @@ test.describe('play editor flow', () => {
     const token = () => page.getByRole('button', { name: 'Move player 1' });
     const p1Pos = await pos(token());
 
-    // Act — add a second phase and move player 1 in it
+    // Act — add a second phase (Add phase ▸ Empty court) and move player 1 in it
     await page.getByRole('button', { name: 'Add phase' }).click();
+    await page.getByRole('button', { name: 'Empty court' }).click();
     await expect(strip.getByRole('tab')).toHaveCount(2);
-    await drag(page, token(), { x: 500, y: 250 });
+    await drag(page, token(), await courtPoint(page, 0.72, 0.3));
     const p2Pos = await pos(token());
     expect(p2Pos).not.toEqual(p1Pos);
 
@@ -226,7 +237,8 @@ test.describe('play editor flow', () => {
     await newPlay(page);
     const token = () => page.getByRole('button', { name: 'Move player 1' });
     await page.getByRole('button', { name: 'Add phase' }).click();
-    await drag(page, token(), { x: 520, y: 260 });
+    await page.getByRole('button', { name: 'Empty court' }).click();
+    await drag(page, token(), await courtPoint(page, 0.75, 0.32));
 
     await page.getByRole('tab', { name: 'Animate' }).click();
     // the moving token layer, order-stable, so we can compare whole frames
