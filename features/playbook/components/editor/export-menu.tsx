@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import {
   exportPhasePng,
   exportSheetPng,
@@ -51,14 +52,6 @@ export function ExportMenu({
     }
   };
 
-  const openSheet = () => {
-    const win = window.open(
-      `/team/${routeKey}/playbook/play/${playId}/sheet`,
-      '_blank',
-    );
-    if (!win) throw new Error('pop-up blocked');
-  };
-
   const item =
     'flex w-full cursor-pointer items-start gap-3 px-3 py-2.5 text-left hover:bg-white/10';
 
@@ -82,15 +75,20 @@ export function ExportMenu({
 
       {open && (
         <div className="absolute right-0 z-20 mt-1 w-72 overflow-hidden rounded-lg border border-white/10 bg-slate-800 py-1 text-white shadow-xl">
-          <button type="button" className={item} onClick={() => run(openSheet)}>
+          <Link
+            href={`/team/${routeKey}/playbook/play/${playId}/sheet`}
+            target="_blank"
+            className={item}
+            onClick={() => setOpen(false)}
+          >
             <FileText className="mt-0.5 h-4 w-4 shrink-0 text-gray-300" />
             <span>
-              Coaching sheet (PDF)
+              Coaching sheet
               <span className="block text-xs text-gray-400">
-                every phase with its notes
+                a printable page — every phase with its notes
               </span>
             </span>
-          </button>
+          </Link>
 
           <button
             type="button"

@@ -37,21 +37,18 @@ const props = {
 beforeEach(() => vi.clearAllMocks());
 
 describe('ExportMenu', () => {
-  it('opens the coaching-sheet PDF route in a new tab', async () => {
-    const open = vi
-      .spyOn(window, 'open')
-      .mockReturnValue({} as unknown as Window);
+  it('links to the coaching-sheet page in a new tab', async () => {
     const user = userEvent.setup();
     render(<ExportMenu {...props} />);
 
     await user.click(screen.getByRole('button', { name: 'Export' }));
-    await user.click(screen.getByRole('button', { name: /Coaching sheet/ }));
+    const link = screen.getByRole('link', { name: /Coaching sheet/ });
 
-    expect(open).toHaveBeenCalledWith(
+    expect(link).toHaveAttribute(
+      'href',
       '/team/cavs-1/playbook/play/play-9/sheet',
-      '_blank',
     );
-    open.mockRestore();
+    expect(link).toHaveAttribute('target', '_blank');
   });
 
   it('exports every phase on one image', async () => {

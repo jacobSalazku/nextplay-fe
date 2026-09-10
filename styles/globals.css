@@ -60,3 +60,15 @@
   content: attr(data-placeholder);
   color: #9a8f78;
 }
+
+/* Coaching sheet: when printing, the sheet (portalled to <body>) takes over
+   the whole page and the rest of the app is hidden. */
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+  body > *:not([data-play-sheet]) {
+    display: none !important;
+  }
+}
