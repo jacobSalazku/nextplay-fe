@@ -1,9 +1,12 @@
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { CourtDiagram } from '@/features/playbook/components/diagram/court-diagram';
+import { ExportMenu } from '@/features/playbook/components/editor/export-menu';
 import PlanViewSkeleton from '@/features/playbook/components/skeleton/plan-view-skeleton';
 import { getPlay } from '@/features/playbook/queries/play/get-play';
 import { asPlayDiagram } from '@/features/playbook/utils/diagram/parse';
 import { playbookSearchParamsCache } from '@/utils/search-params';
+import { Pencil } from 'lucide-react';
 import { sanitizeRichText } from '@/lib/sanitize-rich-text';
 
 type PageProps = {
@@ -46,9 +49,30 @@ async function PlayContent({ id, routeKey }: { id: string; routeKey: string }) {
   return (
     <div className="scrollbar-none h-screen overflow-y-auto px-4 pt-10">
       <div className="mx-auto max-w-7xl md:px-4">
-        <h1 className="font-righteous mb-4 text-3xl font-bold text-white">
-          Play
-        </h1>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h1 className="font-righteous text-3xl font-bold text-white">
+            {play.name}
+          </h1>
+          <div className="flex items-center gap-2">
+            {diagram && (
+              <ExportMenu
+                court={diagram.court}
+                phases={diagram.phases}
+                activeIndex={0}
+                playName={play.name}
+                routeKey={routeKey}
+                playId={play.id}
+              />
+            )}
+            <Link
+              href={`/team/${routeKey}/playbook/play/${play.id}/edit`}
+              className="flex items-center gap-2 rounded-md border border-white/15 px-3 py-1.5 text-sm text-gray-200 transition-colors hover:bg-white/10 hover:text-white"
+            >
+              <Pencil className="h-4 w-4" />
+              Edit
+            </Link>
+          </div>
+        </div>
 
         <div className="flex flex-col p-0 sm:flex-row sm:items-start md:gap-8">
           <div
