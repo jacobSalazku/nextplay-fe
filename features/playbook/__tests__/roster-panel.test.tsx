@@ -23,7 +23,6 @@ function renderPanel(
     onBench: vi.fn(),
     onUnbench: vi.fn(),
     onAddSlot: vi.fn(),
-    onMatchManToMan: vi.fn(),
     onSetBall: vi.fn(),
     onSelect: vi.fn(),
     ...overrides,
@@ -103,18 +102,6 @@ describe('RosterPanel', () => {
     expect(
       screen.getByRole('button', { name: 'Take the ball from 1' }),
     ).toBeInTheDocument();
-  });
-
-  it('matches man-to-man', async () => {
-    // Arrange
-    const user = userEvent.setup();
-    const { onMatchManToMan } = renderPanel();
-
-    // Act
-    await user.click(screen.getByRole('button', { name: /match man-to-man/i }));
-
-    // Assert
-    expect(onMatchManToMan).toHaveBeenCalledOnce();
   });
 
   it('adds a slot', async () => {

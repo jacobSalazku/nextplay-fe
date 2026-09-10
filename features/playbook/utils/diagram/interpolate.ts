@@ -4,7 +4,7 @@ import type { Action, Phase, PlacedObject, Point } from './types';
 // The move time for a transition with no moves to time.
 const DEFAULT_SEGMENT_MS = 900;
 // Per-move beat when a phase has no explicit step timeline.
-const DEFAULT_BEAT_MS = 700;
+const DEFAULT_BEAT_MS = 1000;
 
 // Being the subject of one of these in a step puts a player on that step's beat.
 const MOVE_ACTIONS: ReadonlySet<Action['type']> = new Set([

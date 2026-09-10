@@ -24,6 +24,7 @@ const props = {
   activeIndex: 0,
   onSelectPhase: vi.fn(),
   onAddPhase: vi.fn(),
+  onAddEmptyPhase: vi.fn(),
   onDeletePhase: vi.fn(),
   onDuplicatePhase: vi.fn(),
   onReorderPhase: vi.fn(),
@@ -100,7 +101,7 @@ describe('AnimateView', () => {
     fireEvent.drop(screen.getByText('Cut by Player 1'));
 
     expect(onStepsChange).toHaveBeenCalledWith(0, [
-      { id: 'g0', actionIds: ['a1', 'a2'], durationMs: 700 },
+      { id: 'g0', actionIds: ['a1', 'a2'], durationMs: 1000 },
     ]);
   });
 
@@ -117,7 +118,7 @@ describe('AnimateView', () => {
       />,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Timing options' }));
+    await user.click(screen.getByRole('button', { name: 'Step options' }));
     await user.click(screen.getByRole('button', { name: 'Remove action' }));
 
     expect(onRemoveAction).toHaveBeenCalledWith(0, 'a1');

@@ -1,11 +1,8 @@
-import {
-  actionLabel,
-  durationLabel,
-} from '../components/editor/animate/timeline/labels';
+import { actionLabel } from '../components/editor/animate/timeline/labels';
 import {
   groupsFromSteps,
   moveToStep,
-  retimeStep,
+  reorderGroup,
   splitToStep,
   stepsFromGroups,
 } from '../components/editor/animate/timeline/steps';
@@ -29,18 +26,13 @@ describe('labels', () => {
       actionLabel({ id: 'a', type: 'screen', fromId: 'x1' }, objects),
     ).toBe('Screen by Defender 3');
   });
-
-  it('formats a duration in seconds', () => {
-    expect(durationLabel(400)).toBe('0.4s');
-    expect(durationLabel(1200)).toBe('1.2s');
-  });
 });
 
 describe('groupsFromSteps / stepsFromGroups', () => {
   it('defaults to one move per step, in draw order', () => {
     expect(groupsFromSteps(actions)).toEqual([
-      { actionIds: ['a1'], durationMs: 700 },
-      { actionIds: ['a2'], durationMs: 700 },
+      { actionIds: ['a1'], durationMs: 1000 },
+      { actionIds: ['a2'], durationMs: 1000 },
     ]);
   });
 
@@ -51,7 +43,7 @@ describe('groupsFromSteps / stepsFromGroups', () => {
       ]),
     ).toEqual([
       { actionIds: ['a1'], durationMs: 400 },
-      { actionIds: ['a2'], durationMs: 700 },
+      { actionIds: ['a2'], durationMs: 1000 },
     ]);
   });
 
@@ -61,8 +53,8 @@ describe('groupsFromSteps / stepsFromGroups', () => {
 
   it('stores the steps once moves are grouped', () => {
     expect(
-      stepsFromGroups([{ actionIds: ['a1', 'a2'], durationMs: 700 }], actions),
-    ).toEqual([{ id: 'g0', actionIds: ['a1', 'a2'], durationMs: 700 }]);
+      stepsFromGroups([{ actionIds: ['a1', 'a2'], durationMs: 1000 }], actions),
+    ).toEqual([{ id: 'g0', actionIds: ['a1', 'a2'], durationMs: 1000 }]);
   });
 });
 
@@ -71,23 +63,24 @@ describe('group edits', () => {
 
   it('moves a move into another step', () => {
     expect(moveToStep(groups, 'a2', 0)).toEqual([
-      { actionIds: ['a1', 'a2'], durationMs: 700 },
-      { actionIds: [], durationMs: 700 },
+      { actionIds: ['a1', 'a2'], durationMs: 1000 },
+      { actionIds: [], durationMs: 1000 },
     ]);
   });
 
   it('splits a move onto its own step', () => {
-    const grouped = [{ actionIds: ['a1', 'a2'], durationMs: 700 }];
+    const grouped = [{ actionIds: ['a1', 'a2'], durationMs: 1000 }];
     expect(splitToStep(grouped, 'a2', 1)).toEqual([
-      { actionIds: ['a1'], durationMs: 700 },
-      { actionIds: ['a2'], durationMs: 700 },
+      { actionIds: ['a1'], durationMs: 1000 },
+      { actionIds: ['a2'], durationMs: 1000 },
     ]);
   });
 
-  it('retimes one step', () => {
-    expect(retimeStep(groups, 1, 400)[1]).toEqual({
-      actionIds: ['a2'],
-      durationMs: 400,
-    });
+  it('reorders a step and leaves an out-of-range move a no-op', () => {
+    expect(reorderGroup(groups, 0, 1)).toEqual([
+      { actionIds: ['a2'], durationMs: 1000 },
+      { actionIds: ['a1'], durationMs: 1000 },
+    ]);
+    expect(reorderGroup(groups, 0, 5)).toBe(groups);
   });
 });

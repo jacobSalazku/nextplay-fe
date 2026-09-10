@@ -7,12 +7,10 @@ const base = {
   playing: false,
   progress: 0,
   phaseCount: 3,
-  speed: 1,
   loop: false,
   onToggle: vi.fn(),
   onRestart: vi.fn(),
   onSeek: vi.fn(),
-  onSpeed: vi.fn(),
   onLoop: vi.fn(),
 };
 
@@ -38,20 +36,6 @@ describe('TransportBar', () => {
 
     expect(onToggle).toHaveBeenCalledOnce();
     expect(onRestart).toHaveBeenCalledOnce();
-  });
-
-  it('marks the active speed and reports a change', async () => {
-    const user = userEvent.setup();
-    const onSpeed = vi.fn();
-    render(<TransportBar {...base} speed={1} onSpeed={onSpeed} />);
-
-    expect(screen.getByRole('button', { name: '1×' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
-
-    await user.click(screen.getByRole('button', { name: '2×' }));
-    expect(onSpeed).toHaveBeenCalledWith(2);
   });
 
   it('toggles loop from its current state', async () => {

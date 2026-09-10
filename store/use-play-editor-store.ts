@@ -70,6 +70,7 @@ type PlayEditorState = {
   beginEdit: () => void;
   endEdit: () => void;
   addPhase: () => void;
+  addEmptyPhase: () => void;
   deletePhase: (index: number) => void;
   duplicatePhase: (index: number) => void;
   setActivePhase: (index: number) => void;
@@ -272,6 +273,22 @@ export const usePlayEditorStore = create<PlayEditorState>((set, get) => {
         objects: prev.objects.map((o) => ({ ...o })),
         actions: [],
         ...(holder ? { ballHolderId: holder } : {}),
+      };
+      commitPhases([...phases, next], phases.length);
+    },
+
+    // "Empty court": a new phase with everyone back on their role home spots.
+    addEmptyPhase: () => {
+      const { phases } = get();
+      if (phases.length >= MAX_PHASES) return;
+      const prev = phases[phases.length - 1];
+      const next: Phase = {
+        id: newPhaseId(),
+        objects: prev.objects.map((o) => {
+          const at = roleHome(o.id);
+          return { ...o, x: at.x, y: at.y };
+        }),
+        actions: [],
       };
       commitPhases([...phases, next], phases.length);
     },
