@@ -2,15 +2,10 @@
 
 import { useSyncExternalStore } from 'react';
 import type { PlayDiagram } from '@/features/playbook/utils/diagram/types';
+import { categoryLabel } from '@/features/playbook/utils/play-category-color';
 import { ArrowLeft, Printer } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { PhaseBlocks } from './phase-blocks';
-
-const CATEGORY_LABEL: Record<string, string> = {
-  OFFENSIVE: 'Offense',
-  DEFENSIVE: 'Defense',
-  SPECIAL: 'Special teams',
-};
 
 type Props = {
   playName: string;
@@ -45,7 +40,7 @@ function Paper({
         <p className="mt-1.5 text-[12.5px] text-[#736b57]">
           <span className="font-semibold text-[#1b1b1b]">{coachName}</span>
           {'  ·  '}
-          {CATEGORY_LABEL[category] ?? category}
+          {categoryLabel(category)}
           {'  ·  '}
           {date}
         </p>

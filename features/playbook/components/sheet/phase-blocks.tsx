@@ -32,17 +32,17 @@ function toBlocks(diagram: PlayDiagram): Block[] {
 
 type Theme = 'paper' | 'dark';
 
-const THEME: Record<
-  Theme,
-  {
-    row: string;
-    tag: string;
-    frame: string;
-    notes: string;
-    caption: string;
-    lead: string;
-  }
-> = {
+type ThemeTokens = {
+  row: string;
+  tag: string;
+  frame: string;
+  notes: string;
+  caption: string;
+  lead: string;
+  full: string;
+};
+
+const THEME: Record<Theme, ThemeTokens> = {
   paper: {
     row: 'border-[#e4dcc9]',
     tag: 'bg-[#1f2d4d] text-white',
@@ -54,18 +54,20 @@ const THEME: Record<
     ),
     caption: 'text-[#3a3a3a]',
     lead: 'text-[#8a7a5c]',
+    full: 'grid-cols-[38%_1fr]',
   },
   dark: {
     row: 'border-white/10',
-    tag: 'bg-white/10 text-white',
-    frame: 'rounded-lg border border-white/10 bg-white/[0.03] p-1',
+    tag: 'bg-[#1f2d4d] text-white',
+    frame: 'border border-white/10 bg-[#16213b] p-1.5',
     notes: cn(
-      'prose prose-sm prose-invert max-w-none text-[13px] text-gray-200',
+      'prose prose-sm prose-invert max-w-none text-[13px] text-[#c9cedd]',
       '[&_h1]:text-white [&_h2]:text-white [&_h3]:text-white',
       '[&_mark]:bg-amber-200/80 [&_mark]:text-black',
     ),
-    caption: 'text-gray-400',
-    lead: 'text-gray-500',
+    caption: 'text-[#8b93a7]',
+    lead: 'text-[#5f6b85]',
+    full: 'grid-cols-[44%_1fr]',
   },
 };
 
@@ -76,7 +78,7 @@ function Court({
 }: {
   diagram: PlayDiagram;
   index: number;
-  theme: (typeof THEME)[Theme];
+  theme: ThemeTokens;
 }) {
   const phase = diagram.phases[index];
   return (
@@ -101,13 +103,7 @@ function Court({
   );
 }
 
-function Caption({
-  text,
-  theme,
-}: {
-  text: string;
-  theme: (typeof THEME)[Theme];
-}) {
+function Caption({ text, theme }: { text: string; theme: ThemeTokens }) {
   const [lead, rest] = text
     ? (['Movement', text] as const)
     : (['Reset', 'players hold their spots'] as const);
@@ -142,7 +138,8 @@ export function PhaseBlocks({
           <section
             key={`f${block.index}`}
             className={cn(
-              'grid grid-cols-[38%_1fr] items-start gap-8 py-6',
+              'grid items-start gap-8 py-6',
+              theme.full,
               i > 0 && cn('border-t', theme.row),
             )}
             style={{ breakInside: 'avoid' }}

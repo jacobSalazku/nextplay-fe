@@ -7,9 +7,9 @@ import { PhaseBlocks } from '@/features/playbook/components/sheet/phase-blocks';
 import PlanViewSkeleton from '@/features/playbook/components/skeleton/plan-view-skeleton';
 import { getPlay } from '@/features/playbook/queries/play/get-play';
 import { asPlayDiagram } from '@/features/playbook/utils/diagram/parse';
-import { getCategoryColor } from '@/features/playbook/utils/play-category-color';
+import { categoryLabel } from '@/features/playbook/utils/play-category-color';
+import { autoNote } from '@/features/playbook/utils/sheet/auto-note';
 import { playbookSearchParamsCache } from '@/utils/search-params';
-import { cn } from '@/utils/tw-merge';
 import { Pencil } from 'lucide-react';
 import { sanitizeRichText } from '@/lib/sanitize-rich-text';
 
@@ -27,11 +27,15 @@ export const metadata = {
   },
 };
 
-const CATEGORY_LABEL: Record<string, string> = {
-  OFFENSIVE: 'Offense',
-  DEFENSIVE: 'Defense',
-  SPECIAL: 'Special teams',
-};
+// navy hairline with an orange tick at the start — the coaching sheet's rule,
+// carried onto the screen so the two surfaces read as one playbook
+function Rule() {
+  return (
+    <div className="relative mt-6 h-px bg-[#2b3a5c]">
+      <span className="absolute top-0 left-0 h-px w-10 bg-[#f97316]" />
+    </div>
+  );
+}
 
 async function PlayView({ params, searchParams }: PageProps) {
   const { routeKey } = await params;
@@ -56,89 +60,108 @@ async function PlayContent({ id, routeKey }: { id: string; routeKey: string }) {
     month: 'short',
     year: 'numeric',
   });
+  const phaseCount = diagram?.phases.length ?? 0;
+  const heroMax = diagram?.court === 'full' ? 'max-w-[360px]' : 'max-w-[520px]';
 
   return (
     <div className="scrollbar-none h-screen overflow-y-auto">
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
-        {/* masthead */}
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0">
-            <span
-              className={cn(
-                'inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wide uppercase',
-                getCategoryColor(play.category),
-              )}
-            >
-              {CATEGORY_LABEL[play.category] ?? play.category}
-            </span>
-            <h1 className="font-righteous mt-2 text-4xl leading-tight font-bold text-white sm:text-5xl">
-              {play.name}
-            </h1>
-            {diagram && (
-              <p className="mt-1.5 text-sm text-gray-400">
-                {diagram.phases.length}{' '}
-                {diagram.phases.length === 1 ? 'phase' : 'phases'}
-                {'  ·  updated '}
-                {updated}
+      <div className="mx-auto max-w-5xl px-4 py-10 sm:py-14">
+        <header>
+          <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-4">
+            <div className="min-w-0">
+              <p className="font-righteous text-[11px] tracking-[0.3em] text-[#f97316] uppercase">
+                {categoryLabel(play.category)}
               </p>
-            )}
-          </div>
+              <h1 className="font-righteous mt-2 text-4xl leading-[1.05] text-white sm:text-[3.25rem]">
+                {play.name}
+              </h1>
+              {diagram && (
+                <p className="mt-2.5 text-sm text-[#8b93a7]">
+                  {phaseCount} {phaseCount === 1 ? 'phase' : 'phases'}
+                  <span className="mx-2 text-[#5f6b85]">·</span>
+                  updated {updated}
+                </p>
+              )}
+            </div>
 
-          <div className="flex shrink-0 items-center gap-2">
-            {diagram && (
-              <ExportMenu
-                court={diagram.court}
-                phases={diagram.phases}
-                activeIndex={0}
-                playName={play.name}
-                routeKey={routeKey}
-                playId={play.id}
-              />
-            )}
-            <Link
-              href={editHref}
-              className="flex items-center gap-2 rounded-md border border-white/15 px-3 py-1.5 text-sm text-gray-200 transition-colors hover:bg-white/10 hover:text-white"
-            >
-              <Pencil className="h-4 w-4" />
-              Edit
-            </Link>
+            <div className="flex shrink-0 items-center gap-2">
+              {diagram && (
+                <ExportMenu
+                  court={diagram.court}
+                  phases={diagram.phases}
+                  activeIndex={0}
+                  playName={play.name}
+                  routeKey={routeKey}
+                  playId={play.id}
+                />
+              )}
+              <Link
+                href={editHref}
+                className="flex items-center gap-2 rounded-md border border-white/15 px-3 py-1.5 text-sm text-gray-200 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                <Pencil className="h-4 w-4" />
+                Edit
+              </Link>
+            </div>
           </div>
-        </div>
-
-        {description && (
-          <div
-            className="prose prose-sm prose-invert mt-5 max-w-2xl text-gray-300"
-            dangerouslySetInnerHTML={{ __html: description }}
-          />
-        )}
+          <Rule />
+        </header>
 
         {diagram ? (
           <>
-            {/* the play, running */}
-            <div className="relative mt-8">
-              <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(249,115,22,0.12),transparent_60%)]" />
-              <div className="mx-auto max-w-xl rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:p-6">
+            {description && (
+              <div
+                className="prose prose-sm prose-invert mt-6 max-w-prose text-[#c9cedd]"
+                dangerouslySetInnerHTML={{ __html: description }}
+              />
+            )}
+
+            <section className="mt-8 flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-12">
+              <div
+                className={`w-full ${heroMax} shrink-0 bg-[#16213b] p-3 sm:p-4`}
+              >
                 <PlayPlayer court={diagram.court} phases={diagram.phases} />
               </div>
-            </div>
 
-            {/* phase by phase */}
-            <div className="mt-14 flex items-center gap-3">
+              <ol className="space-y-3 lg:flex-1 lg:pt-1">
+                {diagram.phases.map((phase, i) => (
+                  <li
+                    key={phase.id}
+                    className="flex gap-3 text-sm leading-relaxed"
+                  >
+                    <span className="font-righteous shrink-0 text-[#f97316] tabular-nums">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span className="text-[#c9cedd]">
+                      {autoNote(phase) || 'Players hold their spots'}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+
+            <div className="mt-16">
               <h2 className="font-righteous text-lg text-white">
                 Phase by phase
               </h2>
-              <div className="h-px flex-1 bg-white/10" />
+              <Rule />
             </div>
             <PhaseBlocks diagram={diagram} theme="dark" />
           </>
         ) : (
-          <div className="mt-8 flex flex-col items-center gap-4 rounded-2xl border border-dashed border-white/15 p-10 text-center">
-            <p className="text-sm text-gray-400">
+          <div className="mt-10 flex flex-col items-start gap-4">
+            {description && (
+              <div
+                className="prose prose-sm prose-invert max-w-prose text-[#c9cedd]"
+                dangerouslySetInnerHTML={{ __html: description }}
+              />
+            )}
+            <p className="text-sm text-[#8b93a7]">
               This play doesn&apos;t have a diagram yet.
             </p>
             <Link
               href={editHref}
-              className="rounded-full bg-orange-500 px-5 py-2 text-sm font-semibold text-white hover:bg-orange-400"
+              className="rounded-md bg-[#f97316] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#fb8a3c]"
             >
               Open the editor
             </Link>

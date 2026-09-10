@@ -8,7 +8,6 @@ import { useAnimationClock } from '@/features/playbook/hooks/editor/use-animatio
 import {
   animationDurationMs,
   interpolateFrame,
-  resolveFrame,
 } from '@/features/playbook/utils/diagram/interpolate';
 import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
@@ -49,12 +48,9 @@ export function PlayPlayer({
   });
 
   const frame = interpolateFrame(phases, progress, reduce);
-  const shownIndex = playing
-    ? frame.fromIndex
-    : resolveFrame(phases, progress).fromIndex;
 
   return (
-    <div className="flex w-full flex-col items-center gap-3">
+    <div className="flex w-full flex-col items-start gap-3">
       <div
         ref={stageRef}
         className={`w-full ${stageMax}`}
@@ -64,7 +60,7 @@ export function PlayPlayer({
           court={court}
           phases={phases}
           frame={frame}
-          title={`Phase ${shownIndex + 1}`}
+          title={`Phase ${frame.fromIndex + 1}`}
         />
       </div>
       <div
