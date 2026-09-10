@@ -4,13 +4,13 @@ import { autoNote } from '@/features/playbook/utils/sheet/auto-note';
 import { cn } from '@/utils/tw-merge';
 import { sanitizeRichText } from '@/lib/sanitize-rich-text';
 
-// A phase the coach wrote notes for gets a full-width row (court + prose);
-// phases with only auto-described movement pack two to a row.
+// On paper: a written-note phase gets a full-width row (court + prose), the
+// rest pack two courts to a row to save space.
 type Block =
   | { kind: 'full'; index: number }
   | { kind: 'pair'; indices: number[] };
 
-function toBlocks(diagram: PlayDiagram): Block[] {
+function packedBlocks(diagram: PlayDiagram): Block[] {
   const blocks: Block[] = [];
   let pair: number[] = [];
   const flush = () => {
@@ -39,7 +39,6 @@ type ThemeTokens = {
   notes: string;
   caption: string;
   lead: string;
-  full: string;
 };
 
 const THEME: Record<Theme, ThemeTokens> = {
@@ -54,20 +53,18 @@ const THEME: Record<Theme, ThemeTokens> = {
     ),
     caption: 'text-[#3a3a3a]',
     lead: 'text-[#8a7a5c]',
-    full: 'grid-cols-[38%_1fr]',
   },
   dark: {
     row: 'border-white/10',
     tag: 'bg-[#1f2d4d] text-white',
     frame: 'border border-white/10 bg-[#16213b] p-1.5',
     notes: cn(
-      'prose prose-sm prose-invert max-w-none text-[13px] text-[#c9cedd]',
+      'prose prose-sm prose-invert max-w-none text-sm text-[#c9cedd]',
       '[&_h1]:text-white [&_h2]:text-white [&_h3]:text-white',
       '[&_mark]:bg-amber-200/80 [&_mark]:text-black',
     ),
     caption: 'text-[#8b93a7]',
     lead: 'text-[#5f6b85]',
-    full: 'grid-cols-[44%_1fr]',
   },
 };
 
@@ -103,15 +100,30 @@ function Court({
   );
 }
 
-function Caption({ text, theme }: { text: string; theme: ThemeTokens }) {
+function Caption({
+  text,
+  theme,
+  beside = false,
+}: {
+  text: string;
+  theme: ThemeTokens;
+  beside?: boolean;
+}) {
   const [lead, rest] = text
     ? (['Movement', text] as const)
     : (['Reset', 'players hold their spots'] as const);
   return (
-    <p className={cn('mt-2 text-[11px] leading-relaxed', theme.caption)}>
+    <p
+      className={cn(
+        'leading-relaxed',
+        beside ? 'text-[15px]' : 'mt-2 text-[11px]',
+        theme.caption,
+      )}
+    >
       <span
         className={cn(
-          'font-mono text-[8px] font-bold tracking-wider uppercase',
+          'font-mono font-bold tracking-wider uppercase',
+          beside ? 'text-[9px]' : 'text-[8px]',
           theme.lead,
         )}
       >
@@ -131,28 +143,32 @@ export function PhaseBlocks({
 }) {
   const theme = THEME[name];
 
+  // paper packs movement-only phases two to a row to save paper; on screen every
+  // phase gets its own full-size court with the movement/notes beside it
+  const blocks: Block[] =
+    name === 'paper'
+      ? packedBlocks(diagram)
+      : diagram.phases.map((_, index) => ({ kind: 'full', index }));
+
+  const fullCols =
+    name === 'paper'
+      ? 'grid-cols-[38%_1fr]'
+      : diagram.court === 'full'
+        ? 'grid-cols-[minmax(0,20rem)_1fr]'
+        : 'grid-cols-[minmax(0,32rem)_1fr]';
+
   return (
     <div className="flex flex-col">
-      {toBlocks(diagram).map((block, i) =>
+      {blocks.map((block, i) =>
         block.kind === 'full' ? (
-          <section
+          <FullRow
             key={`f${block.index}`}
-            className={cn(
-              'grid items-start gap-8 py-6',
-              theme.full,
-              i > 0 && cn('border-t', theme.row),
-            )}
-            style={{ breakInside: 'avoid' }}
-          >
-            <Court diagram={diagram} index={block.index} theme={theme} />
-            <div
-              className={theme.notes}
-              // sanitised on write (BE) and again here, like the play view page
-              dangerouslySetInnerHTML={{
-                __html: sanitizeRichText(diagram.phases[block.index].note),
-              }}
-            />
-          </section>
+            diagram={diagram}
+            index={block.index}
+            theme={theme}
+            cols={fullCols}
+            divided={i > 0}
+          />
         ) : (
           <section
             key={`p${block.indices.join('-')}`}
@@ -172,5 +188,46 @@ export function PhaseBlocks({
         ),
       )}
     </div>
+  );
+}
+
+// A full-size court with its text beside it: the coach's notes if there are
+// any, otherwise the auto-described movement (which top-aligns with a long
+// note but centres against a one-line caption).
+function FullRow({
+  diagram,
+  index,
+  theme,
+  cols,
+  divided,
+}: {
+  diagram: PlayDiagram;
+  index: number;
+  theme: ThemeTokens;
+  cols: string;
+  divided: boolean;
+}) {
+  // sanitised on write (BE) and again here, like the play view page
+  const note = sanitizeRichText(diagram.phases[index].note);
+  return (
+    <section
+      className={cn(
+        'grid gap-8 py-6',
+        cols,
+        note ? 'items-start' : 'items-center',
+        divided && cn('border-t', theme.row),
+      )}
+      style={{ breakInside: 'avoid' }}
+    >
+      <Court diagram={diagram} index={index} theme={theme} />
+      {note ? (
+        <div
+          className={theme.notes}
+          dangerouslySetInnerHTML={{ __html: note }}
+        />
+      ) : (
+        <Caption text={autoNote(diagram.phases[index])} theme={theme} beside />
+      )}
+    </section>
   );
 }
