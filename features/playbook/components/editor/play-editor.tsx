@@ -6,8 +6,13 @@ import { useNavigationGuard } from '@/features/playbook/hooks/editor/use-navigat
 import { useUpdatePlay } from '@/features/playbook/hooks/play/use-update-play';
 import type { PlayDiagram } from '@/features/playbook/utils/diagram/types';
 import { isTypingTarget } from '@/features/playbook/utils/editor/keyboard';
+import {
+  EDITOR_MOBILE_BREAKPOINT,
+  EDITOR_STACK_BREAKPOINT,
+} from '@/features/playbook/utils/editor/layout';
+import { useIsMobile } from '@/hooks/use-is-mobile';
 import { usePlayEditorStore } from '@/store/use-play-editor-store';
-import { ArrowLeft, Pencil, Redo2, Save, Undo2 } from 'lucide-react';
+import { ArrowLeft, Pencil, Redo2, Save, Undo2, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Category } from '@/graphql/graphql';
 import { useConfirm } from '@/components/feedback/confirm-provider';
@@ -17,6 +22,9 @@ import { BreakdownView } from './breakdown/breakdown-view';
 import { PhaseRail } from './breakdown/phase-rail';
 import { EditorStage } from './editor-stage';
 import { ExportMenu } from './export-menu';
+import { BottomTabBar } from './mobile/bottom-tab-bar';
+import { PhaseSwitcher } from './mobile/phase-switcher';
+import { RosterSheet } from './mobile/roster-sheet';
 import { ModeTabs, type EditorMode } from './mode-tabs';
 import { RosterPanel } from './roster-panel';
 import { StageColumn } from './stage-column';
@@ -45,6 +53,9 @@ export function PlayEditor({
   );
 
   const [mode, setMode] = useState<EditorMode>('draw');
+  const isMobile = useIsMobile(EDITOR_MOBILE_BREAKPOINT);
+  const isStacked = useIsMobile(EDITOR_STACK_BREAKPOINT);
+  const [rosterOpen, setRosterOpen] = useState(false);
 
   // category is play metadata, written immediately (not with the diagram save);
   // optimistic locally, rolled back on failure.
@@ -87,6 +98,7 @@ export function PlayEditor({
   const setTool = usePlayEditorStore((s) => s.setTool);
   const select = usePlayEditorStore((s) => s.select);
   const addPhase = usePlayEditorStore((s) => s.addPhase);
+  const addEmptyPhase = usePlayEditorStore((s) => s.addEmptyPhase);
   const deletePhase = usePlayEditorStore((s) => s.deletePhase);
   const duplicatePhase = usePlayEditorStore((s) => s.duplicatePhase);
   const setActivePhase = usePlayEditorStore((s) => s.setActivePhase);
@@ -98,7 +110,6 @@ export function PlayEditor({
   const benchObject = usePlayEditorStore((s) => s.benchObject);
   const unbenchObject = usePlayEditorStore((s) => s.unbenchObject);
   const addSlot = usePlayEditorStore((s) => s.addSlot);
-  const matchManToMan = usePlayEditorStore((s) => s.matchManToMan);
   const setBallHolder = usePlayEditorStore((s) => s.setBallHolder);
   const addAction = usePlayEditorStore((s) => s.addAction);
   const updateAction = usePlayEditorStore((s) => s.updateAction);
@@ -152,6 +163,38 @@ export function PlayEditor({
     [tool, addAction],
   );
 
+  const editorStage = (
+    <EditorStage
+      court={court}
+      phase={phase}
+      ballHolderId={phase.ballHolderId}
+      tool={tool}
+      selection={selection}
+      onSelect={select}
+      onPickSelect={() => setTool('select')}
+      onDraw={draw}
+      onBeginEdit={beginEdit}
+      onEndEdit={endEdit}
+      onMove={moveObject}
+      onBend={(id, bend) => updateAction(id, { bend })}
+      onRotate={rotateObject}
+      onSetBall={setBallHolder}
+      onDelete={deleteSelection}
+    />
+  );
+
+  const rosterProps = {
+    objects: phase.objects,
+    rosterCount,
+    ballHolderId: phase.ballHolderId,
+    selectedId: selection?.kind === 'object' ? selection.id : null,
+    onBench: benchObject,
+    onUnbench: unbenchObject,
+    onAddSlot: addSlot,
+    onSetBall: setBallHolder,
+    onSelect: (id: string) => select({ kind: 'object', id }),
+  };
+
   const toPlaybook = `/team/${routeKey}/playbook`;
 
   const confirmDiscard = useCallback(
@@ -201,8 +244,8 @@ export function PlayEditor({
 
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-slate-950 text-white">
-      <header className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
-        <div className="flex min-w-0 flex-1 items-center gap-3">
+      <header className="flex items-center gap-2 border-b border-white/10 px-3 py-2 md:gap-3 md:px-4 md:py-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2 md:gap-3">
           <Button
             variant="close"
             className="text-gray-200 hover:bg-white/10 hover:text-white"
@@ -238,9 +281,9 @@ export function PlayEditor({
           </h1>
         </div>
 
-        <ModeTabs mode={mode} onChange={setMode} />
+        {!isMobile && <ModeTabs mode={mode} onChange={setMode} />}
 
-        <div className="flex flex-1 items-center justify-end gap-2">
+        <div className="flex flex-1 items-center justify-end gap-1 md:gap-2">
           <Button
             variant="close"
             className="text-gray-200 hover:bg-white/10 hover:text-white disabled:text-gray-600"
@@ -275,9 +318,12 @@ export function PlayEditor({
             variant="primary"
             onClick={save}
             disabled={!isDirty || isSaving}
+            aria-label="Save"
           >
-            <Save className="mr-2 h-4 w-4" />
-            {isSaving ? 'Saving…' : 'Save'}
+            <Save className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline">
+              {isSaving ? 'Saving…' : 'Save'}
+            </span>
           </Button>
         </div>
       </header>
@@ -293,10 +339,8 @@ export function PlayEditor({
             phases={phases}
             activeIndex={activePhaseIndex}
             onSelectPhase={setActivePhase}
-            onAddPhase={addPhase}
-            onDeletePhase={deletePhase}
+            onAddEmptyPhase={addEmptyPhase}
             onDuplicatePhase={duplicatePhase}
-            onReorderPhase={reorderPhase}
             onCategoryChange={changeCategory}
             onNoteChange={setPhaseNote}
             onEditStart={beginEdit}
@@ -307,8 +351,11 @@ export function PlayEditor({
             court={court}
             phases={phases}
             activeIndex={activePhaseIndex}
+            stacked={isStacked}
+            compact={isMobile}
             onSelectPhase={setActivePhase}
             onAddPhase={addPhase}
+            onAddEmptyPhase={addEmptyPhase}
             onDeletePhase={deletePhase}
             onDuplicatePhase={duplicatePhase}
             onReorderPhase={reorderPhase}
@@ -316,14 +363,52 @@ export function PlayEditor({
             onEditStart={beginEdit}
             onRemoveAction={deleteActionAt}
           />
+        ) : isMobile ? (
+          <div className="flex min-h-0 flex-1 flex-col gap-2 p-2">
+            <div className="relative flex min-h-0 flex-1 items-center justify-center">
+              {editorStage}
+
+              <div className="absolute top-1.5 left-1.5 z-10">
+                <PhaseSwitcher
+                  phases={phases}
+                  court={court}
+                  activeIndex={activePhaseIndex}
+                  onSelect={setActivePhase}
+                  onAddEmpty={addEmptyPhase}
+                  onDelete={deletePhase}
+                  onDuplicate={duplicatePhase}
+                />
+              </div>
+
+              <button
+                type="button"
+                aria-label="Roster"
+                onClick={() => setRosterOpen(true)}
+                className="absolute top-1.5 right-1.5 z-10 flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg bg-[#faf6ec] text-[#1f2d4d] shadow-md shadow-black/20"
+              >
+                <Users className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="flex items-center rounded-2xl bg-[#faf6ec] py-1.5 shadow-lg shadow-black/25">
+              <ToolDock tool={tool} onToolChange={setTool} variant="bar" />
+            </div>
+
+            <RosterSheet
+              open={rosterOpen}
+              onClose={() => setRosterOpen(false)}
+              {...rosterProps}
+            />
+          </div>
         ) : (
-          <div className="flex min-h-0 flex-1 gap-3 overflow-hidden p-3">
+          <div className="flex min-h-0 flex-1 gap-2 overflow-hidden p-2 xl:gap-3 xl:p-3">
             <PhaseRail
               phases={phases}
               court={court}
               activeIndex={activePhaseIndex}
               onSelect={setActivePhase}
               onAdd={addPhase}
+              onAddEmpty={addEmptyPhase}
               onDelete={deletePhase}
               onDuplicate={duplicatePhase}
               onReorder={reorderPhase}
@@ -336,40 +421,15 @@ export function PlayEditor({
                 </div>
               }
             >
-              <EditorStage
-                court={court}
-                phase={phase}
-                ballHolderId={phase.ballHolderId}
-                tool={tool}
-                selection={selection}
-                onSelect={select}
-                onPickSelect={() => setTool('select')}
-                onDraw={draw}
-                onBeginEdit={beginEdit}
-                onEndEdit={endEdit}
-                onMove={moveObject}
-                onBend={(id, bend) => updateAction(id, { bend })}
-                onRotate={rotateObject}
-                onSetBall={setBallHolder}
-                onDelete={deleteSelection}
-              />
+              {editorStage}
             </StageColumn>
 
-            <RosterPanel
-              objects={phase.objects}
-              rosterCount={rosterCount}
-              ballHolderId={phase.ballHolderId}
-              selectedId={selection?.kind === 'object' ? selection.id : null}
-              onBench={benchObject}
-              onUnbench={unbenchObject}
-              onAddSlot={addSlot}
-              onMatchManToMan={matchManToMan}
-              onSetBall={setBallHolder}
-              onSelect={(id) => select({ kind: 'object', id })}
-            />
+            <RosterPanel {...rosterProps} />
           </div>
         )}
       </div>
+
+      {isMobile && <BottomTabBar mode={mode} onChange={setMode} />}
     </div>
   );
 }

@@ -235,8 +235,9 @@ describe('PlayEditor — phases', () => {
 
     const strip = screen.getByRole('tablist', { name: 'Phases' });
 
-    // Act — add a phase
+    // Act — add a phase from an empty court
     await user.click(screen.getByRole('button', { name: 'Add phase' }));
+    await user.click(screen.getByRole('button', { name: 'Empty court' }));
 
     // Assert — two thumbnails, the new one current
     expect(within(strip).getAllByRole('tab')).toHaveLength(2);

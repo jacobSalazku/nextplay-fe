@@ -21,7 +21,6 @@ export function PlayPlayer({
   phases: Phase[];
 }) {
   const reduce = useReducedMotion();
-  const [speed, setSpeed] = useState(1);
   const [loop, setLoop] = useState(true);
 
   const { w, h } = COURT_VIEWBOX[court];
@@ -41,7 +40,7 @@ export function PlayPlayer({
     return () => observer.disconnect();
   }, []);
 
-  const durationMs = animationDurationMs(phases) / speed;
+  const durationMs = animationDurationMs(phases);
   const { progress, playing, toggle, seek, restart } = useAnimationClock({
     durationMs,
     loop,
@@ -71,12 +70,10 @@ export function PlayPlayer({
           playing={playing}
           progress={progress}
           phaseCount={phases.length}
-          speed={speed}
           loop={loop}
           onToggle={toggle}
           onRestart={restart}
           onSeek={seek}
-          onSpeed={setSpeed}
           onLoop={setLoop}
         />
       </div>

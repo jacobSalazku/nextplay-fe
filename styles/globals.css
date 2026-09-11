@@ -46,8 +46,23 @@
   animation: editor-view-in 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+@keyframes editor-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* the mobile editor's bottom sheets (roster, add phase) slide up */
+.editor-sheet-in {
+  animation: editor-sheet-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .editor-view-enter {
+  .editor-view-enter,
+  .editor-sheet-in {
     animation: none;
   }
 }

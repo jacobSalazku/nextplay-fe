@@ -3,18 +3,14 @@
 import { cn } from '@/utils/tw-merge';
 import { Pause, Play, Repeat, SkipBack } from 'lucide-react';
 
-const SPEEDS = [0.5, 1, 2];
-
 type Props = {
   playing: boolean;
   progress: number;
   phaseCount: number;
-  speed: number;
   loop: boolean;
   onToggle: () => void;
   onRestart: () => void;
   onSeek: (progress: number) => void;
-  onSpeed: (speed: number) => void;
   onLoop: (loop: boolean) => void;
 };
 
@@ -22,12 +18,10 @@ export function TransportBar({
   playing,
   progress,
   phaseCount,
-  speed,
   loop,
   onToggle,
   onRestart,
   onSeek,
-  onSpeed,
   onLoop,
 }: Props) {
   return (
@@ -70,29 +64,6 @@ export function TransportBar({
           onChange={(event) => onSeek(event.target.valueAsNumber)}
           className="relative w-full cursor-pointer accent-orange-500"
         />
-      </div>
-
-      <div
-        role="group"
-        aria-label="Speed"
-        className="flex rounded-md border border-white/10 p-0.5 text-xs"
-      >
-        {SPEEDS.map((option) => (
-          <button
-            key={option}
-            type="button"
-            aria-pressed={option === speed}
-            onClick={() => onSpeed(option)}
-            className={cn(
-              'cursor-pointer rounded px-1.5 py-0.5 font-medium transition',
-              option === speed
-                ? 'bg-slate-700 text-white'
-                : 'text-gray-400 hover:text-white',
-            )}
-          >
-            {option}×
-          </button>
-        ))}
       </div>
 
       <button

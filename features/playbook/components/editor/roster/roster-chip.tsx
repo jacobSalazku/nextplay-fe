@@ -2,8 +2,17 @@ import type { PlayObjectKind } from '@/features/playbook/utils/diagram/types';
 import { cn } from '@/utils/tw-merge';
 import { Eyebrows } from './eyebrows';
 
-// One roster slot: a toggle for on/off the court, with a ball button for
-// on-court offense players.
+type RosterChipProps = {
+  n: number;
+  kind: PlayObjectKind;
+  present: boolean;
+  hasBall: boolean;
+  selected: boolean;
+  onToggle: () => void;
+  onBall: () => void;
+  onSelect: () => void;
+};
+
 export function RosterChip({
   n,
   kind,
@@ -13,16 +22,7 @@ export function RosterChip({
   onToggle,
   onBall,
   onSelect,
-}: {
-  n: number;
-  kind: PlayObjectKind;
-  present: boolean;
-  hasBall: boolean;
-  selected: boolean;
-  onToggle: () => void;
-  onBall: () => void;
-  onSelect: () => void;
-}) {
+}: RosterChipProps) {
   const offense = kind === 'offense';
 
   return (
@@ -36,7 +36,7 @@ export function RosterChip({
           onToggle();
         }}
         className={cn(
-          'flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border pt-1 text-lg font-bold transition',
+          'flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border pt-0.5 text-lg font-bold transition',
           present && offense && 'border-slate-500 bg-slate-700 text-white',
           present && !offense && 'border-red-400 bg-red-600 text-white',
           !present &&

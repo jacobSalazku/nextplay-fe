@@ -1,5 +1,6 @@
 import { usePlayEditorStore } from '../use-play-editor-store';
 import type { PlacedObject } from '@/features/playbook/utils/diagram/types';
+import { roleHome } from '@/features/playbook/utils/editor/roster';
 import { seedDiagram } from '@/features/playbook/utils/editor/seed-diagram';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -367,6 +368,25 @@ describe('usePlayEditorStore', () => {
     });
     expect(phase().actions).toHaveLength(0);
     expect(phase().ballHolderId).toBe('o1');
+  });
+
+  it('adds an empty phase with players reset to their home spots', () => {
+    // Arrange
+    hydrate();
+    store().moveObject('o1', 11, 22);
+    store().setBallHolder('o1');
+
+    // Act
+    store().addEmptyPhase();
+
+    // Assert — new phase active, o1 on its role home, no routes, no ball
+    expect(store().phases).toHaveLength(2);
+    expect(store().activePhaseIndex).toBe(1);
+    expect(phase().objects.find((o) => o.id === 'o1')).toMatchObject(
+      roleHome('o1'),
+    );
+    expect(phase().actions).toHaveLength(0);
+    expect(phase().ballHolderId).toBeUndefined();
   });
 
   it('opens the new phase with the receiver holding it after a pass', () => {

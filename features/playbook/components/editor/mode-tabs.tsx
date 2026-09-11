@@ -5,7 +5,11 @@ import { MessageSquare, Pencil, Play } from 'lucide-react';
 
 export type EditorMode = 'draw' | 'animate' | 'breakdown';
 
-const TABS: { value: EditorMode; label: string; icon: typeof Pencil }[] = [
+export const EDITOR_TABS: {
+  value: EditorMode;
+  label: string;
+  icon: typeof Pencil;
+}[] = [
   { value: 'draw', label: 'Draw', icon: Pencil },
   { value: 'animate', label: 'Animate', icon: Play },
   { value: 'breakdown', label: 'Breakdown', icon: MessageSquare },
@@ -20,7 +24,7 @@ type ModeTabsProps = {
 };
 
 export function ModeTabs({ mode, onChange }: ModeTabsProps) {
-  const activeIndex = TABS.findIndex((t) => t.value === mode);
+  const activeIndex = EDITOR_TABS.findIndex((t) => t.value === mode);
 
   return (
     <div
@@ -32,12 +36,12 @@ export function ModeTabs({ mode, onChange }: ModeTabsProps) {
         aria-hidden
         className="pointer-events-none absolute inset-y-1 left-1 rounded-full bg-[#1f2d4d] shadow-sm transition-transform duration-300 motion-reduce:transition-none"
         style={{
-          width: `calc((100% - 0.5rem) / ${TABS.length})`,
+          width: `calc((100% - 0.5rem) / ${EDITOR_TABS.length})`,
           transform: `translateX(${activeIndex * 100}%)`,
           transitionTimingFunction: SPRING,
         }}
       />
-      {TABS.map(({ value, label, icon: Icon }) => {
+      {EDITOR_TABS.map(({ value, label, icon: Icon }) => {
         const active = mode === value;
         return (
           <button

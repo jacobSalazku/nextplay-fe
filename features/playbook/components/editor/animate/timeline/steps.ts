@@ -1,12 +1,7 @@
 import type { Action, Step } from '@/features/playbook/utils/diagram/types';
 
-export const DEFAULT_MS = 700;
-
-export const DURATIONS = [
-  { ms: 400, label: 'Fast' },
-  { ms: 700, label: 'Normal' },
-  { ms: 1200, label: 'Slow' },
-];
+// Every step runs at one standard beat — there is no per-step timing control.
+export const DEFAULT_MS = 1000;
 
 // A step being edited: the moves that run together and how long they take.
 export type Group = { actionIds: string[]; durationMs: number };
@@ -85,8 +80,15 @@ export function splitToStep(groups: Group[], id: string, at: number): Group[] {
   return next;
 }
 
-export const retimeStep = (
+// Move step `from` to position `to` — the order steps play in.
+export function reorderGroup(
   groups: Group[],
-  step: number,
-  ms: number,
-): Group[] => groups.map((g, i) => (i === step ? { ...g, durationMs: ms } : g));
+  from: number,
+  to: number,
+): Group[] {
+  if (from === to || to < 0 || to >= groups.length) return groups;
+  const next = [...groups];
+  const [moved] = next.splice(from, 1);
+  next.splice(to, 0, moved);
+  return next;
+}

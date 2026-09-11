@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { AddPhaseMenu } from '../mobile/add-phase-menu';
 import { CourtDiagram } from '@/features/playbook/components/diagram/court-diagram';
+import { useDismiss } from '@/features/playbook/hooks/editor/use-dismiss';
 import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
 import { MAX_PHASES } from '@/features/playbook/utils/editor/phase-rail';
 import { cn } from '@/utils/tw-merge';
@@ -19,15 +21,7 @@ function PhaseMenu({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const close = (e: PointerEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('pointerdown', close);
-    return () => document.removeEventListener('pointerdown', close);
-  }, [open]);
+  useDismiss(open, () => setOpen(false), ref);
 
   if (!onDuplicate && !onDelete) return null;
 
@@ -87,6 +81,7 @@ type PhaseRailProps = {
   activeIndex: number;
   onSelect: (index: number) => void;
   onAdd?: () => void;
+  onAddEmpty?: () => void;
   onDelete?: (index: number) => void;
   onDuplicate?: (index: number) => void;
   onReorder?: (from: number, to: number) => void;
@@ -99,12 +94,14 @@ export function PhaseRail({
   activeIndex,
   onSelect,
   onAdd,
+  onAddEmpty,
   onDelete,
   onDuplicate,
   onReorder,
   className,
 }: PhaseRailProps) {
   const listRef = useRef<HTMLDivElement>(null);
+  const [addOpen, setAddOpen] = useState(false);
   // live drag bookkeeping — a ref so a pointermove never reads a stale closure
   const press = useRef<{
     from: number;
@@ -198,7 +195,7 @@ export function PhaseRail({
     <nav
       aria-label="Phases"
       className={cn(
-        'flex w-52 shrink-0 flex-col rounded-2xl bg-[#e9dcc0] p-3',
+        'flex w-[clamp(6rem,13vw,13rem)] shrink-0 flex-col rounded-2xl bg-[#e9dcc0] p-2 xl:p-3',
         className,
       )}
     >
@@ -280,13 +277,24 @@ export function PhaseRail({
           <button
             type="button"
             aria-label="Add phase"
-            onClick={onAdd}
+            onClick={onAddEmpty && onDuplicate ? () => setAddOpen(true) : onAdd}
             className="flex aspect-[100/94] w-full shrink-0 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-[#cdb894] text-[#a89372] transition hover:border-[#1f2d4d]/40 hover:text-[#1f2d4d]"
           >
             <Plus className="h-5 w-5" />
           </button>
         )}
       </div>
+
+      {onAddEmpty && onDuplicate && (
+        <AddPhaseMenu
+          open={addOpen}
+          variant="dialog"
+          activeIndex={activeIndex}
+          onClone={() => onDuplicate(activeIndex)}
+          onEmpty={onAddEmpty}
+          onClose={() => setAddOpen(false)}
+        />
+      )}
 
       {drag &&
         typeof document !== 'undefined' &&

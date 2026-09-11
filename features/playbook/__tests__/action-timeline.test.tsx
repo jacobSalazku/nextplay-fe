@@ -22,7 +22,7 @@ const base = {
 };
 
 const kebab = (i: number) =>
-  screen.getAllByRole('button', { name: 'Timing options' })[i];
+  screen.getAllByRole('button', { name: 'Step options' })[i];
 
 describe('ActionTimeline', () => {
   it('shows the phase header, the timeline label and the moves', () => {
@@ -47,7 +47,7 @@ describe('ActionTimeline', () => {
     );
 
     expect(onChange).toHaveBeenCalledWith([
-      { id: 'g0', actionIds: ['a1', 'a2'], durationMs: 700 },
+      { id: 'g0', actionIds: ['a1', 'a2'], durationMs: 1000 },
     ]);
   });
 
@@ -57,7 +57,7 @@ describe('ActionTimeline', () => {
     render(
       <ActionTimeline
         {...base}
-        steps={[{ id: 'g0', actionIds: ['a1', 'a2'], durationMs: 700 }]}
+        steps={[{ id: 'g0', actionIds: ['a1', 'a2'], durationMs: 1000 }]}
         onChange={onChange}
       />,
     );
@@ -76,21 +76,7 @@ describe('ActionTimeline', () => {
     fireEvent.drop(screen.getByText('Dribble by Player 1'));
 
     expect(onChange).toHaveBeenCalledWith([
-      { id: 'g0', actionIds: ['a1', 'a2'], durationMs: 700 },
-    ]);
-  });
-
-  it('changes a step duration from the kebab menu', async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    render(<ActionTimeline {...base} onChange={onChange} />);
-
-    await user.click(kebab(0));
-    await user.click(screen.getByRole('button', { name: /Fast/ }));
-
-    expect(onChange).toHaveBeenCalledWith([
-      { id: 'g0', actionIds: ['a1'], durationMs: 400 },
-      { id: 'g1', actionIds: ['a2'], durationMs: 700 },
+      { id: 'g0', actionIds: ['a1', 'a2'], durationMs: 1000 },
     ]);
   });
 
@@ -103,5 +89,18 @@ describe('ActionTimeline', () => {
     await user.click(screen.getByRole('button', { name: 'Remove action' }));
 
     expect(onRemoveAction).toHaveBeenCalledWith('a1');
+  });
+
+  it('reorders a step with the arrows in the stacked layout', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<ActionTimeline {...base} variant="stacked" onChange={onChange} />);
+
+    await user.click(screen.getByRole('button', { name: 'Move step 1 later' }));
+
+    expect(onChange).toHaveBeenCalledWith([
+      { id: 'g0', actionIds: ['a2'], durationMs: 1000 },
+      { id: 'g1', actionIds: ['a1'], durationMs: 1000 },
+    ]);
   });
 });

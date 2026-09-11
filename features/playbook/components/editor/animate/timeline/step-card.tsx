@@ -5,21 +5,20 @@ import type {
   PlacedObject,
 } from '@/features/playbook/utils/diagram/types';
 import { GripVertical } from 'lucide-react';
-import { actionLabel, durationLabel } from './labels';
-import { TimingMenu } from './timing-menu';
+import { actionLabel } from './labels';
+import { StepMenu } from './step-menu';
 
 type Props = {
   action: Action;
   objects: PlacedObject[];
   stepIndex: number;
-  durationMs: number;
   canMergeUp: boolean;
   grouped: boolean;
+  stacked?: boolean;
   onDragStart: () => void;
   onDragEnd: () => void;
   onDragOver: (event: React.DragEvent) => void;
   onDrop: (event: React.DragEvent<HTMLElement>) => void;
-  onRetime: (ms: number) => void;
   onMergeUp: () => void;
   onSplitOut: () => void;
   onRemove: () => void;
@@ -29,38 +28,40 @@ export function StepCard({
   action,
   objects,
   stepIndex,
-  durationMs,
   canMergeUp,
   grouped,
+  stacked = false,
   onDragStart,
   onDragEnd,
   onDragOver,
   onDrop,
-  onRetime,
   onMergeUp,
   onSplitOut,
   onRemove,
 }: Props) {
+  const dnd = stacked
+    ? {}
+    : {
+        draggable: true,
+        'data-drop-step': stepIndex,
+        onDragStart,
+        onDragEnd,
+        onDragOver,
+        onDrop,
+      };
+
   return (
     <div
-      draggable
-      data-drop-step={stepIndex}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
-      className="flex items-center gap-2 rounded-lg border border-[#e6dcc4] bg-[#f3ecdb] px-2.5 py-2"
+      {...dnd}
+      className="flex items-center gap-2 rounded-lg border border-[#e6dcc4] bg-[#f3ecdb] px-2.5 py-1.5"
     >
-      <GripVertical className="h-3.5 w-3.5 shrink-0 cursor-grab text-[#b9ac8e] active:cursor-grabbing" />
+      {!stacked && (
+        <GripVertical className="h-3.5 w-3.5 shrink-0 cursor-grab text-[#b9ac8e] active:cursor-grabbing" />
+      )}
       <span className="flex-1 truncate text-sm font-semibold">
         {actionLabel(action, objects)}
       </span>
-      <span className="font-mono text-xs text-[#a89372]">
-        {durationLabel(durationMs)}
-      </span>
-      <TimingMenu
-        durationMs={durationMs}
-        onDuration={onRetime}
+      <StepMenu
         onRemove={onRemove}
         onMergeUp={canMergeUp ? onMergeUp : undefined}
         onSplitOut={grouped ? onSplitOut : undefined}
