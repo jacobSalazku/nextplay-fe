@@ -1,5 +1,3 @@
-import { Suspense } from 'react';
-import PlanViewSkeleton from '@/features/playbook/components/skeleton/plan-view-skeleton';
 import { getGameplanById } from '@/features/playbook/queries/gameplan/get-gameplan-by-id';
 import { gameplanSearchParamsCache } from '@/utils/search-params';
 import { sanitizeRichText } from '@/lib/sanitize-rich-text';
@@ -18,13 +16,12 @@ export const metadata = {
   },
 };
 
-async function GamePlanContent({
-  id,
-  routeKey,
-}: {
-  id: string;
-  routeKey: string;
-}) {
+export default async function GamePlanView({
+  searchParams,
+  params,
+}: PageProps) {
+  const { id } = await gameplanSearchParamsCache.parse(searchParams);
+  const { routeKey } = await params;
   const gameplan = await getGameplanById({ id, routeKey });
 
   if (!gameplan) {
@@ -56,16 +53,3 @@ async function GamePlanContent({
     </div>
   );
 }
-
-async function GamePlanView({ searchParams, params }: PageProps) {
-  const { id } = await gameplanSearchParamsCache.parse(searchParams);
-  const { routeKey } = await params;
-
-  return (
-    <Suspense fallback={<PlanViewSkeleton />}>
-      <GamePlanContent id={id} routeKey={routeKey} />
-    </Suspense>
-  );
-}
-
-export default GamePlanView;

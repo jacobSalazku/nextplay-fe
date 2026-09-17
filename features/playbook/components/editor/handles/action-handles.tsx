@@ -9,39 +9,6 @@ import {
   type Chord,
 } from '@/features/playbook/utils/editor/draw-geometry';
 
-// The small red × shown next to a selected route's bend handle.
-function DeleteControl({
-  x,
-  y,
-  onDelete,
-}: {
-  x: number;
-  y: number;
-  onDelete: () => void;
-}) {
-  return (
-    <g
-      role="button"
-      aria-label="Delete"
-      transform={`translate(${x} ${y})`}
-      style={{ pointerEvents: 'all', cursor: 'pointer' }}
-      onPointerDown={(event) => {
-        event.stopPropagation();
-        onDelete();
-      }}
-    >
-      <circle r={3} fill="transparent" />
-      <circle r={1.1} fill="rgb(220 38 38)" />
-      <path
-        d="M-0.5 -0.5 L0.5 0.5 M-0.5 0.5 L0.5 -0.5"
-        stroke="white"
-        strokeWidth={0.4}
-        strokeLinecap="round"
-      />
-    </g>
-  );
-}
-
 // The bend dot + delete control shown on the selected route.
 export function ActionHandles({
   action,
@@ -59,6 +26,9 @@ export function ActionHandles({
   const chord = actionChord(action, objects);
   const handle = bendHandle(action, objects);
   if (!chord || !handle) return null;
+
+  const deleteX = handle.x + 3;
+  const deleteY = handle.y * sy - 3;
 
   return (
     <>
@@ -79,11 +49,25 @@ export function ActionHandles({
           style={{ pointerEvents: 'none' }}
         />
       </g>
-      <DeleteControl
-        x={handle.x + 3}
-        y={handle.y * sy - 3}
-        onDelete={onDelete}
-      />
+      <g
+        role="button"
+        aria-label="Delete"
+        transform={`translate(${deleteX} ${deleteY})`}
+        style={{ pointerEvents: 'all', cursor: 'pointer' }}
+        onPointerDown={(event) => {
+          event.stopPropagation();
+          onDelete();
+        }}
+      >
+        <circle r={3} fill="transparent" />
+        <circle r={1.1} fill="rgb(220 38 38)" />
+        <path
+          d="M-0.5 -0.5 L0.5 0.5 M-0.5 0.5 L0.5 -0.5"
+          stroke="white"
+          strokeWidth={0.4}
+          strokeLinecap="round"
+        />
+      </g>
     </>
   );
 }

@@ -12,39 +12,6 @@ const CATEGORIES: { value: Category; label: string }[] = [
   { value: Category.Special, label: 'Special' },
 ];
 
-function CategoryPicker({
-  value,
-  onChange,
-}: {
-  value: Category;
-  onChange: (category: Category) => void;
-}) {
-  return (
-    <div
-      role="group"
-      aria-label="Category"
-      className="flex shrink-0 rounded-lg border border-black/10 p-0.5 text-xs"
-    >
-      {CATEGORIES.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          aria-pressed={value === option.value}
-          onClick={() => onChange(option.value)}
-          className={cn(
-            'cursor-pointer rounded-md px-2.5 py-1 font-medium transition',
-            value === option.value
-              ? 'bg-slate-800 text-white'
-              : 'text-slate-500 hover:text-slate-900',
-          )}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 type BreakdownProps = {
   category: Category;
   court: CourtType;
@@ -96,7 +63,28 @@ export function BreakdownView({
           <h2 className="text-xs font-semibold tracking-wider text-[#8a7a5c] uppercase">
             Step notes
           </h2>
-          <CategoryPicker value={category} onChange={onCategoryChange} />
+          <div
+            role="group"
+            aria-label="Category"
+            className="flex shrink-0 rounded-lg border border-black/10 p-0.5 text-xs"
+          >
+            {CATEGORIES.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                aria-pressed={category === option.value}
+                onClick={() => onCategoryChange(option.value)}
+                className={cn(
+                  'cursor-pointer rounded-md px-2.5 py-1 font-medium transition',
+                  category === option.value
+                    ? 'bg-slate-800 text-white'
+                    : 'text-slate-500 hover:text-slate-900',
+                )}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
         </header>
 
         <div className="flex min-h-0 flex-1 flex-col p-3 md:p-4">

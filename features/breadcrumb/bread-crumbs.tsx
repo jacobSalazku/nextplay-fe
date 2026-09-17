@@ -28,8 +28,8 @@ export const Breadcrumb = () => {
 
   const visibleSegments = segments.slice(2);
 
-  // A play's own id makes an ugly, meaningless crumb (view/edit/sheet all
-  // carry it) — collapse the whole play-detail chain to one link back.
+  // A play's own id makes an ugly, meaningless crumb (view/edit/sheet all carry it) — collapse the whole play-detail chain to one link back.
+
   const isPlayDetail =
     visibleSegments[0] === 'playbook' &&
     visibleSegments[1] === 'play' &&
@@ -59,7 +59,7 @@ export const Breadcrumb = () => {
   const userName = user.user.name ?? session?.user?.name ?? 'User';
 
   return (
-    <div className="-mx-4 mb-4 hidden items-center border-b border-orange-200/30 px-4 py-4 text-sm text-orange-200 md:flex">
+    <div className="-mx-4 mb-4 hidden items-center border-b border-orange-200/30 px-10 py-4 text-sm text-orange-200 md:flex">
       <div className="flex items-center gap-2">
         <Link
           aria-label={teamLabel}

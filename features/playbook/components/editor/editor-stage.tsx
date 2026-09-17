@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import { COURT_VIEWBOX } from '@/features/playbook/components/diagram/court';
 import { CourtDiagram } from '@/features/playbook/components/diagram/court-diagram';
-import { RouteArrowMarker } from '@/features/playbook/components/diagram/route';
+import { RouteArrowMarker } from '@/features/playbook/components/diagram/route-arrow-marker';
 import { useCourtPointer } from '@/features/playbook/hooks/editor/use-court-pointer';
 import {
   actionEndpoints,
