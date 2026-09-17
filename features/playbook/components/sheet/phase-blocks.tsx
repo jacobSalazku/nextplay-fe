@@ -150,12 +150,15 @@ export function PhaseBlocks({
       ? packedBlocks(diagram)
       : diagram.phases.map((_, index) => ({ kind: 'full', index }));
 
+  // on screen, a fixed two-column grid has no room to shrink the court below
+  // lg — the desktop sidebar eats enough width that sm/md are still cramped
+  // (same breakpoint the hero right above already switches on)
   const fullCols =
     name === 'paper'
       ? 'grid-cols-[38%_1fr]'
       : diagram.court === 'full'
-        ? 'grid-cols-[minmax(0,20rem)_1fr]'
-        : 'grid-cols-[minmax(0,32rem)_1fr]';
+        ? 'grid-cols-1 lg:grid-cols-[minmax(0,20rem)_1fr]'
+        : 'grid-cols-1 lg:grid-cols-[minmax(0,32rem)_1fr]';
 
   return (
     <div className="flex flex-col">
