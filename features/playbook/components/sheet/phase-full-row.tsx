@@ -11,12 +11,14 @@ export function PhaseFullRow({
   index,
   theme,
   cols,
+  courtMaxWidth,
   divided,
 }: {
   diagram: PlayDiagram;
   index: number;
   theme: ThemeTokens;
   cols: string;
+  courtMaxWidth?: string;
   divided: boolean;
 }) {
   // sanitised on write (BE) and again here, like the play view page
@@ -31,7 +33,9 @@ export function PhaseFullRow({
       )}
       style={{ breakInside: 'avoid' }}
     >
-      <PhaseCourtCard diagram={diagram} index={index} theme={theme} />
+      <div className={cn('mx-auto w-full lg:mx-0', courtMaxWidth)}>
+        <PhaseCourtCard diagram={diagram} index={index} theme={theme} />
+      </div>
       {note ? (
         <div
           className={theme.notes}

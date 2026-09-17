@@ -59,8 +59,17 @@ export function PhaseBlocks({
     name === 'paper'
       ? 'grid-cols-[38%_1fr]'
       : diagram.court === 'full'
-        ? 'grid-cols-1 lg:grid-cols-[minmax(0,20rem)_1fr]'
-        : 'grid-cols-1 lg:grid-cols-[minmax(0,32rem)_1fr]';
+        ? 'grid-cols-1 lg:grid-cols-[minmax(0,10rem)_1fr]'
+        : 'grid-cols-1 lg:grid-cols-[minmax(0,16rem)_1fr]';
+
+  // the court itself is capped too, at roughly half its old size — otherwise
+  // a stacked (<lg) row lets it balloon to the row's full width
+  const courtMaxWidth =
+    name === 'paper'
+      ? undefined
+      : diagram.court === 'full'
+        ? 'max-w-[10rem]'
+        : 'max-w-[16rem]';
 
   return (
     <div className="flex flex-col">
@@ -72,6 +81,7 @@ export function PhaseBlocks({
             index={block.index}
             theme={theme}
             cols={fullCols}
+            courtMaxWidth={courtMaxWidth}
             divided={i > 0}
           />
         ) : (
