@@ -9,36 +9,36 @@ const STROKE = '#CFA068';
 const R = 2.6; // offense token radius
 const DR = 2.1; // defenders sit a touch smaller
 
-function OffenseToken({
+export function Token({
   object,
   hasBall,
 }: {
   object: PlacedObject;
   hasBall: boolean;
 }) {
-  return (
-    <g
-      data-object-id={object.id}
-      transform={`translate(${object.x} ${object.y})`}
-    >
-      {hasBall && (
-        <circle r={R + 1} fill="none" stroke={BALL} strokeWidth={0.7} />
-      )}
-      <circle r={R} fill={OFFENSE_FILL} stroke={STROKE} strokeWidth={0.4} />
-      <text
-        y={1}
-        textAnchor="middle"
-        fontSize={2.7}
-        fontWeight={700}
-        fill={OFFENSE_INK}
+  if (object.kind === 'offense') {
+    return (
+      <g
+        data-object-id={object.id}
+        transform={`translate(${object.x} ${object.y})`}
       >
-        {object.label}
-      </text>
-    </g>
-  );
-}
+        {hasBall && (
+          <circle r={R + 1} fill="none" stroke={BALL} strokeWidth={0.7} />
+        )}
+        <circle r={R} fill={OFFENSE_FILL} stroke={STROKE} strokeWidth={0.4} />
+        <text
+          y={1}
+          textAnchor="middle"
+          fontSize={2.7}
+          fontWeight={700}
+          fill={OFFENSE_INK}
+        >
+          {object.label}
+        </text>
+      </g>
+    );
+  }
 
-function DefenseToken({ object }: { object: PlacedObject }) {
   const facing = object.facing ?? 0;
   return (
     <g
@@ -66,19 +66,5 @@ function DefenseToken({ object }: { object: PlacedObject }) {
         {object.label}
       </text>
     </g>
-  );
-}
-
-export function Token({
-  object,
-  hasBall,
-}: {
-  object: PlacedObject;
-  hasBall: boolean;
-}) {
-  return object.kind === 'offense' ? (
-    <OffenseToken object={object} hasBall={hasBall} />
-  ) : (
-    <DefenseToken object={object} />
   );
 }

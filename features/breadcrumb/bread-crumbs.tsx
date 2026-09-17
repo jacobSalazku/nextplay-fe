@@ -28,8 +28,8 @@ export const Breadcrumb = () => {
 
   const visibleSegments = segments.slice(2);
 
-  // A play's own id makes an ugly, meaningless crumb (view/edit/sheet all
-  // carry it) — collapse the whole play-detail chain to one link back.
+  // A play's own id makes an ugly, meaningless crumb (view/edit/sheet all carry it) — collapse the whole play-detail chain to one link back.
+
   const isPlayDetail =
     visibleSegments[0] === 'playbook' &&
     visibleSegments[1] === 'play' &&
@@ -51,7 +51,7 @@ export const Breadcrumb = () => {
 
   const teamLabel = capitalize(teamSlug);
   const crumbLink =
-    'font-medium bg:hover-text bg-transparent text-base transition-colors duration-200 hover:bg-transparent hover:text-orange-300';
+    'font-medium bg:hover-text p-0 bg-transparent text-lg transition-colors duration-200 hover:bg-transparent hover:text-orange-300';
 
   if (!user?.user) {
     return null;
@@ -59,13 +59,13 @@ export const Breadcrumb = () => {
   const userName = user.user.name ?? session?.user?.name ?? 'User';
 
   return (
-    <div className="-mx-4 mb-4 hidden items-center border-b border-orange-200/30 py-4 pt-3.5 pl-4 text-sm text-orange-200 md:flex">
-      {/* one flex group with a fixed gap, so spacing is the same on every
-          page regardless of how many segments the route has */}
-      <div className="flex items-center gap-2 px-2">
+    <div className="-mx-4 mb-4 hidden items-center border-b border-orange-200/30 px-10 py-4 text-sm text-orange-200 md:flex">
+      <div className="flex items-center gap-2">
         <Link
           aria-label={teamLabel}
-          href={`/team/${routeKey}`}
+          href={{
+            pathname: `/team/${routeKey}`,
+          }}
           className={crumbLink}
         >
           {teamLabel}
@@ -73,7 +73,7 @@ export const Breadcrumb = () => {
 
         {isPlayDetail ? (
           <>
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-5 w-5" />
             <Link
               aria-label="Playbook"
               href={`/team/${routeKey}/playbook`}
@@ -91,10 +91,10 @@ export const Breadcrumb = () => {
 
             return (
               <div className="flex items-center gap-2" key={index}>
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-5 w-5" />
                 {isLast ? (
                   <span
-                    className={cn('text-orange-300', 'text-base font-medium')}
+                    className={cn('text-orange-300', 'text-lg font-medium')}
                   >
                     {label}
                   </span>
@@ -109,10 +109,7 @@ export const Breadcrumb = () => {
         )}
       </div>
 
-      <div
-        className="relative ml-auto pr-6 text-xs text-white"
-        ref={dropdownRef}
-      >
+      <div className="relative ml-auto text-xs text-white" ref={dropdownRef}>
         <button
           aria-label="dropdown settings"
           onClick={() => setOpen((prev) => !prev)}

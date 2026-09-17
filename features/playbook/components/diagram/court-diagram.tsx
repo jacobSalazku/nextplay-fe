@@ -1,7 +1,8 @@
 import { projectPhase } from '@/features/playbook/utils/diagram/project';
 import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
 import { Court, COURT_VIEWBOX } from './court';
-import { Route, RouteArrowMarker } from './route';
+import { Route } from './route';
+import { RouteArrowMarker } from './route-arrow-marker';
 import { Token } from './tokens';
 
 export function CourtDiagram({

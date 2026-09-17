@@ -1,9 +1,7 @@
-import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import GamePlanForm from '@/features/playbook/components/form/gameplan-form';
 import PracticePreparationForm from '@/features/playbook/components/form/practice-preparation-form';
 import PlaybookBookBlock from '@/features/playbook/components/playbook';
-import PlaybookLibrarySkeleton from '@/features/playbook/components/skeleton/playbook-library-skeleton';
 import { getGameplan } from '@/features/playbook/queries/gameplan/get-gameplans';
 import { getGames } from '@/features/playbook/queries/gameplan/get-games';
 import { getPlays } from '@/features/playbook/queries/play/get-plays';
@@ -27,7 +25,9 @@ export const metadata: Metadata = {
   },
 };
 
-async function PlaybookContent({ routeKey }: { routeKey: string }) {
+async function PlaybookPage({ params }: PageProps) {
+  const { routeKey } = await params;
+
   const [
     playbook,
     games,
@@ -73,16 +73,6 @@ async function PlaybookContent({ routeKey }: { routeKey: string }) {
         />
       </div>
     </div>
-  );
-}
-
-async function PlaybookPage({ params }: PageProps) {
-  const { routeKey } = await params;
-
-  return (
-    <Suspense fallback={<PlaybookLibrarySkeleton />}>
-      <PlaybookContent routeKey={routeKey} />
-    </Suspense>
   );
 }
 

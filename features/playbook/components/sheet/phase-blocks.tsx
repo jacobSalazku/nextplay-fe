@@ -1,4 +1,10 @@
-import { CourtDiagram } from '@/features/playbook/components/diagram/court-diagram';
+import {
+  THEME,
+  type Theme,
+} from '@/features/playbook/components/sheet/phase-block-theme';
+import { PhaseCaption } from '@/features/playbook/components/sheet/phase-caption';
+import { PhaseCourtCard } from '@/features/playbook/components/sheet/phase-court-card';
+import { PhaseFullRow } from '@/features/playbook/components/sheet/phase-full-row';
 import type { PlayDiagram } from '@/features/playbook/utils/diagram/types';
 import { autoNote } from '@/features/playbook/utils/sheet/auto-note';
 import { cn } from '@/utils/tw-merge';
@@ -30,110 +36,6 @@ function packedBlocks(diagram: PlayDiagram): Block[] {
   return blocks;
 }
 
-type Theme = 'paper' | 'dark';
-
-type ThemeTokens = {
-  row: string;
-  tag: string;
-  frame: string;
-  notes: string;
-  caption: string;
-  lead: string;
-};
-
-const THEME: Record<Theme, ThemeTokens> = {
-  paper: {
-    row: 'border-[#e4dcc9]',
-    tag: 'bg-[#1f2d4d] text-white',
-    frame: 'border border-[#e4dcc9] bg-white',
-    notes: cn(
-      'prose prose-sm max-w-none text-[13px] text-[#1b1b1b]',
-      '[&_h1]:text-[#1f2d4d] [&_h2]:text-[#1f2d4d] [&_h3]:text-[#1f2d4d]',
-      '[&_mark]:bg-[#fdf1c4]',
-    ),
-    caption: 'text-[#3a3a3a]',
-    lead: 'text-[#8a7a5c]',
-  },
-  dark: {
-    row: 'border-white/10',
-    tag: 'bg-[#1f2d4d] text-white',
-    frame: 'border border-white/10 bg-[#16213b] p-1.5',
-    notes: cn(
-      'prose prose-sm prose-invert max-w-none text-sm text-[#c9cedd]',
-      '[&_h1]:text-white [&_h2]:text-white [&_h3]:text-white',
-      '[&_mark]:bg-amber-200/80 [&_mark]:text-black',
-    ),
-    caption: 'text-[#8b93a7]',
-    lead: 'text-[#5f6b85]',
-  },
-};
-
-function Court({
-  diagram,
-  index,
-  theme,
-}: {
-  diagram: PlayDiagram;
-  index: number;
-  theme: ThemeTokens;
-}) {
-  const phase = diagram.phases[index];
-  return (
-    <div>
-      <span
-        className={cn(
-          'mb-1.5 inline-block rounded px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase',
-          theme.tag,
-        )}
-      >
-        Phase {index + 1}
-      </span>
-      <div className={theme.frame}>
-        <CourtDiagram
-          court={diagram.court}
-          phase={phase}
-          ballHolderId={phase.ballHolderId}
-          className="block w-full"
-        />
-      </div>
-    </div>
-  );
-}
-
-function Caption({
-  text,
-  theme,
-  beside = false,
-}: {
-  text: string;
-  theme: ThemeTokens;
-  beside?: boolean;
-}) {
-  const [lead, rest] = text
-    ? (['Movement', text] as const)
-    : (['Reset', 'players hold their spots'] as const);
-  return (
-    <p
-      className={cn(
-        'leading-relaxed',
-        beside ? 'text-[15px]' : 'mt-2 text-[11px]',
-        theme.caption,
-      )}
-    >
-      <span
-        className={cn(
-          'font-mono font-bold tracking-wider uppercase',
-          beside ? 'text-[9px]' : 'text-[8px]',
-          theme.lead,
-        )}
-      >
-        {lead}
-      </span>{' '}
-      {rest}
-    </p>
-  );
-}
-
 export function PhaseBlocks({
   diagram,
   theme: name = 'paper',
@@ -150,23 +52,36 @@ export function PhaseBlocks({
       ? packedBlocks(diagram)
       : diagram.phases.map((_, index) => ({ kind: 'full', index }));
 
+  // on screen, a fixed two-column grid has no room to shrink the court below
+  // lg — the desktop sidebar eats enough width that sm/md are still cramped
+  // (same breakpoint the hero right above already switches on)
   const fullCols =
     name === 'paper'
       ? 'grid-cols-[38%_1fr]'
       : diagram.court === 'full'
-        ? 'grid-cols-[minmax(0,20rem)_1fr]'
-        : 'grid-cols-[minmax(0,32rem)_1fr]';
+        ? 'grid-cols-1 lg:grid-cols-[minmax(0,10rem)_1fr]'
+        : 'grid-cols-1 lg:grid-cols-[minmax(0,16rem)_1fr]';
+
+  // the court itself is capped too, at roughly half its old size — otherwise
+  // a stacked (<lg) row lets it balloon to the row's full width
+  const courtMaxWidth =
+    name === 'paper'
+      ? undefined
+      : diagram.court === 'full'
+        ? 'max-w-[10rem]'
+        : 'max-w-[16rem]';
 
   return (
     <div className="flex flex-col">
       {blocks.map((block, i) =>
         block.kind === 'full' ? (
-          <FullRow
+          <PhaseFullRow
             key={`f${block.index}`}
             diagram={diagram}
             index={block.index}
             theme={theme}
             cols={fullCols}
+            courtMaxWidth={courtMaxWidth}
             divided={i > 0}
           />
         ) : (
@@ -180,54 +95,16 @@ export function PhaseBlocks({
           >
             {block.indices.map((index) => (
               <div key={diagram.phases[index].id}>
-                <Court diagram={diagram} index={index} theme={theme} />
-                <Caption text={autoNote(diagram.phases[index])} theme={theme} />
+                <PhaseCourtCard diagram={diagram} index={index} theme={theme} />
+                <PhaseCaption
+                  text={autoNote(diagram.phases[index])}
+                  theme={theme}
+                />
               </div>
             ))}
           </section>
         ),
       )}
     </div>
-  );
-}
-
-// A full-size court with its text beside it: the coach's notes if there are
-// any, otherwise the auto-described movement (which top-aligns with a long
-// note but centres against a one-line caption).
-function FullRow({
-  diagram,
-  index,
-  theme,
-  cols,
-  divided,
-}: {
-  diagram: PlayDiagram;
-  index: number;
-  theme: ThemeTokens;
-  cols: string;
-  divided: boolean;
-}) {
-  // sanitised on write (BE) and again here, like the play view page
-  const note = sanitizeRichText(diagram.phases[index].note);
-  return (
-    <section
-      className={cn(
-        'grid gap-8 py-6',
-        cols,
-        note ? 'items-start' : 'items-center',
-        divided && cn('border-t', theme.row),
-      )}
-      style={{ breakInside: 'avoid' }}
-    >
-      <Court diagram={diagram} index={index} theme={theme} />
-      {note ? (
-        <div
-          className={theme.notes}
-          dangerouslySetInnerHTML={{ __html: note }}
-        />
-      ) : (
-        <Caption text={autoNote(diagram.phases[index])} theme={theme} beside />
-      )}
-    </section>
   );
 }

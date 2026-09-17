@@ -4,7 +4,7 @@ import {
   Court,
   COURT_VIEWBOX,
 } from '@/features/playbook/components/diagram/court';
-import { RouteArrowMarker } from '@/features/playbook/components/diagram/route';
+import { RouteArrowMarker } from '@/features/playbook/components/diagram/route-arrow-marker';
 import { Token } from '@/features/playbook/components/diagram/tokens';
 import {
   actionEndpoints,

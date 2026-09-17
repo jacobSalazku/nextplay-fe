@@ -1,11 +1,9 @@
-import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ExportMenu } from '@/features/playbook/components/editor/export-menu';
 import { ShareButton } from '@/features/playbook/components/editor/share-button';
 import { PlayPlayer } from '@/features/playbook/components/play/play-player';
 import { PhaseBlocks } from '@/features/playbook/components/sheet/phase-blocks';
-import PlanViewSkeleton from '@/features/playbook/components/skeleton/plan-view-skeleton';
 import { getPlay } from '@/features/playbook/queries/play/get-play';
 import { asPlayDiagram } from '@/features/playbook/utils/diagram/parse';
 import { categoryLabel } from '@/features/playbook/utils/play-category-color';
@@ -26,27 +24,8 @@ export const metadata = {
   },
 };
 
-// navy hairline with an orange tick at the start — the coaching sheet's rule,
-// carried onto the screen so the two surfaces read as one playbook
-function Rule() {
-  return (
-    <div className="relative mt-6 h-px bg-[#2b3a5c]">
-      <span className="absolute top-0 left-0 h-px w-10 bg-[#f97316]" />
-    </div>
-  );
-}
-
-async function PlayView({ params }: PageProps) {
+export default async function PlayView({ params }: PageProps) {
   const { routeKey, id } = await params;
-
-  return (
-    <Suspense fallback={<PlanViewSkeleton />}>
-      <PlayContent id={id} routeKey={routeKey} />
-    </Suspense>
-  );
-}
-
-async function PlayContent({ id, routeKey }: { id: string; routeKey: string }) {
   const play = await getPlay(id, routeKey);
   if (!play) notFound();
 
@@ -105,7 +84,9 @@ async function PlayContent({ id, routeKey }: { id: string; routeKey: string }) {
               </Link>
             </div>
           </div>
-          <Rule />
+          <div className="relative mt-6 h-px bg-[#2b3a5c]">
+            <span className="absolute top-0 left-0 h-px w-10 bg-[#f97316]" />
+          </div>
         </header>
 
         {diagram ? (
@@ -145,7 +126,9 @@ async function PlayContent({ id, routeKey }: { id: string; routeKey: string }) {
               <h2 className="font-righteous text-lg text-white">
                 Phase by phase
               </h2>
-              <Rule />
+              <div className="relative mt-6 h-px bg-[#2b3a5c]">
+                <span className="absolute top-0 left-0 h-px w-10 bg-[#f97316]" />
+              </div>
             </div>
             <PhaseBlocks diagram={diagram} theme="dark" />
           </>
@@ -172,5 +155,3 @@ async function PlayContent({ id, routeKey }: { id: string; routeKey: string }) {
     </div>
   );
 }
-
-export default PlayView;
