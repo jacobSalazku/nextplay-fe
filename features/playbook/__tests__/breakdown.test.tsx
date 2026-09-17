@@ -1,5 +1,4 @@
 import { BreakdownView } from '../components/editor/breakdown/breakdown-view';
-import { CategoryPicker } from '../components/editor/breakdown/category-picker';
 import { PhaseRail } from '../components/editor/breakdown/phase-rail';
 import type { Phase } from '../utils/diagram/types';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -14,23 +13,6 @@ const phases = (n: number): Phase[] =>
     actions: [],
     ...(i === 0 ? { note: '<p>Iso</p>' } : {}),
   }));
-
-describe('CategoryPicker', () => {
-  it('marks the active category and reports a pick', async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    render(<CategoryPicker value={Category.Offensive} onChange={onChange} />);
-
-    expect(screen.getByRole('button', { name: 'Offense' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Defense' }));
-
-    expect(onChange).toHaveBeenCalledWith(Category.Defensive);
-  });
-});
 
 describe('PhaseRail', () => {
   it('shows the phase counter and switches phase on click', async () => {
@@ -127,5 +109,20 @@ describe('BreakdownView', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('group', { name: 'Category' })).toBeInTheDocument();
     await waitFor(() => expect(screen.getByText('Iso')).toBeInTheDocument());
+  });
+
+  it('marks the active category and reports a pick', async () => {
+    const user = userEvent.setup();
+    const onCategoryChange = vi.fn();
+    render(<BreakdownView {...props} onCategoryChange={onCategoryChange} />);
+
+    expect(screen.getByRole('button', { name: 'Offense' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Defense' }));
+
+    expect(onCategoryChange).toHaveBeenCalledWith(Category.Defensive);
   });
 });
