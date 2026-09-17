@@ -5,10 +5,6 @@ export const boxScoreSearchParams = {
   id: parseAsString.withDefault(''),
 };
 
-export const playbookSearchParams = {
-  id: parseAsString.withDefault(''),
-};
-
 export const gameplanSearchParams = {
   id: parseAsString.withDefault(''),
 };
@@ -30,9 +26,6 @@ export const gameplanSearchParamsCache =
 
 export const practiceSearchParamsCache =
   createSearchParamsCache(practiceSearchParams);
-
-export const playbookSearchParamsCache =
-  createSearchParamsCache(playbookSearchParams);
 
 export const boxScoreSearchParamsCache =
   createSearchParamsCache(boxScoreSearchParams);

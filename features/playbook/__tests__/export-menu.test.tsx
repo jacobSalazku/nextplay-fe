@@ -20,6 +20,11 @@ vi.mock('sonner', () => ({
   toast: { error: (...a: unknown[]) => toastError(...a) },
 }));
 
+const copyShareLink = vi.fn();
+vi.mock('@/features/playbook/utils/copy-share-link', () => ({
+  copyShareLink: (...args: unknown[]) => copyShareLink(...args),
+}));
+
 const phases: Phase[] = [
   { id: 'p1', objects: [], actions: [] },
   { id: 'p2', objects: [], actions: [] },
@@ -86,5 +91,15 @@ describe('ExportMenu', () => {
 
     expect(await screen.findByRole('button', { name: 'Export' })).toBeEnabled();
     expect(toastError).toHaveBeenCalled();
+  });
+
+  it('copies the share link', async () => {
+    const user = userEvent.setup();
+    render(<ExportMenu {...props} />);
+
+    await user.click(screen.getByRole('button', { name: 'Export' }));
+    await user.click(screen.getByRole('button', { name: /Copy share link/ }));
+
+    expect(copyShareLink).toHaveBeenCalledWith('cavs-1', 'play-9');
   });
 });

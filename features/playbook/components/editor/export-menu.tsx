@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
+import { useDismiss } from '@/features/playbook/hooks/editor/use-dismiss';
+import { copyShareLink } from '@/features/playbook/utils/copy-share-link';
 import {
   exportPhasePng,
   exportSheetPng,
 } from '@/features/playbook/utils/diagram/export-diagram';
 import type { CourtType, Phase } from '@/features/playbook/utils/diagram/types';
-import { FileText, ImageIcon, LayoutGrid, Loader2 } from 'lucide-react';
+import { FileText, ImageIcon, LayoutGrid, Link2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 type Props = {
@@ -30,15 +32,7 @@ export function ExportMenu({
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const close = (event: PointerEvent) => {
-      if (!ref.current?.contains(event.target as Node)) setOpen(false);
-    };
-    document.addEventListener('pointerdown', close);
-    return () => document.removeEventListener('pointerdown', close);
-  }, [open]);
+  useDismiss(open, () => setOpen(false), ref);
 
   const run = async (task: () => void | Promise<void>) => {
     setOpen(false);
@@ -126,6 +120,22 @@ export function ExportMenu({
               Current phase (PNG)
               <span className="block text-xs text-gray-400">
                 phase {activeIndex + 1} only
+              </span>
+            </span>
+          </button>
+
+          <div className="my-1 border-t border-white/10" />
+
+          <button
+            type="button"
+            className={item}
+            onClick={() => run(() => copyShareLink(routeKey, playId))}
+          >
+            <Link2 className="mt-0.5 h-4 w-4 shrink-0 text-gray-300" />
+            <span>
+              Copy share link
+              <span className="block text-xs text-gray-400">
+                anyone on this team can open it
               </span>
             </span>
           </button>

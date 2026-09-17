@@ -28,6 +28,14 @@ export const Breadcrumb = () => {
 
   const visibleSegments = segments.slice(2);
 
+  // A play's own id makes an ugly, meaningless crumb (view/edit/sheet all
+  // carry it) — collapse the whole play-detail chain to one link back.
+  const isPlayDetail =
+    visibleSegments[0] === 'playbook' &&
+    visibleSegments[1] === 'play' &&
+    visibleSegments.length >= 3 &&
+    visibleSegments[2] !== 'new';
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -42,6 +50,8 @@ export const Breadcrumb = () => {
   }, []);
 
   const teamLabel = capitalize(teamSlug);
+  const crumbLink =
+    'font-medium bg:hover-text bg-transparent text-sm transition-colors duration-200 hover:bg-transparent hover:text-orange-300';
 
   if (!user?.user) {
     return null;
@@ -54,39 +64,46 @@ export const Breadcrumb = () => {
         <Link
           aria-label={teamLabel}
           href={`/team/${routeKey}`}
-          className="font-righteous bg:hover-text bg-transparent text-2xl transition-colors duration-200 hover:bg-transparent hover:text-orange-300"
+          className={crumbLink}
         >
           {teamLabel}
         </Link>
       </div>
 
-      {visibleSegments.map((segment, index) => {
-        const label = capitalize(segment);
-        const isLast = index === visibleSegments.length - 1;
+      {isPlayDetail ? (
+        <div className="-mr-5 flex items-center gap-2 px-2">
+          <ChevronRight className="h-4 w-4" />
+          <Link
+            aria-label="Playbook"
+            href={`/team/${routeKey}/playbook`}
+            className={crumbLink}
+          >
+            Playbook
+          </Link>
+        </div>
+      ) : (
+        visibleSegments.map((segment, index) => {
+          const label = capitalize(segment);
+          const isLast = index === visibleSegments.length - 1;
 
-        const href = '/' + segments.slice(0, index + 3).join('/');
+          const href = '/' + segments.slice(0, index + 3).join('/');
 
-        return (
-          <div className="-mr-5 flex items-center gap-2 px-2" key={index}>
-            <ChevronRight className="h-6 w-6" />
-            {isLast ? (
-              <span
-                className={cn('text-orange-300', 'font-righteous text-2xl')}
-              >
-                {label}
-              </span>
-            ) : (
-              <Link
-                aria-label={label}
-                href={href}
-                className="font-righteous bg:hover-text bg-transparent text-2xl transition-colors duration-200 hover:bg-transparent hover:text-orange-300"
-              >
-                {label}
-              </Link>
-            )}
-          </div>
-        );
-      })}
+          return (
+            <div className="-mr-5 flex items-center gap-2 px-2" key={index}>
+              <ChevronRight className="h-4 w-4" />
+              {isLast ? (
+                <span className={cn('text-orange-300', 'text-sm font-medium')}>
+                  {label}
+                </span>
+              ) : (
+                <Link aria-label={label} href={href} className={crumbLink}>
+                  {label}
+                </Link>
+              )}
+            </div>
+          );
+        })
+      )}
 
       <div
         className="relative ml-auto pr-6 text-xs text-white"
