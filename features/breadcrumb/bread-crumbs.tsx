@@ -51,7 +51,7 @@ export const Breadcrumb = () => {
 
   const teamLabel = capitalize(teamSlug);
   const crumbLink =
-    'font-medium bg:hover-text bg-transparent text-sm transition-colors duration-200 hover:bg-transparent hover:text-orange-300';
+    'font-medium bg:hover-text bg-transparent text-base transition-colors duration-200 hover:bg-transparent hover:text-orange-300';
 
   if (!user?.user) {
     return null;
@@ -59,8 +59,10 @@ export const Breadcrumb = () => {
   const userName = user.user.name ?? session?.user?.name ?? 'User';
 
   return (
-    <div className="-mx-4 mb-4 hidden items-center justify-between gap-2 border-b border-orange-200/30 py-4 pt-3.5 pl-4 text-sm text-orange-200 md:flex">
-      <div className="-mr-5 flex items-center gap-2 px-2">
+    <div className="-mx-4 mb-4 hidden items-center border-b border-orange-200/30 py-4 pt-3.5 pl-4 text-sm text-orange-200 md:flex">
+      {/* one flex group with a fixed gap, so spacing is the same on every
+          page regardless of how many segments the route has */}
+      <div className="flex items-center gap-2 px-2">
         <Link
           aria-label={teamLabel}
           href={`/team/${routeKey}`}
@@ -68,42 +70,44 @@ export const Breadcrumb = () => {
         >
           {teamLabel}
         </Link>
+
+        {isPlayDetail ? (
+          <>
+            <ChevronRight className="h-4 w-4" />
+            <Link
+              aria-label="Playbook"
+              href={`/team/${routeKey}/playbook`}
+              className={crumbLink}
+            >
+              Playbook
+            </Link>
+          </>
+        ) : (
+          visibleSegments.map((segment, index) => {
+            const label = capitalize(segment);
+            const isLast = index === visibleSegments.length - 1;
+
+            const href = '/' + segments.slice(0, index + 3).join('/');
+
+            return (
+              <div className="flex items-center gap-2" key={index}>
+                <ChevronRight className="h-4 w-4" />
+                {isLast ? (
+                  <span
+                    className={cn('text-orange-300', 'text-base font-medium')}
+                  >
+                    {label}
+                  </span>
+                ) : (
+                  <Link aria-label={label} href={href} className={crumbLink}>
+                    {label}
+                  </Link>
+                )}
+              </div>
+            );
+          })
+        )}
       </div>
-
-      {isPlayDetail ? (
-        <div className="-mr-5 flex items-center gap-2 px-2">
-          <ChevronRight className="h-4 w-4" />
-          <Link
-            aria-label="Playbook"
-            href={`/team/${routeKey}/playbook`}
-            className={crumbLink}
-          >
-            Playbook
-          </Link>
-        </div>
-      ) : (
-        visibleSegments.map((segment, index) => {
-          const label = capitalize(segment);
-          const isLast = index === visibleSegments.length - 1;
-
-          const href = '/' + segments.slice(0, index + 3).join('/');
-
-          return (
-            <div className="-mr-5 flex items-center gap-2 px-2" key={index}>
-              <ChevronRight className="h-4 w-4" />
-              {isLast ? (
-                <span className={cn('text-orange-300', 'text-sm font-medium')}>
-                  {label}
-                </span>
-              ) : (
-                <Link aria-label={label} href={href} className={crumbLink}>
-                  {label}
-                </Link>
-              )}
-            </div>
-          );
-        })
-      )}
 
       <div
         className="relative ml-auto pr-6 text-xs text-white"
