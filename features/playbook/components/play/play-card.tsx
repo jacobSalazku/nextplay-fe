@@ -136,7 +136,9 @@ export const PlayCard = ({ play, role }: PlayCardProps) => {
               variant="primary"
               size="full"
               className="h-9 rounded-full text-[13px] font-bold tracking-wide"
-              href={`/team/${routeKey}/playbook/play/${play.id}`}
+              href={{
+                pathname: `/team/${routeKey}/playbook/play/${play.id}`,
+              }}
             >
               View Playbook
             </Link>

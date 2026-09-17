@@ -70,7 +70,9 @@ export function ExportMenu({
       {open && (
         <div className="absolute right-0 z-20 mt-1 w-72 overflow-hidden rounded-lg border border-white/10 bg-slate-800 py-1 text-white shadow-xl">
           <Link
-            href={`/team/${routeKey}/playbook/play/${playId}/sheet`}
+            href={{
+              pathname: `/team/${routeKey}/playbook/play/${playId}/sheet`,
+            }}
             target="_blank"
             className={item}
             onClick={() => setOpen(false)}

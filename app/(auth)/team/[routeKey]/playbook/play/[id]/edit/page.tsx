@@ -31,7 +31,9 @@ async function EditorContent({
       <div className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-slate-950 text-white">
         <h1 className="text-xl font-semibold">This play has no diagram</h1>
         <Link
-          href={`/team/${routeKey}/playbook`}
+          href={{
+            pathname: `/team/${routeKey}/playbook`,
+          }}
           className="text-sm text-orange-300 underline"
         >
           Back to playbook

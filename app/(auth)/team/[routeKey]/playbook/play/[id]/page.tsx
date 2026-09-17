@@ -52,7 +52,9 @@ async function PlayContent({ id, routeKey }: { id: string; routeKey: string }) {
 
   const diagram = asPlayDiagram(play.diagram);
   const description = sanitizeRichText(play.description);
-  const editHref = `/team/${routeKey}/playbook/play/${play.id}/edit`;
+  const editHref = {
+    pathname: `/team/${routeKey}/playbook/play/${play.id}/edit`,
+  };
   const updated = new Date(play.updatedAt).toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'short',

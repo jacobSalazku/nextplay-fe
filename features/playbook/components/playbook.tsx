@@ -207,7 +207,7 @@ const PlaybookBookBlock: FC<PageProps> = ({
                 <Link
                   aria-label="Add New Play"
                   href={{
-                    pathname: `/team/${routeKey}/playbook/create`,
+                    pathname: `/team/${routeKey}/playbook/play/new`,
                   }}
                   className="flex items-center justify-center rounded-xl border border-white/10 bg-slate-950/80 px-6 py-6 group-hover:bg-slate-900 md:px-10 md:py-10"
                 >
