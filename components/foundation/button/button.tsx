@@ -23,6 +23,8 @@ const buttonVariants = cva(
           'bg-red-900 text-red-foreground text-white shadow-sm hover:bg-red-800',
         close:
           'rounded p-2 text-gray-900 transition-colors duration-200 hover:bg-gray-800',
+        darkGhost:
+          'rounded p-2 text-sm text-gray-200 transition-colors duration-200 hover:bg-white/10 hover:text-white',
       },
       size: {
         default: 'h-9 px-4 py-2',

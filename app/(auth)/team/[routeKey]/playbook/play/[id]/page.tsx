@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ExportMenu } from '@/features/playbook/components/editor/export-menu';
+import { ShareButton } from '@/features/playbook/components/editor/share-button';
 import { PlayPlayer } from '@/features/playbook/components/play/play-player';
 import { PhaseBlocks } from '@/features/playbook/components/sheet/phase-blocks';
 import PlanViewSkeleton from '@/features/playbook/components/skeleton/plan-view-skeleton';
@@ -9,13 +10,11 @@ import { getPlay } from '@/features/playbook/queries/play/get-play';
 import { asPlayDiagram } from '@/features/playbook/utils/diagram/parse';
 import { categoryLabel } from '@/features/playbook/utils/play-category-color';
 import { autoNote } from '@/features/playbook/utils/sheet/auto-note';
-import { playbookSearchParamsCache } from '@/utils/search-params';
 import { Pencil } from 'lucide-react';
 import { sanitizeRichText } from '@/lib/sanitize-rich-text';
 
 type PageProps = {
-  params: Promise<{ routeKey: string }>;
-  searchParams: Promise<{ id: string }>;
+  params: Promise<{ routeKey: string; id: string }>;
 };
 
 export const metadata = {
@@ -37,9 +36,8 @@ function Rule() {
   );
 }
 
-async function PlayView({ params, searchParams }: PageProps) {
-  const { routeKey } = await params;
-  const { id } = await playbookSearchParamsCache.parse(searchParams);
+async function PlayView({ params }: PageProps) {
+  const { routeKey, id } = await params;
 
   return (
     <Suspense fallback={<PlanViewSkeleton />}>
@@ -85,6 +83,7 @@ async function PlayContent({ id, routeKey }: { id: string; routeKey: string }) {
             </div>
 
             <div className="flex shrink-0 items-center gap-2">
+              <ShareButton routeKey={routeKey} playId={play.id} />
               {diagram && (
                 <ExportMenu
                   court={diagram.court}
@@ -116,18 +115,18 @@ async function PlayContent({ id, routeKey }: { id: string; routeKey: string }) {
               />
             )}
 
-            <section className="mt-8 flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-12">
+            <section className="mt-8 flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-12">
               <div
                 className={`w-full ${heroMax} shrink-0 bg-[#16213b] p-3 sm:p-4`}
               >
                 <PlayPlayer court={diagram.court} phases={diagram.phases} />
               </div>
 
-              <ol className="space-y-3 lg:flex-1 lg:pt-1">
+              <ol className="space-y-3 lg:flex-1">
                 {diagram.phases.map((phase, i) => (
                   <li
                     key={phase.id}
-                    className="flex gap-3 text-sm leading-relaxed"
+                    className="flex gap-3 text-base leading-relaxed"
                   >
                     <span className="font-righteous shrink-0 text-[#f97316] tabular-nums">
                       {String(i + 1).padStart(2, '0')}
